@@ -54,19 +54,36 @@ const formSchema = z.object({
   region: z.string(),
   platform: z.string(),
   gamemode: z.string(),
-  roles: z.array(z.string()).nonempty("Please select at least one role"),
+  roles: z.array(z.string()),
   rank: z.string(),
   characterPrefs: z.array(z.string()),
 });
 
 export function ProfileForm() {
+  const defaultValues = {
+    region: "",
+    platform: "",
+    gamemode: "",
+    roles: [] as string[],
+    rank: "",
+    characterPrefs: [] as string[]
+  };
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      roles: [],
-      characterPrefs: [],
-    },
+    defaultValues,
   });
+
+  function onReset() {
+    form.reset(defaultValues);
+    form.setValue("region", "", { shouldDirty: false });
+    form.setValue("platform", "", { shouldDirty: false });
+    form.setValue("gamemode", "", { shouldDirty: false });
+    form.setValue("rank", "", { shouldDirty: false });
+
+    form.setValue("roles", [], { shouldDirty: false });
+    form.setValue("characterPrefs", [], { shouldDirty: false });
+  }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -74,7 +91,7 @@ export function ProfileForm() {
       toast(
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>,
+        </pre>
       );
     } catch (error) {
       console.error("Form submission error", error);
@@ -98,7 +115,7 @@ export function ProfileForm() {
                   <FormLabel>Region</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -127,7 +144,7 @@ export function ProfileForm() {
                   <FormLabel>Platform</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -160,7 +177,7 @@ export function ProfileForm() {
                   <FormLabel>Gamemode</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -197,7 +214,7 @@ export function ProfileForm() {
                           role="combobox"
                           className={cn(
                             "w-full justify-between",
-                            !field.value && "text-muted-foreground",
+                            !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value
@@ -227,7 +244,7 @@ export function ProfileForm() {
                                     "mr-2 h-4 w-4",
                                     rank.value === field.value
                                       ? "opacity-100"
-                                      : "opacity-0",
+                                      : "opacity-0"
                                   )}
                                 />
                                 {rank.label}
@@ -320,7 +337,12 @@ export function ProfileForm() {
             />
           </div>
         </div>
-        <Button type="submit">Submit</Button>
+        <div className="flex space-x-2">
+          <Button type="button" variant="destructive" onClick={onReset}>
+            Clear
+          </Button>
+          <Button type="submit">Submit</Button>
+        </div>
       </form>
     </Form>
   );
