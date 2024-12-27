@@ -1,0 +1,82 @@
+[
+    {
+        "label": "Bronze III",
+        "value": "b3"
+    },
+    {
+        "label": "Bronze II",
+        "value": "b2"
+    },
+    {
+        "label": "Bronze I",
+        "value": "b1"
+    },
+    {
+        "label": "Silver III",
+        "value": "s3"
+    },
+    {
+        "label": "Silver II",
+        "value": "s2"
+    },
+    {
+        "label": "Silver I",
+        "value": "s1"
+    },
+    {
+        "label": "Gold III",
+        "value": "g3"
+    },
+    {
+        "label": "Gold II",
+        "value": "g2"
+    },
+    {
+        "label": "Gold I",
+        "value": "g1"
+    },
+    {
+        "label": "Platinum III",
+        "value": "p3"
+    },
+    {
+        "label": "Platinum II",
+        "value": "p2"
+    },
+    {
+        "label": "Platinum I",
+        "value": "p1"
+    },
+    {
+        "label": "Diamond III",
+        "value": "d3"
+    },
+    {
+        "label": "Diamond II",
+        "value": "d2"
+    },
+    {
+        "label": "Diamond I",
+        "value": "d1"
+    },
+    {
+        "label": "Grandmaster III",
+        "value": "gm3"
+    },
+    {
+        "label": "Grandmaster II",
+        "value": "gm2"
+    },
+    {
+        "label": "Grandmaster I",
+        "value": "gm1"
+    },
+    {
+        "label": "Eternity",
+        "value": "e"
+    },
+    {
+        "label": "One Above All",
+        "value": "oa"
+    }
+]

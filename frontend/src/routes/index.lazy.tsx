@@ -1,3 +1,4 @@
+import { ProfileForm } from "@/components";
 import { createLazyFileRoute } from "@tanstack/react-router";
 
 export const Route = createLazyFileRoute("/")({
@@ -6,9 +7,9 @@ export const Route = createLazyFileRoute("/")({
 
 function Index() {
   return (
-    <section className="p-2 text-center">
-      <div className="h-screen w-screen flex items-center justify-center">
-        <h3>Welcome to my blog!</h3>
+    <section className="p-2 md:p-4">
+      <div className="min-h-[80vh] w-full flex flex-col items-center">
+        <ProfileForm />
       </div>
     </section>
   );

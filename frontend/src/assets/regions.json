@@ -1,0 +1,22 @@
+[
+  {
+    "label": "North America",
+    "value": "na"
+  },
+  {
+    "label": "Europe",
+    "value": "eu"
+  },
+  {
+    "label": "Middle East",
+    "value": "me"
+  },
+  {
+    "label": "Asia Pacific",
+    "value": "ap"
+  },
+  {
+    "label": "South America",
+    "value": "sa"
+  }
+]

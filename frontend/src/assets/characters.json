@@ -1,0 +1,135 @@
+[
+    {
+        "name": "Captain America",
+        "role": "Vanguard"
+    },
+    {
+        "name": "Doctor Strange",
+        "role": "Vanguard"
+    },
+    {
+        "name": "Groot",
+        "role": "Vanguard"
+    },
+    {
+        "name": "Hulk",
+        "role": "Vanguard"
+    },
+    {
+        "name": "Magneto",
+        "role": "Vanguard"
+    },
+    {
+        "name": "Peni Parker",
+        "role": "Vanguard"
+    },
+    {
+        "name": "Thor",
+        "role": "Vanguard"
+    },
+    {
+        "name": "Venom",
+        "role": "Vanguard"
+    },
+    {
+        "name": "Black Panther",
+        "role": "Duelist"
+    },
+    {
+        "name": "Black Widow",
+        "role": "Duelist"
+    },
+    {
+        "name": "Hawkeye",
+        "role": "Duelist"
+    },
+    {
+        "name": "Hela",
+        "role": "Duelist"
+    },
+    {
+        "name": "Iron Fist",
+        "role": "Duelist"
+    },
+    {
+        "name": "Iron Man",
+        "role": "Duelist"
+
+    },
+    {
+        "name": "Magik",
+        "role": "Duelist"
+    },
+    {
+        "name": "Moon Knight",
+        "role": "Duelist"
+    },
+    {
+        "name": "Namor",
+        "role": "Duelist"
+    },
+    {
+        "name": "Psylocke",
+        "role": "Duelist"
+    },
+    {
+        "name": "Scarlet Witch",
+        "role": "Duelist"
+    },
+    {
+        "name": "Spiderman",
+        "role": "Duelist"
+    },
+    {
+        "name": "Squirrel Girl",
+        "role": "Duelist"
+    },
+    {
+        "name": "Star-Lord",
+        "role": "Duelist"
+    },
+    {
+        "name": "Storm",
+        "role": "Duelist"
+    },
+    {
+        "name": "The Punisher",
+        "role": "Duelist"
+    },
+    {
+        "name": "Winter Soldier",
+        "role": "Duelist"
+    },
+    {
+        "name": "Wolverine",
+        "role": "Duelist"
+    },
+    {
+        "name": "Adam Warlock",
+        "role": "Strategist"
+    },
+    {
+        "name": "Cloak & Dagger",
+        "role": "Strategist"
+    },
+    {
+        "name": "Jeff the Land Shark",
+        "role": "Strategist"
+    },
+    {
+        "name": "Loki",
+        "role": "Strategist"
+    },
+    {
+        "name": "Luna Snow",
+        "role": "Strategist"
+    },
+    {
+        "name": "Mantis",
+        "role": "Strategist"
+    },
+    {
+        "name": "Rocket Raccoon",
+        "role": "Strategist"
+    }
+]
