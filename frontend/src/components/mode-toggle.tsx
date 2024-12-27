@@ -11,7 +11,12 @@ export function ModeToggle() {
   };
 
   return (
-    <Button variant="ghost" onClick={toggleDarkMode} className="p-2">
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleDarkMode}
+      className="p-2"
+    >
       {theme === "dark" ? (
         <Moon className="w-4 h-4" />
       ) : (

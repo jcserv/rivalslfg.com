@@ -11,16 +11,16 @@ export const Header: React.FC = () => {
           <Link to="/">Rivals LFG</Link>
         </span>
       </h1>
-      <div className="space-x-2 p-2">
-        <Link to="/">Home</Link>
+      <div className="flex items-center space-x-2 p-2">
+        <Link to="/" className="inline-flex items-center hover:underline">
+          Home
+        </Link>
         <Button
           variant="ghost"
+          size="icon"
           className="p-2"
           onClick={() => {
-            window.open(
-              "https://github.com/jcserv/rivalslfg.com",
-              "_blank"
-            );
+            window.open("https://github.com/jcserv/rivalslfg.com", "_blank");
           }}
         >
           <Github className="w-4 h-4" />
