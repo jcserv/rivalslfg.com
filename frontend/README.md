@@ -1,24 +1,16 @@
-# react-vite-shadcn-template
+# rivalslfg.com (frontend)
 
-this template can be used to quickly setup a react + typeScript + vite + shadcn site,
-with all the required configuration out of the box.
+## setup
 
-## features
+### prerequisites
+- node
+- pnpm
 
-- ✨ components & styling with tailwindcss & shadcn
-- 📦 bundling via vite
-- 🔀 routing w/ tanStack router
-- 🧪 unit/component tests setup (see Header.cy.tsx & utils.test.ts)
-- 🌑 dark mode
-- ✅ continuous integration/deployment with github workflows & vercel
-
-## dependencies
-
-- [vite](https://vite.dev/)
-- [tailwindcss](https://tailwindcss.com/)
-- [shadcn](https://ui.shadcn.com/docs)
-- [tanstack router](https://tanstack.com/router/latest/docs/framework/react/overview)
+### installation
+1. Clone the repo
+2. Run `pnpm install`
+3. Run `pnpm run dev`
 
 ## references
 
-- [shadcn-vite template](https://github.com/shadcn/vite-template)
+- [favicon.io/](https://favicon.io/)
