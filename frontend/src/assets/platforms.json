@@ -1,14 +1,14 @@
 [
-    {
-        "label": "🖥️ PC",
-        "value": "pc"
-    },
-    {
-        "label": "🎮 PlayStation",
-        "value": "ps4"
-    },
-    {
-        "label": "❎ Xbox",
-        "value": "xb1"
-    }
+  {
+    "label": "🖥️ PC",
+    "value": "pc"
+  },
+  {
+    "label": "🎮 PlayStation",
+    "value": "ps4"
+  },
+  {
+    "label": "❎ Xbox",
+    "value": "xb1"
+  }
 ]

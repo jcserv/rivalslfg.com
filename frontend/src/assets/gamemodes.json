@@ -1,10 +1,10 @@
 [
-    {
-        "label": "Competitive",
-        "value": "comp"
-    },
-    {
-        "label": "Quickplay",
-        "value": "qp"
-    }
+  {
+    "label": "Competitive",
+    "value": "comp"
+  },
+  {
+    "label": "Quickplay",
+    "value": "qp"
+  }
 ]

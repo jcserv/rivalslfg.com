@@ -74,7 +74,7 @@ export function ProfileForm() {
       toast(
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
+        </pre>,
       );
     } catch (error) {
       console.error("Form submission error", error);
@@ -197,7 +197,7 @@ export function ProfileForm() {
                           role="combobox"
                           className={cn(
                             "w-full justify-between",
-                            !field.value && "text-muted-foreground"
+                            !field.value && "text-muted-foreground",
                           )}
                         >
                           {field.value
@@ -227,7 +227,7 @@ export function ProfileForm() {
                                     "mr-2 h-4 w-4",
                                     rank.value === field.value
                                       ? "opacity-100"
-                                      : "opacity-0"
+                                      : "opacity-0",
                                   )}
                                 />
                                 {rank.label}
@@ -303,7 +303,10 @@ export function ProfileForm() {
                       <MultiSelectorContent>
                         <MultiSelectorList>
                           {characters.map((character) => (
-                            <MultiSelectorItem key={character.name} value={character.name}>
+                            <MultiSelectorItem
+                              key={character.name}
+                              value={character.name}
+                            >
                               {character.name} - {character.role}
                             </MultiSelectorItem>
                           ))}
