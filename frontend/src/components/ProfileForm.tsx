@@ -49,6 +49,7 @@ import platforms from "@/assets/platforms.json";
 import ranks from "@/assets/ranks.json";
 import regions from "@/assets/regions.json";
 import roles from "@/assets/roles.json";
+import { Profile } from "@/types/profile";
 
 const formSchema = Object.freeze(z.object({
   region: z.string().min(1, "Please select a region"),
@@ -57,7 +58,7 @@ const formSchema = Object.freeze(z.object({
   roles: z.array(z.string()).min(1, "Please select at least one role"),
   rank: z.string().min(1, "Please select a rank"),
   characterPrefs: z.array(z.string())
-})) as z.ZodType<any>;
+})) as z.ZodType<Profile>;
 
 export function ProfileForm() {
   const defaultValues = {
