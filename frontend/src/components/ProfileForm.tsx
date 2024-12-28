@@ -91,10 +91,14 @@ const formSchema = z
       .max(6, "Please select a maximum of 6 strategists"),
     sum: z.any().optional(), // Used to render the error message
   })
-  .refine((data) => data.vanguards + data.duelists + data.strategists === TEAM_SIZE, {
-    message: "Number of vanguards, duelists, and strategists must add up to 6",
-    path: ["sum"],
-  });
+  .refine(
+    (data) => data.vanguards + data.duelists + data.strategists === TEAM_SIZE,
+    {
+      message:
+        "Number of vanguards, duelists, and strategists must add up to 6",
+      path: ["sum"],
+    },
+  );
 
 export function ProfileForm() {
   const [roleQueueEnabled, setRoleQueueEnabled] = useState(false);
@@ -133,7 +137,7 @@ export function ProfileForm() {
       toast(
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
+        </pre>,
       );
     } catch (error) {
       console.error("Form submission error", error);
@@ -270,12 +274,12 @@ export function ProfileForm() {
                               role="combobox"
                               className={cn(
                                 "w-full justify-between",
-                                !field.value && "text-muted-foreground"
+                                !field.value && "text-muted-foreground",
                               )}
                             >
                               {field.value
                                 ? ranks.find(
-                                    (rank) => rank.value === field.value
+                                    (rank) => rank.value === field.value,
                                   )?.label
                                 : "Select your rank"}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -301,7 +305,7 @@ export function ProfileForm() {
                                         "mr-2 h-4 w-4",
                                         rank.value === field.value
                                           ? "opacity-100"
-                                          : "opacity-0"
+                                          : "opacity-0",
                                       )}
                                     />
                                     {rank.label}
