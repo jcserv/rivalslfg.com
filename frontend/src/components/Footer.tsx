@@ -19,11 +19,11 @@ export const Footer: React.FC = () => {
         <span>
           <p className="text-sm text-muted-foreground">
             Rivals LFG is unofficial Fan Content, not approved/endorsed by
-            Marvel or NetEase Games.
+            Marvel, Disney, or NetEase Games.
           </p>
           <p className="text-sm text-muted-foreground">
-            Portions of the materials used are property of Marvel. © Marvel
-            LLC.
+            Portions of the materials used are property of Marvel, Disney, and
+            NetEase Games. © Marvel LLC.
           </p>
         </span>
       </div>
