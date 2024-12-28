@@ -51,13 +51,13 @@ import regions from "@/assets/regions.json";
 import roles from "@/assets/roles.json";
 
 const formSchema = z.object({
-  region: z.string(),
-  platform: z.string(),
-  gamemode: z.string(),
-  roles: z.array(z.string()),
-  rank: z.string(),
-  characterPrefs: z.array(z.string()),
-}) satisfies z.Schema;
+  region: z.string().min(1, "Please select a region"),
+  platform: z.string().min(1, "Please select a platform"),
+  gamemode: z.string().min(1, "Please select a gamemode"),
+  roles: z.array(z.string()).min(1, "Please select at least one role"),
+  rank: z.string().min(1, "Please select a rank"),
+  characterPrefs: z.array(z.string())
+});
 
 export function ProfileForm() {
   const defaultValues = {
