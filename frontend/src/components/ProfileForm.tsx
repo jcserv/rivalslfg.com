@@ -56,24 +56,59 @@ import platforms from "@/assets/platforms.json";
 import ranks from "@/assets/ranks.json";
 import regions from "@/assets/regions.json";
 import roles from "@/assets/roles.json";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Input,
+  Label,
+} from "./ui";
+import { Checkbox } from "./ui/checkbox";
+import { useState } from "react";
 
-const formSchema = z.object({
-  region: z.string().min(1, "Please select a region"),
-  platform: z.string().min(1, "Please select a platform"),
-  gamemode: z.string().min(1, "Please select a gamemode"),
-  roles: z.array(z.string()).min(1, "Please select at least one role"),
-  rank: z.string().min(1, "Please select a rank"),
-  characterPrefs: z.array(z.string()),
-});
+const TEAM_SIZE = 6;
+
+const formSchema = z
+  .object({
+    region: z.string().min(1, "Please select a region"),
+    platform: z.string().min(1, "Please select a platform"),
+    gamemode: z.string().min(1, "Please select a gamemode"),
+    roles: z.array(z.string()).min(1, "Please select at least one role"),
+    rank: z.string().min(1, "Please select a rank"),
+    characters: z.array(z.string()),
+    vanguards: z
+      .number()
+      .min(0, "Please select a minimum of 0 vanguards")
+      .max(6, "Please select a maximum of 6 vanguards"),
+    duelists: z
+      .number()
+      .min(0, "Please select a minimum of 0 duelists")
+      .max(6, "Please select a maximum of 6 duelists"),
+    strategists: z
+      .number()
+      .min(0, "Please select a minimum of 0 strategists")
+      .max(6, "Please select a maximum of 6 strategists"),
+    sum: z.any().optional(), // Used to render the error message
+  })
+  .refine((data) => data.vanguards + data.duelists + data.strategists === TEAM_SIZE, {
+    message: "Number of vanguards, duelists, and strategists must add up to 6",
+    path: ["sum"],
+  });
 
 export function ProfileForm() {
+  const [roleQueueEnabled, setRoleQueueEnabled] = useState(false);
+
   const defaultValues = {
     region: "",
     platform: "",
     gamemode: "",
     roles: [] as string[],
     rank: "",
-    characterPrefs: [] as string[],
+    characters: [] as string[],
+    vanguards: 2,
+    duelists: 2,
+    strategists: 2,
   };
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -89,7 +124,7 @@ export function ProfileForm() {
     form.setValue("rank", "", { shouldDirty: false });
 
     form.setValue("roles", [], { shouldDirty: false });
-    form.setValue("characterPrefs", [], { shouldDirty: false });
+    form.setValue("characters", [], { shouldDirty: false });
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -98,7 +133,7 @@ export function ProfileForm() {
       toast(
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>,
+        </pre>
       );
     } catch (error) {
       console.error("Form submission error", error);
@@ -111,15 +146,15 @@ export function ProfileForm() {
       <CardHeader>
         <CardTitle>Preferences</CardTitle>
         <CardDescription>
-          Make changes to your matchmaking preferences here. Click submit when you&apos;re
-          done.
+          Make changes to your matchmaking preferences here. Click submit when
+          you&apos;re done.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8 max-w-3xl mx-auto py-10"
+            className="space-y-8 max-w-3xl mx-auto"
           >
             <div className="grid grid-cols-12 gap-4">
               <div className="col-span-6">
@@ -235,12 +270,12 @@ export function ProfileForm() {
                               role="combobox"
                               className={cn(
                                 "w-full justify-between",
-                                !field.value && "text-muted-foreground",
+                                !field.value && "text-muted-foreground"
                               )}
                             >
                               {field.value
                                 ? ranks.find(
-                                    (rank) => rank.value === field.value,
+                                    (rank) => rank.value === field.value
                                   )?.label
                                 : "Select your rank"}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -266,7 +301,7 @@ export function ProfileForm() {
                                         "mr-2 h-4 w-4",
                                         rank.value === field.value
                                           ? "opacity-100"
-                                          : "opacity-0",
+                                          : "opacity-0"
                                       )}
                                     />
                                     {rank.label}
@@ -325,7 +360,7 @@ export function ProfileForm() {
               <div className="col-span-6">
                 <FormField
                   control={form.control}
-                  name="characterPrefs"
+                  name="characters"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Characters</FormLabel>
@@ -359,6 +394,111 @@ export function ProfileForm() {
                 />
               </div>
             </div>
+
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="item-1">
+                <AccordionTrigger>Advanced Settings</AccordionTrigger>
+                <AccordionContent className="flex flex-col gap-2 m-auto">
+                  <div className="flex items-center space-x-2 px-2">
+                    <Checkbox
+                      id="roleQueue"
+                      checked={roleQueueEnabled}
+                      onClick={() => setRoleQueueEnabled(!roleQueueEnabled)}
+                    />
+                    <Label
+                      htmlFor="roleQueue"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Enable Role Queue
+                    </Label>
+                  </div>
+                  {roleQueueEnabled && (
+                    <>
+                      <div className="flex flex-col space-y-2 p-2">
+                        <FormField
+                          control={form.control}
+                          name="vanguards"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Vanguards</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  id="vanguards"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(+e.target.value)
+                                  }
+                                  min={0}
+                                  max={6}
+                                  className="w-[75px]"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="flex flex-col space-y-2 p-2">
+                        <FormField
+                          control={form.control}
+                          name="duelists"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Duelists</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  id="duelists"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(+e.target.value)
+                                  }
+                                  min={0}
+                                  max={6}
+                                  className="w-[75px]"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="flex flex-col space-y-2 p-2">
+                        <FormField
+                          control={form.control}
+                          name="strategists"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Strategists</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  id="strategists"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(+e.target.value)
+                                  }
+                                  min={0}
+                                  max={6}
+                                  className="w-[75px]"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </>
+                  )}
+                  {form.formState.errors?.sum?.message && (
+                    <p className="text-sm font-medium text-destructive px-2">
+                      {String(form.formState.errors?.sum?.message)}
+                    </p>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
             <div className="flex space-x-2">
               <Button type="button" variant="destructive" onClick={onReset}>
                 Clear

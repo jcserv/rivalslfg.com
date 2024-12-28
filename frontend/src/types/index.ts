@@ -10,5 +10,5 @@ export type Profile = {
   gamemode: string;
   roles: string[];
   rank: string;
-  characterPrefs: string[];
+  characters: string[];
 };
