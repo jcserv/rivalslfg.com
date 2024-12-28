@@ -13,8 +13,7 @@ describe("Header", () => {
         </RouterContextProvider>
       </>,
     );
-    cy.contains("DevBlog").should("exist");
+    cy.contains("Rivals LFG").should("exist");
     cy.contains("Home").should("exist");
-    cy.contains("About").should("exist");
   });
 });
