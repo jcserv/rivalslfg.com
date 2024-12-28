@@ -69,37 +69,42 @@ import { useState } from "react";
 
 const TEAM_SIZE = 6;
 
-const formSchema = z
-  .object({
-    region: z.string().min(1, "Please select a region"),
-    platform: z.string().min(1, "Please select a platform"),
-    gamemode: z.string().min(1, "Please select a gamemode"),
-    roles: z.array(z.string()).min(1, "Please select at least one role"),
-    rank: z.string().min(1, "Please select a rank"),
-    characters: z.array(z.string()),
-    vanguards: z
-      .number()
-      .min(0, "Please select a minimum of 0 vanguards")
-      .max(6, "Please select a maximum of 6 vanguards"),
-    duelists: z
-      .number()
-      .min(0, "Please select a minimum of 0 duelists")
-      .max(6, "Please select a maximum of 6 duelists"),
-    strategists: z
-      .number()
-      .min(0, "Please select a minimum of 0 strategists")
-      .max(6, "Please select a maximum of 6 strategists"),
-    sum: z.any().optional(), // Used to render the error message
-  })
-  .refine(
-    (data) => data.vanguards + data.duelists + data.strategists === TEAM_SIZE,
-    {
-      message:
-        "Number of vanguards, duelists, and strategists must add up to 6",
-      path: ["sum"],
-    },
-  );
+const formSchema = z.object({
+  region: z.string().min(1, "Please select a region"),
+  platform: z.string().min(1, "Please select a platform"),
+  gamemode: z.string().min(1, "Please select a gamemode"),
+  roles: z.array(z.string()).min(1, "Please select at least one role"),
+  rank: z.string().min(1, "Please select a rank"),
+  characters: z.array(z.string()),
+  roleQueue: z
+    .object({
+      vanguards: z
+        .number()
+        .min(0, "Please select a minimum of 0 vanguards")
+        .max(6, "Please select a maximum of 6 vanguards"),
+      duelists: z
+        .number()
+        .min(0, "Please select a minimum of 0 duelists")
+        .max(6, "Please select a maximum of 6 duelists"),
 
+      strategists: z
+        .number()
+        .min(0, "Please select a minimum of 0 strategists")
+        .max(6, "Please select a maximum of 6 strategists"),
+      sum: z.any().optional(), // Used to render the error message
+    })
+    .optional()
+    .refine(
+      (data) =>
+        data &&
+        data?.vanguards + data?.duelists + data?.strategists === TEAM_SIZE,
+      {
+        message:
+          "Number of vanguards, duelists, and strategists must add up to 6",
+        path: ["sum"],
+      },
+    ),
+});
 export function ProfileForm() {
   const [roleQueueEnabled, setRoleQueueEnabled] = useState(false);
 
@@ -110,9 +115,11 @@ export function ProfileForm() {
     roles: [] as string[],
     rank: "",
     characters: [] as string[],
-    vanguards: 2,
-    duelists: 2,
-    strategists: 2,
+    roleQueue: {
+      vanguards: 2,
+      duelists: 2,
+      strategists: 2,
+    },
   };
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -122,13 +129,6 @@ export function ProfileForm() {
 
   function onReset() {
     form.reset(defaultValues);
-    form.setValue("region", "", { shouldDirty: false });
-    form.setValue("platform", "", { shouldDirty: false });
-    form.setValue("gamemode", "", { shouldDirty: false });
-    form.setValue("rank", "", { shouldDirty: false });
-
-    form.setValue("roles", [], { shouldDirty: false });
-    form.setValue("characters", [], { shouldDirty: false });
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -421,14 +421,14 @@ export function ProfileForm() {
                       <div className="flex flex-col space-y-2 p-2">
                         <FormField
                           control={form.control}
-                          name="vanguards"
+                          name="roleQueue.vanguards"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Vanguards</FormLabel>
                               <FormControl>
                                 <Input
                                   type="number"
-                                  id="vanguards"
+                                  id="roleQueue.vanguards"
                                   value={field.value}
                                   onChange={(e) =>
                                     field.onChange(+e.target.value)
@@ -446,14 +446,14 @@ export function ProfileForm() {
                       <div className="flex flex-col space-y-2 p-2">
                         <FormField
                           control={form.control}
-                          name="duelists"
+                          name="roleQueue.duelists"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Duelists</FormLabel>
                               <FormControl>
                                 <Input
                                   type="number"
-                                  id="duelists"
+                                  id="roleQueue.duelists"
                                   value={field.value}
                                   onChange={(e) =>
                                     field.onChange(+e.target.value)
@@ -471,14 +471,14 @@ export function ProfileForm() {
                       <div className="flex flex-col space-y-2 p-2">
                         <FormField
                           control={form.control}
-                          name="strategists"
+                          name="roleQueue.strategists"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Strategists</FormLabel>
                               <FormControl>
                                 <Input
                                   type="number"
-                                  id="strategists"
+                                  id="roleQueue.strategists"
                                   value={field.value}
                                   onChange={(e) =>
                                     field.onChange(+e.target.value)
@@ -495,9 +495,9 @@ export function ProfileForm() {
                       </div>
                     </>
                   )}
-                  {form.formState.errors?.sum?.message && (
+                  {form.formState.errors?.roleQueue?.sum?.message && (
                     <p className="text-sm font-medium text-destructive px-2">
-                      {String(form.formState.errors?.sum?.message)}
+                      {String(form.formState.errors?.roleQueue?.sum?.message)}
                     </p>
                   )}
                 </AccordionContent>

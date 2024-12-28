@@ -11,4 +11,11 @@ export type Profile = {
   roles: string[];
   rank: string;
   characters: string[];
+  roleQueue?: RoleQueue;
+};
+
+export type RoleQueue = {
+  vanguards: number;
+  duelists: number;
+  strategists: number;
 };
