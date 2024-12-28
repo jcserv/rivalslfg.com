@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "clean": "rm -rf dist node_modules && pnpm store prune && pnpm i",
     "preview": "vite preview",
     "lint": "prettier . --write && eslint . --fix",
     "prepare": "husky",
@@ -16,7 +17,7 @@
     "test:types": "tsc --noEmit"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.9.1",
+    "@hookform/resolvers": "3.3.1",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.4",
@@ -32,11 +33,11 @@
     "lucide-react": "^0.162.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-hook-form": "^7.54.2",
+    "react-hook-form": "7.45.4",
     "sonner": "^1.7.1",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.24.1"
+    "zod": "3.21.4"
   },
   "devDependencies": {
     "@cypress/react18": "^2.0.1",
