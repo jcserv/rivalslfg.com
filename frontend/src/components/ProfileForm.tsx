@@ -57,7 +57,7 @@ const formSchema = z.object({
   roles: z.array(z.string()),
   rank: z.string(),
   characterPrefs: z.array(z.string()),
-});
+}) satisfies z.Schema;
 
 export function ProfileForm() {
   const defaultValues = {
