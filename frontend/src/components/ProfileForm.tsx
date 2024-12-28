@@ -416,6 +416,12 @@ export function ProfileForm() {
                       Enable Role Queue
                     </Label>
                   </div>
+                  <div>
+                    <FormDescription>
+                      If this setting is enabled, you&apos;ll be matched to
+                      groups according to your desired role counts.
+                    </FormDescription>
+                  </div>
                   {roleQueueEnabled && (
                     <>
                       <div className="flex flex-col space-y-2 p-2">
