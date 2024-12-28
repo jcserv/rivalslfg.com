@@ -57,7 +57,7 @@ const formSchema = z.object({
   roles: z.array(z.string()).min(1, "Please select at least one role"),
   rank: z.string().min(1, "Please select a rank"),
   characterPrefs: z.array(z.string())
-});
+}).readonly();
 
 export function ProfileForm() {
   const defaultValues = {
