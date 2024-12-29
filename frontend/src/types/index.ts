@@ -119,6 +119,8 @@ export type Profile = {
   roles: Role[];
   rank: Rank;
   characters: string[];
+  voiceChat: boolean;
+  mic: boolean;
   roleQueue?: RoleQueue;
 };
 
