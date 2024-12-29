@@ -111,14 +111,28 @@ const formSchema = z.object({
         path: ["sum"],
       },
     ),
+  groupSettings: z
+    .object({
+      platforms: z
+        .array(z.nativeEnum(Platform))
+        .min(1, "Please select at least one platform"),
+      voiceChat: z.boolean(),
+      mic: z.boolean(),
+    })
+    .optional(),
 });
 
 interface ProfileFormProps {
+  isGroup?: boolean;
   initialValues?: Profile;
   setProfile: (profile: Profile) => void;
 }
 
-export function ProfileForm({ initialValues, setProfile }: ProfileFormProps) {
+export function ProfileForm({
+  isGroup = false,
+  initialValues,
+  setProfile,
+}: ProfileFormProps) {
   const [roleQueueEnabled, setRoleQueueEnabled] = useState(
     initialValues?.roleQueue ? true : false,
   );
@@ -137,6 +151,11 @@ export function ProfileForm({ initialValues, setProfile }: ProfileFormProps) {
       vanguards: 2,
       duelists: 2,
       strategists: 2,
+    },
+    groupSettings: {
+      platforms: [],
+      voiceChat: false,
+      mic: false,
     },
     ...initialValues,
   };
@@ -354,7 +373,7 @@ export function ProfileForm({ initialValues, setProfile }: ProfileFormProps) {
                       <MultiSelectorInput placeholder="Select your preferred role(s)" />
                     </MultiSelectorTrigger>
                     <MultiSelectorContent>
-                      <MultiSelectorList>
+                      <MultiSelectorList className="z-50">
                         {roles.map((role) => (
                           <MultiSelectorItem key={role} value={role}>
                             {role}
@@ -387,7 +406,7 @@ export function ProfileForm({ initialValues, setProfile }: ProfileFormProps) {
                       <MultiSelectorInput placeholder="Select your preferred character(s)" />
                     </MultiSelectorTrigger>
                     <MultiSelectorContent>
-                      <MultiSelectorList>
+                      <MultiSelectorList className="h-28">
                         {characters.map((character) => (
                           <MultiSelectorItem
                             key={character.name}
@@ -494,7 +513,9 @@ export function ProfileForm({ initialValues, setProfile }: ProfileFormProps) {
             )}
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-1">
-                <AccordionTrigger>Advanced</AccordionTrigger>
+                <AccordionTrigger>
+                  {isGroup ? "Group" : "Advanced"}
+                </AccordionTrigger>
                 <AccordionContent className="flex flex-col gap-2 m-auto">
                   <div className="flex items-center space-x-2 px-2">
                     <Checkbox
@@ -587,6 +608,66 @@ export function ProfileForm({ initialValues, setProfile }: ProfileFormProps) {
                                   min={0}
                                   max={6}
                                   className="w-[75px]"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {isGroup && (
+                    <div className="grid grid-cols-12 gap-4">
+                      <div className="col-span-6">
+                        <FormField
+                          control={form.control}
+                          name="groupSettings.voiceChat"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start gap-2 m-2">
+                              <div className="space-y-0.5">
+                                <FormLabel className="self-center leading-none mt-1">
+                                  Voice Chat
+                                </FormLabel>
+                                <FormDescription>
+                                  This indicates whether you want all players to
+                                  be able to listen via voice chat, either
+                                  in-game or through Discord.
+                                </FormDescription>
+                              </div>
+                              <FormControl>
+                                <Switch
+                                  id="groupSettings.voiceChat"
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="col-span-6">
+                        <FormField
+                          control={form.control}
+                          name="groupSettings.mic"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start gap-2 m-2">
+                              <div className="space-y-0.5">
+                                <FormLabel className="self-center leading-none mt-1">
+                                  Mic
+                                </FormLabel>
+                                <FormDescription>
+                                  This indicates whether you want all players to
+                                  be able to speak via voice chat, either
+                                  in-game or through Discord.
+                                </FormDescription>
+                              </div>
+                              <FormControl>
+                                <Switch
+                                  id="groupSettings.mic"
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
                                 />
                               </FormControl>
                               <FormMessage />

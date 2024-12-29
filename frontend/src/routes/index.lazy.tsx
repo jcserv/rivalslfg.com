@@ -41,6 +41,7 @@ function Index() {
           </TabsContent>
           <TabsContent value="create">
             <ProfileForm
+              isGroup
               initialValues={profile as Profile}
               setProfile={setProfile}
             />

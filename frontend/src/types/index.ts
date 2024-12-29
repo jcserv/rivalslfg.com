@@ -122,12 +122,19 @@ export type Profile = {
   voiceChat: boolean;
   mic: boolean;
   roleQueue?: RoleQueue;
+  groupSettings?: GroupSettings;
 };
 
 export type RoleQueue = {
   vanguards: number;
   duelists: number;
   strategists: number;
+};
+
+export type GroupSettings = {
+  platforms: Platform[];
+  voiceChat: boolean;
+  mic: boolean;
 };
 
 export type Group = {
