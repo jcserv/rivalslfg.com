@@ -285,9 +285,11 @@ export function getRequirements(group: Group): GroupRequirements {
 export function areRequirementsMet(
   group: Group,
   requirements: GroupRequirements,
-  profile: Profile,
+  profile: Profile | null,
 ): boolean {
   const { minRank, maxRank, mic, voiceChat, platforms } = requirements;
+  if (!profile) return false;
+  if (!Object.keys(profile).length) return false;
   const { rank, gamemode, region, platform } = profile;
   const rankKey = rankToKey(rank);
 

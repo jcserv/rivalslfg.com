@@ -1,18 +1,19 @@
 import { DataTable } from "./ui/data-table";
 import { columns } from "./GroupTable.Columns";
 
-import { useLocalStorage } from "@/hooks/localStorage";
-import { Group } from "@/types";
+import { Group, Profile } from "@/types";
 
 interface GroupTableProps {
   groups: Group[];
+  profile: Profile | null;
+  isProfileEmpty: boolean;
 }
 
-export function GroupTable({ groups }: GroupTableProps) {
-  const fourteenDaysFromToday = new Date(
-    new Date().setDate(new Date().getDate() + 14),
-  );
-  const [profile] = useLocalStorage("profile", {}, fourteenDaysFromToday);
+export function GroupTable({
+  groups,
+  profile,
+  isProfileEmpty,
+}: GroupTableProps) {
   return (
     <>
       <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
@@ -21,7 +22,7 @@ export function GroupTable({ groups }: GroupTableProps) {
             <h2 className="text-2xl font-bold tracking-tight">Groups</h2>
           </div>
         </div>
-        <DataTable data={groups} columns={columns(profile)} />
+        <DataTable data={groups} columns={columns(profile, isProfileEmpty)} />
       </div>
     </>
   );

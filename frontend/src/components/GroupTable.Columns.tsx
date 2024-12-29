@@ -34,7 +34,10 @@ const defaultFilterFn = (
   return value.includes(row.getValue(accessorKey));
 };
 
-export const columns = (profile: Profile): ColumnDef<Group>[] => [
+export const columns = (
+  profile: Profile | null,
+  isProfileEmpty: boolean,
+): ColumnDef<Group>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -57,7 +60,11 @@ export const columns = (profile: Profile): ColumnDef<Group>[] => [
             </Tooltip>
           </TooltipProvider>
           <span className="max-w-[500px] truncate font-medium">
-            <Link to={`/groups/${row.original.id}`} className="hover:underline">
+            <Link
+              to={`/groups/${row.original.id}`}
+              className={!isProfileEmpty ? "hover:underline" : ""}
+              disabled={isProfileEmpty}
+            >
               {row.getValue("name")}
             </Link>
           </span>

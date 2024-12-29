@@ -20,10 +20,12 @@ export const ErrorBanner = ({
   message,
   error,
   className,
+  children,
 }: {
   message: string;
-  error: string;
+  error?: string;
   className?: string;
+  children?: React.ReactNode;
 }) => (
   <Alert
     className={cn(
@@ -35,14 +37,17 @@ export const ErrorBanner = ({
     <AlertTitle>Error</AlertTitle>
     <AlertDescription className="space-y-1">
       <p>{message}</p>
-      <Accordion type="single" collapsible>
-        <AccordionItem value="item-1">
-          <AccordionTrigger>Click to View Details</AccordionTrigger>
-          <AccordionContent className="overflow-y-scroll">
-            <pre>{error}</pre>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+      {children}
+      {error && (
+        <Accordion type="single" collapsible>
+          <AccordionItem value="item-1">
+            <AccordionTrigger>Click to View Details</AccordionTrigger>
+            <AccordionContent className="overflow-y-scroll">
+              <pre>{error}</pre>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      )}
     </AlertDescription>
   </Alert>
 );
