@@ -37,6 +37,9 @@ importers:
       "@radix-ui/react-select":
         specifier: ^2.1.4
         version: 2.1.4(@types/react-dom@18.3.1)(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      "@radix-ui/react-separator":
+        specifier: ^1.1.1
+        version: 1.1.1(@types/react-dom@18.3.1)(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       "@radix-ui/react-slot":
         specifier: ^1.1.0
         version: 1.1.0(@types/react@18.3.11)(react@18.3.1)
@@ -52,6 +55,9 @@ importers:
       "@tanstack/react-router":
         specifier: 1.65.0
         version: 1.65.0(@tanstack/router-generator@1.65.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      "@tanstack/react-table":
+        specifier: ^8.20.6
+        version: 8.20.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       class-variance-authority:
         specifier: ^0.5.3
         version: 0.5.3(typescript@5.6.3)
@@ -1712,6 +1718,22 @@ packages:
       "@types/react-dom":
         optional: true
 
+  "@radix-ui/react-separator@1.1.1":
+    resolution:
+      {
+        integrity: sha512-RRiNRSrD8iUiXriq/Y5n4/3iE8HzqgLHsusUSg5jVpU2+3tqcUFPJXHDymwEypunc2sWxDUS3UC+rkZRlHedsw==,
+      }
+    peerDependencies:
+      "@types/react": "*"
+      "@types/react-dom": "*"
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      "@types/react":
+        optional: true
+      "@types/react-dom":
+        optional: true
+
   "@radix-ui/react-slot@1.0.2":
     resolution:
       {
@@ -2114,6 +2136,16 @@ packages:
       react: ^17.0.0 || ^18.0.0
       react-dom: ^17.0.0 || ^18.0.0
 
+  "@tanstack/react-table@8.20.6":
+    resolution:
+      {
+        integrity: sha512-w0jluT718MrOKthRcr2xsjqzx+oEM7B7s/XXyfs19ll++hlId3fjTm+B2zrR3ijpANpkzBAr15j1XGVOMxpggQ==,
+      }
+    engines: { node: ">=12" }
+    peerDependencies:
+      react: ">=16.8"
+      react-dom: ">=16.8"
+
   "@tanstack/router-generator@1.65.0":
     resolution:
       {
@@ -2144,6 +2176,13 @@ packages:
       {
         integrity: sha512-EOSrgdDAJExbvRZEQ/Xhh9iZchXpMN+ga1Bnk8Nmygzs8TfiE6hbzThF+Pr2G19uHL6+DTDTHhJ8VQiOd7l4tA==,
       }
+
+  "@tanstack/table-core@8.20.5":
+    resolution:
+      {
+        integrity: sha512-P9dF7XbibHph2PFRz8gfBKEXEY/HJPOhym8CHmjF8y3q5mWpKx9xtZapXQUWCgkqvsK0R46Azuz+VaxD4Xl+Tg==,
+      }
+    engines: { node: ">=12" }
 
   "@tanstack/virtual-file-routes@1.64.0":
     resolution:
@@ -5853,6 +5892,15 @@ snapshots:
       "@types/react": 18.3.11
       "@types/react-dom": 18.3.1
 
+  "@radix-ui/react-separator@1.1.1(@types/react-dom@18.3.1)(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)":
+    dependencies:
+      "@radix-ui/react-primitive": 2.0.1(@types/react-dom@18.3.1)(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    optionalDependencies:
+      "@types/react": 18.3.11
+      "@types/react-dom": 18.3.1
+
   "@radix-ui/react-slot@1.0.2(@types/react@18.3.11)(react@18.3.1)":
     dependencies:
       "@babel/runtime": 7.26.0
@@ -6083,6 +6131,12 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       use-sync-external-store: 1.2.2(react@18.3.1)
 
+  "@tanstack/react-table@8.20.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)":
+    dependencies:
+      "@tanstack/table-core": 8.20.5
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
   "@tanstack/router-generator@1.65.0":
     dependencies:
       "@tanstack/virtual-file-routes": 1.64.0
@@ -6117,6 +6171,8 @@ snapshots:
       - webpack-sources
 
   "@tanstack/store@0.5.5": {}
+
+  "@tanstack/table-core@8.20.5": {}
 
   "@tanstack/virtual-file-routes@1.64.0": {}
 
