@@ -33,7 +33,7 @@ export function GroupDisplay({ group }: GroupDisplayProps) {
         acc.currStrategists += player.roles.includes("strategist") ? 1 : 0;
         return acc;
       },
-      { currVanguards: 0, currDuelists: 0, currStrategists: 0 }
+      { currVanguards: 0, currDuelists: 0, currStrategists: 0 },
     );
   }, [group.players]);
 
@@ -114,14 +114,17 @@ export function GroupDisplay({ group }: GroupDisplayProps) {
           </TableHeader>
           <TableBody>
             {group.players.map((player) => (
-                <TableRow key={player.name}>
-                  <TableCell>{player.name}{player.leader ? " 🚩" : ""}</TableCell>
-                  <TableCell>{getRank(player.rank)}</TableCell>
-                  <TableCell>{strArrayToTitleCase(player.roles)}</TableCell>
-                  <TableCell>{player.characters.join(", ")}</TableCell>
-                  <TableCell>{getPlatform(player.platform)}</TableCell>
-                  <TableCell>✅</TableCell>
-                </TableRow>
+              <TableRow key={player.name}>
+                <TableCell>
+                  {player.name}
+                  {player.leader ? " 🚩" : ""}
+                </TableCell>
+                <TableCell>{getRank(player.rank)}</TableCell>
+                <TableCell>{strArrayToTitleCase(player.roles)}</TableCell>
+                <TableCell>{player.characters.join(", ")}</TableCell>
+                <TableCell>{getPlatform(player.platform)}</TableCell>
+                <TableCell>✅</TableCell>
+              </TableRow>
             ))}
           </TableBody>
         </Table>

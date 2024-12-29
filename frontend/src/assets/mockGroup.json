@@ -1,57 +1,40 @@
 {
-    "region": "na",
-    "gamemode": "competitive",
-    "roleQueue": {
-        "vanguards": 2,
-        "duelists": 2,
-        "strategists": 2
+  "region": "na",
+  "gamemode": "competitive",
+  "roleQueue": {
+    "vanguards": 2,
+    "duelists": 2,
+    "strategists": 2
+  },
+  "players": [
+    {
+      "name": "Skelzore",
+      "leader": true,
+      "rank": "p3",
+      "roles": ["strategist"],
+      "characters": ["Mantis"],
+      "platform": "pc"
     },
-    "players": [
-        {
-            "name": "Skelzore",
-            "leader": true,
-            "rank": "p3",
-            "roles": [
-                "strategist"
-            ],
-            "characters": [
-                "Mantis"
-            ],
-            "platform": "pc"
-        },
-        {
-            "name": "imphungky",
-            "rank": "d3",
-            "roles": [
-                "vanguard"
-            ],
-            "characters": [
-                "Doctor Strange"
-            ],
-            "platform": "xb"
-        },
-        {
-            "name": "xZestence",
-            "rank": "p1",
-            "roles": [
-                "strategist"
-            ],
-            "characters": [
-                "Rocket Raccoon",
-                "Luna Snow"
-            ],
-            "platform": "ps"
-        },
-        {
-            "name": "Scynthesia",
-            "rank": "d1",
-            "roles": [
-                "duelist"
-            ],
-            "characters": [
-                "Winter Solider"
-            ],
-            "platform": "pc"
-        }
-    ]
+    {
+      "name": "imphungky",
+      "rank": "d3",
+      "roles": ["vanguard"],
+      "characters": ["Doctor Strange"],
+      "platform": "xb"
+    },
+    {
+      "name": "xZestence",
+      "rank": "p1",
+      "roles": ["strategist"],
+      "characters": ["Rocket Raccoon", "Luna Snow"],
+      "platform": "ps"
+    },
+    {
+      "name": "Scynthesia",
+      "rank": "d1",
+      "roles": ["duelist"],
+      "characters": ["Winter Solider"],
+      "platform": "pc"
+    }
+  ]
 }

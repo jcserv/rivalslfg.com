@@ -7,15 +7,18 @@ export enum Region {
 }
 
 const Regions = {
-  "na": Region.NA,
-  "eu": Region.EU,
-  "me": Region.ME,
-  "ap": Region.AP,
-  "sa": Region.SA,
+  na: Region.NA,
+  eu: Region.EU,
+  me: Region.ME,
+  ap: Region.AP,
+  sa: Region.SA,
 } as const;
 
 export function getRegion(region: string): Region {
-  return Object.entries(Regions).find((entry) => entry[0] === region)?.[1] ?? Region.NA;
+  return (
+    Object.entries(Regions).find((entry) => entry[0] === region)?.[1] ??
+    Region.NA
+  );
 }
 
 export enum Gamemode {
@@ -30,22 +33,24 @@ export enum Platform {
 }
 
 const Platforms = {
-  "pc": { 
+  pc: {
     emoji: "🖥️",
-    label: Platform.PC
+    label: Platform.PC,
   },
-  "ps": {
+  ps: {
     emoji: "🎮",
-    label: Platform.PS
+    label: Platform.PS,
   },
-  "xb": {
+  xb: {
     emoji: "❎",
-    label: Platform.XB
-  }
-}
+    label: Platform.XB,
+  },
+};
 
 export function getPlatform(platform: string): string {
-  const platformObj = Object.entries(Platforms).find((entry) => entry[0] === platform)?.[1];
+  const platformObj = Object.entries(Platforms).find(
+    (entry) => entry[0] === platform,
+  )?.[1];
   return `${platformObj?.emoji} ${platformObj?.label}`;
 }
 
@@ -75,30 +80,32 @@ export enum Rank {
 }
 
 const Ranks = {
-  "b3": Rank.b3,
-  "b2": Rank.b2,
-  "b1": Rank.b1,
-  "s3": Rank.s3,
-  "s2": Rank.s2,
-  "s1": Rank.s1,
-  "g3": Rank.g3,
-  "g2": Rank.g2,
-  "g1": Rank.g1,
-  "p3": Rank.p3,
-  "p2": Rank.p2,
-  "p1": Rank.p1,
-  "d3": Rank.d3,
-  "d2": Rank.d2,
-  "d1": Rank.d1,
-  "gm3": Rank.gm3,
-  "gm2": Rank.gm2,
-  "gm1": Rank.gm1,
-  "e": Rank.e,
-  "oa": Rank.oa,
+  b3: Rank.b3,
+  b2: Rank.b2,
+  b1: Rank.b1,
+  s3: Rank.s3,
+  s2: Rank.s2,
+  s1: Rank.s1,
+  g3: Rank.g3,
+  g2: Rank.g2,
+  g1: Rank.g1,
+  p3: Rank.p3,
+  p2: Rank.p2,
+  p1: Rank.p1,
+  d3: Rank.d3,
+  d2: Rank.d2,
+  d1: Rank.d1,
+  gm3: Rank.gm3,
+  gm2: Rank.gm2,
+  gm1: Rank.gm1,
+  e: Rank.e,
+  oa: Rank.oa,
 } as const;
 
 export function getRank(rank: string): Rank {
-  return Object.entries(Ranks).find((entry) => entry[0] === rank)?.[1] ?? Rank.b3;
+  return (
+    Object.entries(Ranks).find((entry) => entry[0] === rank)?.[1] ?? Rank.b3
+  );
 }
 
 export type Profile = {
