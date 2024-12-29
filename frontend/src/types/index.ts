@@ -173,6 +173,7 @@ export type GroupSettings = {
 export type Group = {
   id: string;
   name: string;
+  open: boolean;
   region: string;
   gamemode: string;
   roleQueue?: RoleQueue;

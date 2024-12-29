@@ -5,6 +5,7 @@ import { toTitleCase } from "@/lib/utils";
 import { getRegion, Group, Player } from "@/types";
 import { TEAM_SIZE } from "@/types/constants";
 import { Link } from "@tanstack/react-router";
+import { Eye, EyeOff } from "lucide-react";
 
 const defaultFilterFn = (
   row: Row<Group>,
@@ -21,8 +22,10 @@ export const columns: ColumnDef<Group>[] = [
       <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => {
+      const open = row.original.open;
       return (
         <div className="flex space-x-2">
+          {open ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
           <span className="max-w-[500px] truncate font-medium">
             <Link to={`/groups/${row.original.id}`} className="hover:underline">
               {row.getValue("name")}
