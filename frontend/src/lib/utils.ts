@@ -18,7 +18,3 @@ export function toTitleCase(str: string) {
 export function strArrayToTitleCase(strArray: string[]) {
   return strArray.map((str) => toTitleCase(str)).join(", ");
 }
-
-export function add(a: number, b: number) {
-  return a + b;
-}

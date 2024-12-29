@@ -12,6 +12,11 @@ export const Route = createLazyFileRoute("/groups/$groupId")({
 });
 
 function Group() {
+  function onLeave() {
+    // TODO: This should also be logged in the chat
+    console.log("i'm leavin here D:");
+  }
+
   return (
     <section className="p-2 md:p-4">
       <div className="min-h-[80vh] w-full flex flex-col items-center">
@@ -19,7 +24,9 @@ function Group() {
           <div className="col-span-8">
             <GroupDisplay group={mockGroup as GroupType} />
             <div className="flex flex-row justify-center mt-4">
-              <Button variant="destructive">Leave</Button>
+              <Button variant="destructive" onClick={onLeave}>
+                Leave
+              </Button>
             </div>
           </div>
           <div className="col-span-4 space-y-4">

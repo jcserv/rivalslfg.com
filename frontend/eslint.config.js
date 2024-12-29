@@ -12,7 +12,6 @@ export default [
       "src/hooks/use-toast.ts",
       "tailwind.config.js",
       "dist/",
-      "cypress/",
     ],
   },
   { languageOptions: { globals: globals.browser } },
