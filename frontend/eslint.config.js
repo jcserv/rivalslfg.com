@@ -9,6 +9,7 @@ export default [
     ignores: [
       "public/",
       "src/components/ui",
+      "src/hooks/use-toast.ts",
       "tailwind.config.js",
       "dist/",
       "cypress/",

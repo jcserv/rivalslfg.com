@@ -106,7 +106,7 @@ const formSchema = z.object({
         message:
           "Number of desired vanguards, duelists, and strategists must add up to 6",
         path: ["sum"],
-      }
+      },
     ),
 });
 
@@ -117,7 +117,7 @@ interface ProfileFormProps {
 
 export function ProfileForm({ initialValues, setProfile }: ProfileFormProps) {
   const [roleQueueEnabled, setRoleQueueEnabled] = useState(
-    initialValues?.roleQueue ? true : false
+    initialValues?.roleQueue ? true : false,
   );
   const { toast } = useToast();
 
@@ -308,12 +308,12 @@ export function ProfileForm({ initialValues, setProfile }: ProfileFormProps) {
                               role="combobox"
                               className={cn(
                                 "w-full justify-between",
-                                !field.value && "text-muted-foreground"
+                                !field.value && "text-muted-foreground",
                               )}
                             >
                               {field.value
                                 ? ranks.find(
-                                    (rank) => rank.value === field.value
+                                    (rank) => rank.value === field.value,
                                   )?.label
                                 : "Select your rank"}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -339,7 +339,7 @@ export function ProfileForm({ initialValues, setProfile }: ProfileFormProps) {
                                         "mr-2 h-4 w-4",
                                         rank.value === field.value
                                           ? "opacity-100"
-                                          : "opacity-0"
+                                          : "opacity-0",
                                       )}
                                     />
                                     {rank.label}
