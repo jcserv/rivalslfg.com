@@ -28,6 +28,11 @@ export enum Gamemode {
   Quickplay = "quickplay",
 }
 
+export const gamemodeEmojis: Record<Gamemode, string> = {
+  [Gamemode.Competitive]: "👑",
+  [Gamemode.Quickplay]: "⚡",
+};
+
 export enum Platform {
   PC = "PC",
   PS = "PlayStation",
@@ -82,6 +87,9 @@ export enum Rank {
   oa = "One Above All",
 }
 
+function rankToKey(rank: Rank): RankKey {
+  return rank.toString() as RankKey;
+}
 const Ranks = {
   b3: Rank.b3,
   b2: Rank.b2,
@@ -136,7 +144,20 @@ const RankVals: Record<RankKey, number> = {
   oa: 70,
 } as const;
 
-export function canJoin(userRank: RankKey, groupRanks: RankKey[]) {
+export const getRankFromRankVal = (rankVal: number): Rank => {
+  const rankKey =
+    Object.entries(RankVals).find((entry) => entry[1] === rankVal)?.[0] ?? "b3";
+  return getRank(rankKey);
+};
+
+export function isAdjacentRank(
+  userRank: RankKey,
+  comparisonRank: number,
+): boolean {
+  return Math.abs(RankVals[userRank] - comparisonRank) <= 10;
+}
+
+export function canJoinGroup(userRank: RankKey, groupRanks: RankKey[]) {
   return (
     groupRanks.reduce((acc, rank) => {
       return acc + (RankVals[rank] - RankVals[userRank]);
@@ -174,11 +195,137 @@ export type Group = {
   id: string;
   name: string;
   open: boolean;
-  region: string;
-  gamemode: string;
-  roleQueue?: RoleQueue;
+  region: Region;
+  gamemode: Gamemode;
   players: Player[];
+  groupSettings: GroupSettings;
+  roleQueue?: RoleQueue;
 };
+
+type GroupInfo = {
+  minRank: number;
+  maxRank: number;
+  currVanguards: number;
+  currDuelists: number;
+  currStrategists: number;
+  currCharacters: Set<string>;
+};
+
+export function getGroupInfo(group: Group): GroupInfo {
+  return group.players.reduce(
+    (acc, player) => {
+      const rankKey = player.rank as RankKey;
+      acc.minRank = Math.min(acc.minRank, RankVals[rankKey]);
+      acc.maxRank = Math.max(acc.maxRank, RankVals[rankKey]);
+      acc.currVanguards += player.roles.includes("vanguard") ? 1 : 0;
+      acc.currDuelists += player.roles.includes("duelist") ? 1 : 0;
+      acc.currStrategists += player.roles.includes("strategist") ? 1 : 0;
+      acc.currCharacters = acc.currCharacters.union(new Set(player.characters));
+      return acc;
+    },
+    {
+      minRank: RankVals["oa"],
+      maxRank: RankVals["b1"],
+      currVanguards: 0,
+      currDuelists: 0,
+      currStrategists: 0,
+      currCharacters: new Set<string>(),
+    },
+  );
+}
+
+export type GroupRequirements = {
+  minRank: number;
+  maxRank: number;
+  requestedRoles: {
+    vanguards: {
+      curr: number;
+      max: number;
+    };
+    duelists: {
+      curr: number;
+      max: number;
+    };
+    strategists: {
+      curr: number;
+      max: number;
+    };
+  };
+  voiceChat: boolean;
+  mic: boolean;
+  platforms: Platform[];
+};
+
+export function getRequirements(group: Group): GroupRequirements {
+  const { currVanguards, currDuelists, currStrategists, minRank, maxRank } =
+    getGroupInfo(group);
+  return {
+    minRank,
+    maxRank,
+    requestedRoles: {
+      vanguards: {
+        curr: currVanguards,
+        max: group.roleQueue?.vanguards ?? 0,
+      },
+      duelists: {
+        curr: currDuelists,
+        max: group.roleQueue?.duelists ?? 0,
+      },
+      strategists: {
+        curr: currStrategists,
+        max: group.roleQueue?.strategists ?? 0,
+      },
+    },
+    platforms: group.groupSettings.platforms,
+    mic: group.groupSettings.mic,
+    voiceChat: group.groupSettings.voiceChat,
+  };
+}
+
+export function areRequirementsMet(
+  group: Group,
+  requirements: GroupRequirements,
+  profile: Profile,
+): boolean {
+  const { minRank, maxRank, mic, voiceChat, platforms } = requirements;
+  const { rank, gamemode, region, platform } = profile;
+  const rankKey = rankToKey(rank);
+
+  const basicRequirementsMet =
+    gamemode === group.gamemode &&
+    region === group.region &&
+    (platforms.length > 0 ? platforms.includes(platform) : true) &&
+    (mic ? profile.mic : true) &&
+    (voiceChat ? profile.voiceChat : true);
+
+  if (!basicRequirementsMet) return false;
+  if (!group.roleQueue) return true;
+
+  const canFill = profile.roles.some((role) => {
+    switch (role.toLowerCase()) {
+      case Roles[0]: {
+        const vanguardSpots = requirements.requestedRoles.vanguards;
+        return vanguardSpots.curr < vanguardSpots.max;
+      }
+      case Roles[1]: {
+        const duelistSpots = requirements.requestedRoles.duelists;
+        return duelistSpots.curr < duelistSpots.max;
+      }
+      case Roles[2]: {
+        const strategistSpots = requirements.requestedRoles.strategists;
+        return strategistSpots.curr < strategistSpots.max;
+      }
+      default:
+        return false;
+    }
+  });
+
+  return (
+    isAdjacentRank(rankKey, minRank) &&
+    isAdjacentRank(rankKey, maxRank) &&
+    canFill
+  );
+}
 
 export type Player = {
   name: string;

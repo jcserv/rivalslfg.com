@@ -1,4 +1,11 @@
-import { getPlatform, getRank, getRegion, Group, Player } from "@/types";
+import {
+  getGroupInfo,
+  getPlatform,
+  getRank,
+  getRegion,
+  Group,
+  Player,
+} from "@/types";
 import {
   Card,
   CardContent,
@@ -35,23 +42,7 @@ export function GroupDisplay({ group }: GroupDisplayProps) {
 
   const { currVanguards, currDuelists, currStrategists, currCharacters } =
     useMemo(() => {
-      return group.players.reduce(
-        (acc, player) => {
-          acc.currVanguards += player.roles.includes("vanguard") ? 1 : 0;
-          acc.currDuelists += player.roles.includes("duelist") ? 1 : 0;
-          acc.currStrategists += player.roles.includes("strategist") ? 1 : 0;
-          acc.currCharacters = acc.currCharacters.union(
-            new Set(player.characters),
-          );
-          return acc;
-        },
-        {
-          currVanguards: 0,
-          currDuelists: 0,
-          currStrategists: 0,
-          currCharacters: new Set(),
-        },
-      );
+      return getGroupInfo(group);
     }, [group.players]);
 
   // TODO: Exclude suggested teamups that would violate the role queue restrictions

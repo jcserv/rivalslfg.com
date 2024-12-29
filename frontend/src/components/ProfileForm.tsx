@@ -92,7 +92,6 @@ const formSchema = z.object({
         .number()
         .min(0, "Please select a minimum of 0 duelists")
         .max(6, "Please select a maximum of 6 duelists"),
-
       strategists: z
         .number()
         .min(0, "Please select a minimum of 0 strategists")
@@ -112,9 +111,7 @@ const formSchema = z.object({
     ),
   groupSettings: z
     .object({
-      platforms: z
-        .array(z.nativeEnum(Platform))
-        .min(1, "Please select at least one platform"),
+      platforms: z.array(z.nativeEnum(Platform)),
       voiceChat: z.boolean(),
       mic: z.boolean(),
     })
