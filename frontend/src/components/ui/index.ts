@@ -14,6 +14,7 @@ export * from "./label";
 export * from "./multi-select";
 export * from "./popover";
 export * from "./select";
+export * from "./switch";
 export * from "./table";
 export * from "./tabs";
 export * from "./toast";

@@ -1,4 +1,4 @@
-import { getPlatform, getRank, getRegion, Group } from "@/types";
+import { getPlatform, getRank, getRegion, Group, Player } from "@/types";
 import {
   Card,
   CardContent,
@@ -20,12 +20,17 @@ import { useMemo } from "react";
 
 import teamUps from "@/assets/teamups.json";
 import { TeamUpItem } from "./TeamUp";
+import { Button } from "./ui/button";
+import { Copy, X } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface GroupDisplayProps {
   group: Group;
 }
 
 export function GroupDisplay({ group }: GroupDisplayProps) {
+  const { toast } = useToast();
+
   const leader = group.players.find((player) => player.leader);
 
   const { currVanguards, currDuelists, currStrategists, currCharacters } =
@@ -59,10 +64,28 @@ export function GroupDisplay({ group }: GroupDisplayProps) {
     );
   }, [teamUps, currCharacters]);
 
+  function onKick(player: Player) {
+    console.log(player);
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{leader?.name}&apos;s Group</CardTitle>
+        <CardTitle>
+          {leader?.name}&apos;s Group
+          <Button variant="outline" size="icon" className="ml-2">
+            <Copy
+              className="w-4 h-4"
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                toast({
+                  title: "Copied current URL to clipboard!",
+                  variant: "success",
+                });
+              }}
+            />
+          </Button>
+        </CardTitle>
         <CardDescription>
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-6">
@@ -132,7 +155,7 @@ export function GroupDisplay({ group }: GroupDisplayProps) {
               <TableHead>Roles</TableHead>
               <TableHead>Characters</TableHead>
               <TableHead>Platform</TableHead>
-              <TableHead>Ready</TableHead>
+              <TableHead>Kick</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -146,7 +169,15 @@ export function GroupDisplay({ group }: GroupDisplayProps) {
                 <TableCell>{strArrayToTitleCase(player.roles)}</TableCell>
                 <TableCell>{player.characters.join(", ")}</TableCell>
                 <TableCell>{getPlatform(player.platform)}</TableCell>
-                <TableCell>✅</TableCell>
+                <TableCell>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => onKick(player)}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
