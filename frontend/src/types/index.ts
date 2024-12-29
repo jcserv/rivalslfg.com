@@ -171,6 +171,8 @@ export type GroupSettings = {
 };
 
 export type Group = {
+  id: string;
+  name: string;
   region: string;
   gamemode: string;
   roleQueue?: RoleQueue;

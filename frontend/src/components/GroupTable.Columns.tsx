@@ -1,121 +1,115 @@
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-
-import { labels, priorities, statuses } from "@/components/ui/data-table/data";
-import { Task } from "@/components/ui/data-table/schema";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
-import { DataTableRowActions } from "@/components/ui/data-table/data-table-row-actions";
+import { toTitleCase } from "@/lib/utils";
+import { getRegion, Group, Player } from "@/types";
+import { TEAM_SIZE } from "@/types/constants";
 
-export const columns: ColumnDef<Task>[] = [
+const defaultFilterFn = (
+  row: Row<Group>,
+  accessorKey: string,
+  value: string,
+) => {
+  return value.includes(row.getValue(accessorKey));
+};
+
+export const columns: ColumnDef<Group>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "id",
+    accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Task" />
-    ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "title",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Title" />
+      <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
-
       return (
         <div className="flex space-x-2">
-          {label && <Badge variant="outline">{label.label}</Badge>}
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("title")}
+            {row.getValue("name")}
           </span>
         </div>
       );
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "region",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Region" />
     ),
     cell: ({ row }) => {
-      const status = statuses.find(
-        (status) => status.value === row.getValue("status"),
-      );
+      const region: string = row.getValue("region");
 
-      if (!status) {
+      if (!region) {
         return null;
       }
 
       return (
         <div className="flex w-[100px] items-center">
-          {status.icon && (
-            <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-          )}
-          <span>{status.label}</span>
+          <span>{getRegion(region)}</span>
         </div>
       );
     },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
+    filterFn: (row, accessorKey, value) => {
+      const cellValue: string = row.getValue(accessorKey);
+      if (!cellValue) {
+        return false;
+      }
+      return value.includes(cellValue.toUpperCase());
     },
   },
   {
-    accessorKey: "priority",
+    accessorKey: "gamemode",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Priority" />
+      <DataTableColumnHeader column={column} title="Gamemode" />
     ),
     cell: ({ row }) => {
-      const priority = priorities.find(
-        (priority) => priority.value === row.getValue("priority"),
-      );
+      const gamemode: string = row.getValue("gamemode");
 
-      if (!priority) {
+      if (!gamemode) {
         return null;
       }
 
       return (
-        <div className="flex items-center">
-          {priority.icon && (
-            <priority.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-          )}
-          <span>{priority.label}</span>
+        <div className="flex w-[100px] items-center">
+          <span>{toTitleCase(gamemode)}</span>
         </div>
       );
     },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
+    filterFn: defaultFilterFn,
+  },
+  {
+    accessorKey: "requirements",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Requirements" />
+    ),
+    cell: () => {
+      return null;
     },
   },
   {
-    id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    accessorKey: "players",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Size" />
+    ),
+    cell: ({ row }) => {
+      const players: Player[] = row.getValue("players");
+      if (!players) {
+        return null;
+      }
+
+      const playerCount = players.length;
+
+      if (playerCount === TEAM_SIZE) {
+        return (
+          <div className="flex items-center">
+            <span className="text-muted-foreground">Full</span>
+          </div>
+        );
+      }
+
+      return (
+        <div className="flex items-center">
+          <span className="text-muted-foreground">{`${players.length}/${TEAM_SIZE}`}</span>
+        </div>
+      );
+    },
   },
 ];

@@ -1,71 +1,19 @@
-import {
-  ArrowDown,
-  ArrowRight,
-  ArrowUp,
-  CheckCircle,
-  Circle,
-  CircleOff,
-  HelpCircle,
-  Timer,
-} from "lucide-react";
+import { Region } from "@/types";
 
-export const labels = [
-  {
-    value: "bug",
-    label: "Bug",
-  },
-  {
-    value: "feature",
-    label: "Feature",
-  },
-  {
-    value: "documentation",
-    label: "Documentation",
-  },
-];
+export const regions = Object.entries(Region).map(([key, value]) => ({
+  value: key,
+  label: value,
+}));
 
-export const statuses = [
+export const gamemodes = [
   {
-    value: "backlog",
-    label: "Backlog",
-    icon: HelpCircle,
+    value: "competitive",
+    label: "Competitive",
+    icon: "👑",
   },
   {
-    value: "todo",
-    label: "Todo",
-    icon: Circle,
-  },
-  {
-    value: "in progress",
-    label: "In Progress",
-    icon: Timer,
-  },
-  {
-    value: "done",
-    label: "Done",
-    icon: CheckCircle,
-  },
-  {
-    value: "canceled",
-    label: "Canceled",
-    icon: CircleOff,
-  },
-];
-
-export const priorities = [
-  {
-    label: "Low",
-    value: "low",
-    icon: ArrowDown,
-  },
-  {
-    label: "Medium",
-    value: "medium",
-    icon: ArrowRight,
-  },
-  {
-    label: "High",
-    value: "high",
-    icon: ArrowUp,
+    value: "quickplay",
+    label: "Quickplay",
+    icon: "⚡",
   },
 ];

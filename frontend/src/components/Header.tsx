@@ -8,7 +8,7 @@ export const Header: React.FC = () => {
     <header className="flex items-center justify-between m-4">
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
         <span className="inline-block align-middle">
-          <Link to="/">Rivals LFG</Link>
+          <Link to="/">Rivals LFG 🤩</Link>
         </span>
       </h1>
       <div className="flex items-center space-x-2 p-2">

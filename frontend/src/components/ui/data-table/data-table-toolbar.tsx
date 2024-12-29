@@ -3,11 +3,10 @@ import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { DataTableViewOptions } from "@/components/ui/data-table/data-table-view-options";
 
 // TODO: filter by region, gamemode, role queue -> LF vanguard/duelist/strategist
 
-import { priorities, statuses } from "./data";
+import { gamemodes, regions } from "./data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {
@@ -23,25 +22,25 @@ export function DataTableToolbar<TData>({
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <Input
-          placeholder="Filter tasks..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+          placeholder="Search groups..."
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        {table.getColumn("status") && (
+        {table.getColumn("region") && (
           <DataTableFacetedFilter
-            column={table.getColumn("status")}
-            title="Status"
-            options={statuses}
+            column={table.getColumn("region")}
+            title="Region"
+            options={regions}
           />
         )}
-        {table.getColumn("priority") && (
+        {table.getColumn("gamemode") && (
           <DataTableFacetedFilter
-            column={table.getColumn("priority")}
-            title="Priority"
-            options={priorities}
+            column={table.getColumn("gamemode")}
+            title="Gamemode"
+            options={gamemodes}
           />
         )}
         {isFiltered && (
@@ -50,12 +49,11 @@ export function DataTableToolbar<TData>({
             onClick={() => table.resetColumnFilters()}
             className="h-8 px-2 lg:px-3"
           >
-            Reset
+            Clear
             <X />
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
     </div>
   );
 }

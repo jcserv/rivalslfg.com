@@ -68,8 +68,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { Gamemode, Platform, Profile, Rank, Region, Roles } from "@/types";
 import { useToast } from "@/hooks/use-toast";
-
-const TEAM_SIZE = 6;
+import { TEAM_SIZE } from "@/types/constants";
 
 const formSchema = z.object({
   name: z.string().min(1, "Please enter your in-game name"),
