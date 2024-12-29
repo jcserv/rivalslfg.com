@@ -30,7 +30,7 @@ function Group() {
             </div>
           </div>
           <div className="col-span-4 space-y-4">
-            <GroupControls passcode={mockGroup.passcode} />
+            <GroupControls isGroupOpen={mockGroup.open} />
             <Chat />
           </div>
         </div>

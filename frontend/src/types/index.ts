@@ -105,9 +105,42 @@ const Ranks = {
   oa: Rank.oa,
 } as const;
 
+type RankKey = keyof typeof Ranks;
+
 export function getRank(rank: string): Rank {
   return (
     Object.entries(Ranks).find((entry) => entry[0] === rank)?.[1] ?? Rank.b3
+  );
+}
+
+const RankVals: Record<RankKey, number> = {
+  b3: 0,
+  b2: 1,
+  b1: 2,
+  s3: 10,
+  s2: 11,
+  s1: 12,
+  g3: 20,
+  g2: 21,
+  g1: 22,
+  p3: 30,
+  p2: 31,
+  p1: 32,
+  d3: 40,
+  d2: 41,
+  d1: 42,
+  gm3: 50,
+  gm2: 51,
+  gm1: 52,
+  e: 60,
+  oa: 70,
+} as const;
+
+export function canJoin(userRank: RankKey, groupRanks: RankKey[]) {
+  return (
+    groupRanks.reduce((acc, rank) => {
+      return acc + (RankVals[rank] - RankVals[userRank]);
+    }, 0) <= 10
   );
 }
 

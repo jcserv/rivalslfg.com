@@ -1,7 +1,7 @@
 {
   "region": "na",
   "gamemode": "competitive",
-  "passcode": "abcd",
+  "open": true,
   "roleQueue": {
     "vanguards": 2,
     "duelists": 2,
