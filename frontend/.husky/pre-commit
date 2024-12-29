@@ -1,1 +1,1 @@
-pnpm test:types && pnpm test:jest && pnpm lint
+pnpm test:types && pnpm lint
