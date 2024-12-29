@@ -16,7 +16,15 @@ import {
 import { TEAM_SIZE } from "@/types/constants";
 import { Link } from "@tanstack/react-router";
 import { Eye, EyeOff } from "lucide-react";
-import { HoverCardContent, HoverCard, HoverCardTrigger } from "./ui";
+import {
+  HoverCardContent,
+  HoverCard,
+  HoverCardTrigger,
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "./ui";
 
 const defaultFilterFn = (
   row: Row<Group>,
@@ -36,7 +44,18 @@ export const columns = (profile: Profile): ColumnDef<Group>[] => [
       const open = row.original.open;
       return (
         <div className="flex space-x-2">
-          {open ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                {open ? (
+                  <Eye className="w-4 h-4" />
+                ) : (
+                  <EyeOff className="w-4 h-4" />
+                )}
+              </TooltipTrigger>
+              <TooltipContent>{open ? "Public" : "Private"}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <span className="max-w-[500px] truncate font-medium">
             <Link to={`/groups/${row.original.id}`} className="hover:underline">
               {row.getValue("name")}
