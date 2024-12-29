@@ -18,6 +18,9 @@ import {
 import { strArrayToTitleCase, toTitleCase } from "@/lib/utils";
 import { useMemo } from "react";
 
+import teamUps from "@/assets/teamups.json";
+import { TeamUpItem } from "./TeamUp";
+
 interface GroupDisplayProps {
   group: Group;
 }
@@ -25,17 +28,34 @@ interface GroupDisplayProps {
 export function GroupDisplay({ group }: GroupDisplayProps) {
   const leader = group.players.find((player) => player.leader);
 
-  const { currVanguards, currDuelists, currStrategists } = useMemo(() => {
-    return group.players.reduce(
-      (acc, player) => {
-        acc.currVanguards += player.roles.includes("vanguard") ? 1 : 0;
-        acc.currDuelists += player.roles.includes("duelist") ? 1 : 0;
-        acc.currStrategists += player.roles.includes("strategist") ? 1 : 0;
-        return acc;
-      },
-      { currVanguards: 0, currDuelists: 0, currStrategists: 0 },
+  const { currVanguards, currDuelists, currStrategists, currCharacters } =
+    useMemo(() => {
+      return group.players.reduce(
+        (acc, player) => {
+          acc.currVanguards += player.roles.includes("vanguard") ? 1 : 0;
+          acc.currDuelists += player.roles.includes("duelist") ? 1 : 0;
+          acc.currStrategists += player.roles.includes("strategist") ? 1 : 0;
+          acc.currCharacters = acc.currCharacters.union(new Set(player.characters));
+          return acc;
+        },
+        {
+          currVanguards: 0,
+          currDuelists: 0,
+          currStrategists: 0,
+          currCharacters: new Set(),
+        }
+      );
+    }, [group.players]);
+
+  // TODO: Exclude suggested teamups that would violate the role queue restrictions
+  const suggestedTeamUps = useMemo(() => {
+    return teamUps.filter(
+      (teamup) =>
+        (new Set(teamup.requirements.allOf)
+          .union(new Set(teamup.requirements.oneOf)))
+          .intersection(currCharacters).size > 0
     );
-  }, [group.players]);
+  }, [teamUps, currCharacters]);
 
   return (
     <Card>
@@ -91,8 +111,9 @@ export function GroupDisplay({ group }: GroupDisplayProps) {
                 Suggested Team-ups:
                 <br />
                 <ul>
-                  <li>• Eye of Agabobo </li>
-                  <li>• Unlimited Ammo </li>
+                  {suggestedTeamUps.map((teamup) => (
+                    <TeamUpItem key={teamup.name} teamup={teamup} />
+                  ))}
                 </ul>
               </div>
             </div>

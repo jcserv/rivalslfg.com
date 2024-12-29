@@ -1,3 +1,5 @@
+import { toTitleCase } from "@/lib/utils";
+
 export enum Region {
   NA = "North America",
   EU = "Europe",
@@ -49,7 +51,7 @@ const Platforms = {
 
 export function getPlatform(platform: string): string {
   const platformObj = Object.entries(Platforms).find(
-    (entry) => entry[0] === platform,
+    (entry) => entry[0] === platform
   )?.[1];
   return `${platformObj?.emoji} ${platformObj?.label}`;
 }
@@ -140,3 +142,38 @@ export type Player = {
   characters: string[];
   platform: string;
 };
+
+export type TeamUp = {
+  name: string;
+  requirements: {
+    allOf: string[];
+    oneOf?: string[];
+  };
+  description: string;
+  seasonBonus: {
+    stat: string;
+    modifier: string;
+    target: string;
+    value: number;
+    unit: string;
+  };
+};
+
+function formatStat(stat: TeamUp["seasonBonus"]["stat"]) {
+  switch (stat) {
+    case "max-health":
+      return "Max Health";
+    case "healing":
+      return "Healing";
+    case "damage":
+      return "Damage";
+    default:
+      return stat;
+  }
+}
+
+export function formatSeasonBonus(seasonBonus: TeamUp["seasonBonus"]) {
+  return `${seasonBonus.target}: ${seasonBonus.unit === "+" ? "+" : ""}${seasonBonus.value}${
+    seasonBonus.unit === "%" ? "%" : ""
+  } ${formatStat(seasonBonus.stat)} ${toTitleCase(seasonBonus.modifier)}`;
+}

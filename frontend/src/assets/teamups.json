@@ -9,7 +9,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "damage",
-      "targets": ["Hela"],
+      "target": "Hela",
       "value": 20,
       "unit": "%"
     }
@@ -23,7 +23,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "damage",
-      "targets": ["Scarlet Witch"],
+      "target": "Scarlet Witch",
       "value": 10,
       "unit": "%"
     }
@@ -38,7 +38,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "max-health",
-      "targets": ["Thor"],
+      "target": "Thor",
       "value": 100,
       "unit": "+"
     }
@@ -53,7 +53,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "max-health",
-      "targets": ["Groot"],
+      "target": "Groot",
       "value": 150,
       "unit": "+"
     }
@@ -68,7 +68,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "max-health",
-      "targets": ["Venom"],
+      "target": "Venom",
       "value": 150,
       "unit": "+"
     }
@@ -83,7 +83,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "max-health",
-      "targets": ["Hulk"],
+      "target": "Hulk",
       "value": 150,
       "unit": "+"
     }
@@ -98,7 +98,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "healing",
-      "targets": ["Rocket Raccoon"],
+      "target": "Rocket Raccoon",
       "value": 5,
       "unit": "%"
     }
@@ -113,7 +113,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "damage",
-      "targets": ["Magik"],
+      "target": "Magik",
       "value": 15,
       "unit": "%"
     }
@@ -127,7 +127,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "healing",
-      "targets": ["Cloak & Dagger"],
+      "target": "Cloak & Dagger",
       "value": 15,
       "unit": "%"
     }
@@ -142,7 +142,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "healing",
-      "targets": ["Adam Warlock"],
+      "target": "Adam Warlock",
       "value": 15,
       "unit": "%"
     }
@@ -157,7 +157,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "healing",
-      "targets": ["Luna Snow"],
+      "target": "Luna Snow",
       "value": 15,
       "unit": "%"
     }
@@ -171,7 +171,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "damage",
-      "targets": ["Hawkeye"],
+      "target": "Hawkeye",
       "value": 20,
       "unit": "%"
     }
@@ -185,7 +185,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "damage",
-      "targets": ["Iron Fist"],
+      "target": "Iron Fist",
       "value": 15,
       "unit": "%"
     }
@@ -199,7 +199,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "damage",
-      "targets": ["Spider-Man"],
+      "target": "Spider-Man",
       "value": 10,
       "unit": "%"
     }
@@ -213,7 +213,7 @@
     "seasonBonus": {
       "modifier": "increase",
       "stat": "health",
-      "targets": ["Hulk"],
+      "target": "Hulk",
       "value": 150,
       "unit": "+"
     }
