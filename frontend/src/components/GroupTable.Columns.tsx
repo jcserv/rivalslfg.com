@@ -34,6 +34,7 @@ export const columns: ColumnDef<Group>[] = [
         </div>
       );
     },
+    enableHiding: false,
   },
   {
     accessorKey: "region",
@@ -60,6 +61,7 @@ export const columns: ColumnDef<Group>[] = [
       }
       return value.includes(cellValue.toUpperCase());
     },
+    enableHiding: false,
   },
   {
     accessorKey: "gamemode",
@@ -80,6 +82,7 @@ export const columns: ColumnDef<Group>[] = [
       );
     },
     filterFn: defaultFilterFn,
+    enableHiding: false,
   },
   {
     accessorKey: "requirements",
@@ -89,6 +92,7 @@ export const columns: ColumnDef<Group>[] = [
     cell: () => {
       return null;
     },
+    enableHiding: false,
   },
   {
     accessorKey: "players",
@@ -102,20 +106,14 @@ export const columns: ColumnDef<Group>[] = [
       }
 
       const playerCount = players.length;
-
-      if (playerCount === TEAM_SIZE) {
-        return (
-          <div className="flex items-center">
-            <span className="text-muted-foreground">Full</span>
-          </div>
-        );
-      }
-
+      const innerText =
+        playerCount === TEAM_SIZE ? "Full" : `${players.length}/${TEAM_SIZE}`;
       return (
         <div className="flex items-center">
-          <span className="text-muted-foreground">{`${players.length}/${TEAM_SIZE}`}</span>
+          <span className="text-muted-foreground">{innerText}</span>
         </div>
       );
     },
+    enableHiding: false,
   },
 ];
