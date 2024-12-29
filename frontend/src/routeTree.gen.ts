@@ -16,10 +16,16 @@ import { Route as rootRoute } from "./routes/__root";
 
 // Create Virtual Routes
 
+const GroupLazyImport = createFileRoute("/group")();
 const AboutLazyImport = createFileRoute("/about")();
 const IndexLazyImport = createFileRoute("/")();
 
 // Create/Update Routes
+
+const GroupLazyRoute = GroupLazyImport.update({
+  path: "/group",
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import("./routes/group.lazy").then((d) => d.Route));
 
 const AboutLazyRoute = AboutLazyImport.update({
   path: "/about",
@@ -49,6 +55,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AboutLazyImport;
       parentRoute: typeof rootRoute;
     };
+    "/group": {
+      id: "/group";
+      path: "/group";
+      fullPath: "/group";
+      preLoaderRoute: typeof GroupLazyImport;
+      parentRoute: typeof rootRoute;
+    };
   }
 }
 
@@ -57,36 +70,41 @@ declare module "@tanstack/react-router" {
 export interface FileRoutesByFullPath {
   "/": typeof IndexLazyRoute;
   "/about": typeof AboutLazyRoute;
+  "/group": typeof GroupLazyRoute;
 }
 
 export interface FileRoutesByTo {
   "/": typeof IndexLazyRoute;
   "/about": typeof AboutLazyRoute;
+  "/group": typeof GroupLazyRoute;
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute;
   "/": typeof IndexLazyRoute;
   "/about": typeof AboutLazyRoute;
+  "/group": typeof GroupLazyRoute;
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/about";
+  fullPaths: "/" | "/about" | "/group";
   fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/about";
-  id: "__root__" | "/" | "/about";
+  to: "/" | "/about" | "/group";
+  id: "__root__" | "/" | "/about" | "/group";
   fileRoutesById: FileRoutesById;
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute;
   AboutLazyRoute: typeof AboutLazyRoute;
+  GroupLazyRoute: typeof GroupLazyRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   AboutLazyRoute: AboutLazyRoute,
+  GroupLazyRoute: GroupLazyRoute,
 };
 
 export const routeTree = rootRoute
@@ -102,7 +120,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/about"
+        "/about",
+        "/group"
       ]
     },
     "/": {
@@ -110,6 +129,9 @@ export const routeTree = rootRoute
     },
     "/about": {
       "filePath": "about.lazy.tsx"
+    },
+    "/group": {
+      "filePath": "group.lazy.tsx"
     }
   }
 }
