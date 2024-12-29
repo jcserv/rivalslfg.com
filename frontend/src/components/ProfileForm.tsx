@@ -413,9 +413,15 @@ export function ProfileForm({ initialValues, setProfile }: ProfileFormProps) {
             name="voiceChat"
             render={({ field }) => (
               <FormItem className="flex flex-row items-start gap-2 m-2">
-                <FormLabel className="self-center leading-none mt-1">
-                  Voice Chat
-                </FormLabel>
+                <div className="space-y-0.5">
+                  <FormLabel className="self-center leading-none mt-1">
+                    Voice Chat
+                  </FormLabel>
+                  <FormDescription>
+                    This indicates whether you are able to listen via voice
+                    chat, either in-game or through Discord.
+                  </FormDescription>
+                </div>
                 <FormControl>
                   <Switch
                     id="voiceChat"
@@ -434,9 +440,15 @@ export function ProfileForm({ initialValues, setProfile }: ProfileFormProps) {
             name="mic"
             render={({ field }) => (
               <FormItem className="flex flex-row items-start gap-2 m-2">
-                <FormLabel className="self-center leading-none mt-1">
-                  Mic
-                </FormLabel>
+                <div className="space-y-0.5">
+                  <FormLabel className="self-center leading-none mt-1">
+                    Mic
+                  </FormLabel>
+                  <FormDescription>
+                    This indicates whether you are able to speak via voice chat,
+                    either in-game or through Discord.
+                  </FormDescription>
+                </div>
                 <FormControl>
                   <Switch
                     id="mic"
@@ -500,7 +512,7 @@ export function ProfileForm({ initialValues, setProfile }: ProfileFormProps) {
                   <div>
                     <FormDescription>
                       If this setting is enabled, you&apos;ll be matched to
-                      groups according to your desired role counts.
+                      players according to your desired role counts.
                     </FormDescription>
                   </div>
                   {roleQueueEnabled && (
