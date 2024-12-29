@@ -1,0 +1,221 @@
+[
+  {
+    "name": "Ragnarok Rebirth",
+    "requirements": {
+      "allOf": ["Hela"],
+      "oneOf": ["Thor", "Loki"]
+    },
+    "description": "When Hela lands a final hit in defeating an enemy, she can instantly resurrect Loki and Thor in the respawn phase, or grant them Bonus Health if they are still alive.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "damage",
+      "targets": ["Hela"],
+      "value": 20,
+      "unit": "%"
+    }
+  },
+  {
+    "name": "Metallic Chaos",
+    "requirements": {
+      "allOf": ["Scarlet Witch", "Magneto"]
+    },
+    "description": "Scarlet Witch can infuse Chaos Energy into Magneto to enchant his greatsword. Upon receiving the Chaos Energy, Magneto can unleash its full force, striking down enemies with his enchanted greatsword.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "damage",
+      "targets": ["Scarlet Witch"],
+      "value": 10,
+      "unit": "%"
+    }
+  },
+  {
+    "name": "Voltaic Union",
+    "requirements": {
+      "allOf": ["Thor"],
+      "oneOf": ["Captain America", "Storm"]
+    },
+    "description": "Thor infuses Thorforce into Storm and Captain America, granting them an electrifying enhancement. With an electrifying enhancement, Storm can unleash a lightning barrage. With an electrifying enhancement, Captain America gains a Movement Boost, and his shield is imbued with thunder power, electrocuting nearby enemies.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "max-health",
+      "targets": ["Thor"],
+      "value": 100,
+      "unit": "+"
+    }
+  },
+  {
+    "name": "Planet X Pals",
+    "requirements": {
+      "allOf": ["Groot"],
+      "oneOf": ["Rocket Raccoon", "Jeff the Land Shark"]
+    },
+    "description": "Jeff the Land Shark and Rocket Raccoon can ride on Groot's shoulders, receiving Damage Reduction.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "max-health",
+      "targets": ["Groot"],
+      "value": 150,
+      "unit": "+"
+    }
+  },
+  {
+    "name": "Symbiote Bond",
+    "requirements": {
+      "allOf": ["Venom"],
+      "oneOf": ["Spider-Man", "Peni Parker"]
+    },
+    "description": "Venom shares a part of his symbiotes with Spider-Man and Peni Parker, activating their symbiote abilities. Spider-Man and Peni Parker can convert the symbiotes into explosive spikes that inflict harm on nearby enemies and relentlessly drive them back.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "max-health",
+      "targets": ["Venom"],
+      "value": 150,
+      "unit": "+"
+    }
+  },
+  {
+    "name": "Gamma Charge",
+    "requirements": {
+      "allOf": ["Hulk"],
+      "oneOf": ["Doctor Strange", "Iron Man"]
+    },
+    "description": "Hulk charges Doctor Strange and Iron Man with gamma radiation. When Doctor Strange uses Maelstrom of Madness, he unleashes excess gamma energy. When Iron Man uses Armor Overdrive, he will initiate a gamma upgrade.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "max-health",
+      "targets": ["Hulk"],
+      "value": 150,
+      "unit": "+"
+    }
+  },
+  {
+    "name": "Ammo Overload",
+    "requirements": {
+      "allOf": ["Rocket Raccoon"],
+      "oneOf": ["The Punisher", "Winter Soldier"]
+    },
+    "description": "Rocket Raccoon throws an Ammo Overload Device in the target direction. Upon entering the device's range, The Punisher and Winter Soldier receive the buffs of Infinite Ammo and Faster Firing.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "healing",
+      "targets": ["Rocket Raccoon"],
+      "value": 5,
+      "unit": "%"
+    }
+  },
+  {
+    "name": "Dimensional Shortcut",
+    "requirements": {
+      "allOf": ["Magik"],
+      "oneOf": ["Psylocke", "Black Panther"]
+    },
+    "description": "When Magik is on the field, Black Panther and Psylocke can tap into Limbo to rewind a few seconds back to a previous position; after passing through Limbo, Black Panther and Psylocke will gain Bonus Health based on missing health.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "damage",
+      "targets": ["Magik"],
+      "value": 15,
+      "unit": "%"
+    }
+  },
+  {
+    "name": "Lunar Force",
+    "requirements": {
+      "allOf": ["Cloak & Dagger", "Moon Knight"]
+    },
+    "description": "Cloak & Dagger can inject light and dark energy into Moon Knight to create a Light & Dark Realm where Moon Knight can become invisible.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "healing",
+      "targets": ["Cloak & Dagger"],
+      "value": 15,
+      "unit": "%"
+    }
+  },
+  {
+    "name": "Guardian Revival",
+    "requirements": {
+      "allOf": ["Adam Warlock"],
+      "oneOf": ["Mantis", "Star-Lord"]
+    },
+    "description": "Adam Warlock enhances the rebirth power of Star-Lord and Mantis, granting them the power of cocooned revival.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "healing",
+      "targets": ["Adam Warlock"],
+      "value": 15,
+      "unit": "%"
+    }
+  },
+  {
+    "name": "Chilling Charisma",
+    "requirements": {
+      "allOf": ["Luna Snow"],
+      "oneOf": ["Namor", "Jeff the Land Shark"]
+    },
+    "description": "Luna Snow infusees ice energy into Namor and Jeff the Land Shark, who then can tap into the ice energy to power up abilities at will.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "healing",
+      "targets": ["Luna Snow"],
+      "value": 15,
+      "unit": "%"
+    }
+  },
+  {
+    "name": "Allied Agents",
+    "requirements": {
+      "allOf": ["Hawkeye", "Black Widow"]
+    },
+    "description": "Hawkeye can share his Hunter's Sight with Black Widow, enabling her to catch sight of and damage afterimages of enemies.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "damage",
+      "targets": ["Hawkeye"],
+      "value": 20,
+      "unit": "%"
+    }
+  },
+  {
+    "name": "Atlas Bond",
+    "requirements": {
+      "allOf": ["Iron Fist", "Luna Snow"]
+    },
+    "description": "Iron Fist channels the Chi of Shou-Lao into Luna Snow, transforming her ice power into a Chi-infused frosty ring that radiates from her. This ring can launch up enemies with chilling damage and applies a slowing effect, while simultaneously healing her allies.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "damage",
+      "targets": ["Iron Fist"],
+      "value": 15,
+      "unit": "%"
+    }
+  },
+  {
+    "name": "Esu Alumnus",
+    "requirements": {
+      "allOf": ["Spider-Man", "Squirrel Girl"]
+    },
+    "description": "Spider-Man gives Squirrel Girl a web bomb. She can launch it to unleash an explosion upon contact with the environment or an enemy, briefly Immobilizing and damaging enemies caught in the blast.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "damage",
+      "targets": ["Spider-Man"],
+      "value": 10,
+      "unit": "%"
+    }
+  },
+  {
+    "name": "Fastball Special",
+    "requirements": {
+      "allOf": ["Hulk", "Wolverine"]
+    },
+    "description": "Wolverine, Hulk can interact with each other. Once both parties confirm, Hulk can lift Wolverine and press the key to hurl him forward.",
+    "seasonBonus": {
+      "modifier": "increase",
+      "stat": "health",
+      "targets": ["Hulk"],
+      "value": 150,
+      "unit": "+"
+    }
+  }
+]
