@@ -15,6 +15,12 @@ export const Header: React.FC = () => {
         <Link to="/" className="inline-flex items-center hover:underline">
           Home
         </Link>
+        <Link
+          to="/profile"
+          className="inline-flex items-center hover:underline"
+        >
+          Profile
+        </Link>
         <Button
           variant="ghost"
           size="icon"
