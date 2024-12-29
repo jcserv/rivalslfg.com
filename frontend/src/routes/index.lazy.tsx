@@ -1,5 +1,7 @@
 import { InfoBanner, ProfileForm } from "@/components";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui";
+import { useLocalStorage } from "@/hooks/localStorage";
+import { Profile } from "@/types";
 import { createLazyFileRoute } from "@tanstack/react-router";
 
 export const Route = createLazyFileRoute("/")({
@@ -7,6 +9,9 @@ export const Route = createLazyFileRoute("/")({
 });
 
 function Index() {
+  const fourteenDaysFromToday = new Date(new Date().setDate(new Date().getDate() + 14));
+  const [profile, setProfile] = useLocalStorage("profile", {}, fourteenDaysFromToday);
+
   return (
     <section className="p-2 md:p-4">
       <div className="w-full flex flex-col items-center">
@@ -23,10 +28,10 @@ function Index() {
             <TabsTrigger value="create">Create Group</TabsTrigger>
           </TabsList>
           <TabsContent value="find">
-            <ProfileForm />
+            <ProfileForm initialValues={profile as Profile} setProfile={setProfile} />
           </TabsContent>
           <TabsContent value="create">
-            <ProfileForm />
+            <ProfileForm initialValues={profile as Profile} setProfile={setProfile} />
           </TabsContent>
         </Tabs>
       </div>

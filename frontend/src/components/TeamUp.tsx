@@ -1,5 +1,5 @@
 import { formatSeasonBonus, TeamUp } from "@/types";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 interface TeamUpProps {
   teamup: TeamUp;

@@ -57,6 +57,7 @@ export function getPlatform(platform: string): string {
 }
 
 export type Role = "vanguard" | "duelist" | "strategist";
+export const Roles = ["vanguard", "duelist", "strategist"] as const;
 
 export enum Rank {
   b3 = "Bronze III",

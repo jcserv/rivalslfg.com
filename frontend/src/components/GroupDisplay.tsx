@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/card";
+} from "@/components/ui/card";
 import {
   Table,
   TableCaption,
@@ -14,7 +14,7 @@ import {
   TableHead,
   TableBody,
   TableCell,
-} from "./ui/table";
+} from "@/components/ui/table";
 import { strArrayToTitleCase, toTitleCase } from "@/lib/utils";
 import { useMemo } from "react";
 

@@ -1,4 +1,3 @@
-import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -64,18 +63,22 @@ import {
   Input,
   Label,
 } from "./ui";
-import { Checkbox } from "./ui/checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
+import { Gamemode, Platform, Profile, Rank, Region, Roles } from "@/types";
+import { useToast } from "@/hooks/use-toast";
 
 const TEAM_SIZE = 6;
 
 const formSchema = z.object({
   name: z.string().min(1, "Please enter your in-game name"),
-  region: z.string().min(1, "Please select a region"),
-  platform: z.string().min(1, "Please select a platform"),
-  gamemode: z.string().min(1, "Please select a gamemode"),
-  roles: z.array(z.string()).min(1, "Please select at least one role"),
-  rank: z.string().min(1, "Please select a rank"),
+  region: z.nativeEnum(Region).or(z.string()),
+  platform: z.nativeEnum(Platform).or(z.string()),
+  gamemode: z.nativeEnum(Gamemode).or(z.string()),
+  roles: z
+    .array(z.enum(Roles).or(z.string()))
+    .min(1, "Please select at least one role"),
+  rank: z.nativeEnum(Rank).or(z.string()),
   characters: z.array(z.string()),
   roleQueue: z
     .object({
@@ -103,11 +106,20 @@ const formSchema = z.object({
         message:
           "Number of desired vanguards, duelists, and strategists must add up to 6",
         path: ["sum"],
-      },
+      }
     ),
 });
-export function ProfileForm() {
-  const [roleQueueEnabled, setRoleQueueEnabled] = useState(false);
+
+interface ProfileFormProps {
+  initialValues?: Profile;
+  setProfile: (profile: Profile) => void;
+}
+
+export function ProfileForm({ initialValues, setProfile }: ProfileFormProps) {
+  const [roleQueueEnabled, setRoleQueueEnabled] = useState(
+    initialValues?.roleQueue ? true : false
+  );
+  const { toast } = useToast();
 
   const defaultValues = {
     region: "",
@@ -121,6 +133,7 @@ export function ProfileForm() {
       duelists: 2,
       strategists: 2,
     },
+    ...initialValues,
   };
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -134,15 +147,18 @@ export function ProfileForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>,
-      );
+      setProfile(values as Profile);
+      toast({
+        title: "Preferences saved",
+        variant: "success",
+      });
     } catch (error) {
       console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
+      toast({
+        title: "Failed to save preferences",
+        description: "Please try again.",
+        variant: "destructive",
+      });
     }
   }
 
@@ -292,12 +308,12 @@ export function ProfileForm() {
                               role="combobox"
                               className={cn(
                                 "w-full justify-between",
-                                !field.value && "text-muted-foreground",
+                                !field.value && "text-muted-foreground"
                               )}
                             >
                               {field.value
                                 ? ranks.find(
-                                    (rank) => rank.value === field.value,
+                                    (rank) => rank.value === field.value
                                   )?.label
                                 : "Select your rank"}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -323,7 +339,7 @@ export function ProfileForm() {
                                         "mr-2 h-4 w-4",
                                         rank.value === field.value
                                           ? "opacity-100"
-                                          : "opacity-0",
+                                          : "opacity-0"
                                       )}
                                     />
                                     {rank.label}
