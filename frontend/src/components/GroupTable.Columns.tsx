@@ -4,6 +4,7 @@ import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-col
 import { toTitleCase } from "@/lib/utils";
 import { getRegion, Group, Player } from "@/types";
 import { TEAM_SIZE } from "@/types/constants";
+import { Link } from "@tanstack/react-router";
 
 const defaultFilterFn = (
   row: Row<Group>,
@@ -23,7 +24,9 @@ export const columns: ColumnDef<Group>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("name")}
+            <Link to={`/groups/${row.original.id}`} className="hover:underline">
+              {row.getValue("name")}
+            </Link>
           </span>
         </div>
       );
