@@ -35,7 +35,9 @@ export function GroupDisplay({ group }: GroupDisplayProps) {
           acc.currVanguards += player.roles.includes("vanguard") ? 1 : 0;
           acc.currDuelists += player.roles.includes("duelist") ? 1 : 0;
           acc.currStrategists += player.roles.includes("strategist") ? 1 : 0;
-          acc.currCharacters = acc.currCharacters.union(new Set(player.characters));
+          acc.currCharacters = acc.currCharacters.union(
+            new Set(player.characters),
+          );
           return acc;
         },
         {
@@ -43,7 +45,7 @@ export function GroupDisplay({ group }: GroupDisplayProps) {
           currDuelists: 0,
           currStrategists: 0,
           currCharacters: new Set(),
-        }
+        },
       );
     }, [group.players]);
 
@@ -51,9 +53,9 @@ export function GroupDisplay({ group }: GroupDisplayProps) {
   const suggestedTeamUps = useMemo(() => {
     return teamUps.filter(
       (teamup) =>
-        (new Set(teamup.requirements.allOf)
-          .union(new Set(teamup.requirements.oneOf)))
-          .intersection(currCharacters).size > 0
+        new Set(teamup.requirements.allOf)
+          .union(new Set(teamup.requirements.oneOf))
+          .intersection(currCharacters).size > 0,
     );
   }, [teamUps, currCharacters]);
 

@@ -51,7 +51,7 @@ const Platforms = {
 
 export function getPlatform(platform: string): string {
   const platformObj = Object.entries(Platforms).find(
-    (entry) => entry[0] === platform
+    (entry) => entry[0] === platform,
   )?.[1];
   return `${platformObj?.emoji} ${platformObj?.label}`;
 }
