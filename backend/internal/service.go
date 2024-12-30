@@ -61,7 +61,7 @@ func (s *Service) ConnectDB(ctx context.Context) (*pgx.Conn, error) {
 	}
 	log.Info(ctx, "Connection established to database")
 
-	customDataTypes := []string{"Region", "Gamemode", "Role", "RankName", "RankID", "Rank"}
+	customDataTypes := []string{"RankName", "RankID", "Rank"}
 	for _, typeName := range customDataTypes {
 		dataType, _ := conn.LoadType(ctx, typeName)
 		conn.TypeMap().RegisterType(dataType)

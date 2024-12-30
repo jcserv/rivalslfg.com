@@ -1,30 +1,5 @@
 -- Types
 
-CREATE TYPE Region AS ENUM (
-    'na',
-    'eu',
-    'me',
-    'ap',
-    'sa'
-);
-
-CREATE TYPE Gamemode AS ENUM (
-    'competitive',
-    'quickplay'
-);
-
-CREATE TYPE Platform AS ENUM (
-    'pc',
-    'ps',
-    'xb'
-);
-
-CREATE TYPE Role AS ENUM (
-    'vanguard',
-    'duelist',
-    'strategist'
-);
-
 CREATE TYPE RankName AS ENUM (
     'Bronze III',
     'Bronze II',
@@ -139,8 +114,8 @@ CREATE TABLE Groups (
     id CHAR(4) PRIMARY KEY DEFAULT generate_group_id(),
     community_id INTEGER NOT NULL REFERENCES Community(id) DEFAULT 1,
     owner VARCHAR(14) NOT NULL, -- this is the player's display_name
-    region Region NOT NULL,
-    gamemode Gamemode NOT NULL,
+    region CHAR(2) NOT NULL,
+    gamemode TEXT NOT NULL,
     
     open BOOLEAN NOT NULL,
     passcode VARCHAR(4) NOT NULL DEFAULT generate_passcode(),
@@ -151,7 +126,7 @@ CREATE TABLE Groups (
     strategists INTEGER,
 
     -- group_settings
-    platforms Platform[],
+    platforms CHAR(2)[],
     voice_chat BOOLEAN,
     mic BOOLEAN,
     
@@ -163,10 +138,10 @@ CREATE TABLE Players (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR(14) UNIQUE NOT NULL,
     display_name VARCHAR(14) NOT NULL,
-    region Region NOT NULL,
-    platform Platform NOT NULL,
-    gamemode Gamemode NOT NULL,
-    roles Role[] NOT NULL,
+    region CHAR(2) NOT NULL,
+    platform CHAR(2) NOT NULL,
+    gamemode TEXT NOT NULL,
+    roles TEXT[] NOT NULL,
     rank RankID NOT NULL,
     characters TEXT[] NOT NULL,
     p_voice_chat BOOLEAN NOT NULL,
@@ -178,7 +153,7 @@ CREATE TABLE Players (
     strategists INTEGER,
 
     -- group_settings
-    platforms Platform[],
+    platforms CHAR(2)[],
     g_voice_chat BOOLEAN,
     g_mic BOOLEAN,
 
@@ -201,13 +176,13 @@ INSERT INTO Community (name, description, link) VALUES
     ('Rivals LFG', 'A site that helps Marvel Rivals players find groups to play with', 'https://rivalslfg.com');
 
 INSERT INTO Groups (id, owner, region, gamemode, open, vanguards, duelists, strategists, platforms, voice_chat, mic) VALUES
-    ('AAAA', 'Skelzore', 'na', 'competitive', true, 2, 2, 2, ARRAY['pc']::Platform[], false, false);
+    ('AAAA', 'Skelzore', 'na', 'competitive', true, 2, 2, 2, ARRAY['pc'], false, false);
 
 INSERT INTO Players (name, display_name, region, platform, gamemode, roles, rank, characters, p_voice_chat, p_mic) VALUES
-    ('skelzore', 'Skelzore', 'na', 'pc', 'competitive', ARRAY['strategist']::Role[], 'p3', ARRAY['Mantis'], false, false),
-    ('imphungky', 'imphungky', 'na', 'xb', 'competitive', ARRAY['vanguard']::Role[], 'd3', ARRAY['Doctor Strange'], false, false),
-    ('xzestence', 'xZestence', 'na', 'ps', 'quickplay', ARRAY['strategist']::Role[], 'p1', ARRAY['Rocket Raccoon', 'Luna Snow'], true, false),
-    ('scynthesia', 'Scynthesia', 'na', 'pc', 'quickplay', ARRAY['duelist']::Role[], 'd3', ARRAY['Winter Solider'], false, false);
+    ('skelzore', 'Skelzore', 'na', 'pc', 'competitive', ARRAY['strategist'], 'p3', ARRAY['Mantis'], false, false),
+    ('imphungky', 'imphungky', 'na', 'xb', 'competitive', ARRAY['vanguard'], 'd3', ARRAY['Doctor Strange'], false, false),
+    ('xzestence', 'xZestence', 'na', 'ps', 'quickplay', ARRAY['strategist'], 'p1', ARRAY['Rocket Raccoon', 'Luna Snow'], true, false),
+    ('scynthesia', 'Scynthesia', 'na', 'pc', 'quickplay', ARRAY['duelist'], 'd3', ARRAY['Winter Solider'], false, false);
 
 INSERT INTO GroupMembers (group_id, player_id, leader) VALUES
     ('AAAA', 1, true),
