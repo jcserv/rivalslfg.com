@@ -1,0 +1,19 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy-api:
+    name: Deploy API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    concurrency: deploy-group 
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
