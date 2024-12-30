@@ -11,7 +11,7 @@ export const Header: React.FC = () => {
           <Link to="/">Rivals LFG 🤩</Link>
         </span>
       </h1>
-      <div className="flex items-center space-x-2 p-2">
+      <div className="flex items-center space-x-6 p-2">
         <Link to="/" className="inline-flex items-center hover:underline">
           Home
         </Link>
@@ -23,6 +23,12 @@ export const Header: React.FC = () => {
           className="inline-flex items-center hover:underline"
         >
           Profile
+        </Link>
+        <Link
+          to="/discord"
+          className="inline-flex items-center hover:underline"
+        >
+          Discord
         </Link>
         <Button
           variant="ghost"
