@@ -13,6 +13,7 @@ func LogIncomingRequests() mux.MiddlewareFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 			log.Info(ctx, fmt.Sprintf("%s %s", r.Method, r.URL.Path))
+			next.ServeHTTP(w, r)
 		})
 	}
 }

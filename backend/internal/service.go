@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jcserv/rivalslfg/internal/transport/rest"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
@@ -21,10 +22,20 @@ func NewService() (*Service, error) {
 		return nil, err
 	}
 
+	if err := cfg.Validate(); err != nil {
+		return nil, err
+	}
+
 	s := &Service{
-		api: rest.NewAPI(),
 		cfg: cfg,
 	}
+
+	conn, err := s.ConnectDB(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	s.api = rest.NewAPI(conn)
 	return s, nil
 }
 
@@ -41,6 +52,15 @@ func (s *Service) Run() error {
 
 	wg.Wait()
 	return nil
+}
+
+func (s *Service) ConnectDB(ctx context.Context) (*pgx.Conn, error) {
+	conn, err := pgx.Connect(context.Background(), s.cfg.DatabaseURL)
+	if err != nil {
+		return nil, err
+	}
+	log.Info(ctx, "Connection established to database")
+	return conn, nil
 }
 
 func (s *Service) StartHTTP(ctx context.Context) error {
