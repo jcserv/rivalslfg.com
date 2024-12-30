@@ -8,6 +8,16 @@ COPY . .
 
 RUN go build /app/cmd/rivalslfg
 
-FROM scratch as release
+FROM alpine:latest as release
+WORKDIR /app
+
+# Install migrate binary
+RUN wget https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-amd64.tar.gz \
+    && tar xvz migrate.linux-amd64.tar.gz \
+    && mv migrate.linux-amd64 /usr/local/bin/migrate \
+    && chmod +x /usr/local/bin/migrate
+
 COPY --from=builder /app/rivalslfg /rivalslfg
+COPY --from=builder /app/db/migrations ./db/migrations
+
 ENTRYPOINT ["/rivalslfg"]
