@@ -1,11 +1,14 @@
-name: Deploy
+name: cd
 on:
   push:
     branches:
       - main
+    paths:
+      - "backend/**"
+
 jobs:
-  deploy-api:
-    name: Deploy API
+  cd-api:
+    name: cd-api
     runs-on: ubuntu-latest
     defaults:
       run:
