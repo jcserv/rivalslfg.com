@@ -9,13 +9,51 @@ import (
 	"context"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const findAllGroups = `-- name: FindAllGroups :many
+SELECT id, community_id, owner, region, gamemode, open, passcode, vanguards, duelists, strategists, platforms, voice_chat, mic, created_at, updated_at FROM Groups
+`
+
+func (q *Queries) FindAllGroups(ctx context.Context) ([]Group, error) {
+	rows, err := q.db.Query(ctx, findAllGroups)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Group
+	for rows.Next() {
+		var i Group
+		if err := rows.Scan(
+			&i.ID,
+			&i.CommunityID,
+			&i.Owner,
+			&i.Region,
+			&i.Gamemode,
+			&i.Open,
+			&i.Passcode,
+			&i.Vanguards,
+			&i.Duelists,
+			&i.Strategists,
+			&i.Platforms,
+			&i.VoiceChat,
+			&i.Mic,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findAllPlayers = `-- name: FindAllPlayers :many
-SELECT id, name, level, class, created_at, updated_at, gold FROM player
-ORDER BY level DESC
+SELECT id, name, display_name, region, platform, gamemode, roles, rank, characters, p_voice_chat, p_mic, vanguards, duelists, strategists, platforms, g_voice_chat, g_mic, created_at, updated_at FROM Players
 `
 
 func (q *Queries) FindAllPlayers(ctx context.Context) ([]Player, error) {
@@ -30,11 +68,23 @@ func (q *Queries) FindAllPlayers(ctx context.Context) ([]Player, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
-			&i.Level,
-			&i.Class,
+			&i.DisplayName,
+			&i.Region,
+			&i.Platform,
+			&i.Gamemode,
+			&i.Roles,
+			&i.Rank,
+			&i.Characters,
+			&i.PVoiceChat,
+			&i.PMic,
+			&i.Vanguards,
+			&i.Duelists,
+			&i.Strategists,
+			&i.Platforms,
+			&i.GVoiceChat,
+			&i.GMic,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Gold,
 		); err != nil {
 			return nil, err
 		}
@@ -46,149 +96,95 @@ func (q *Queries) FindAllPlayers(ctx context.Context) ([]Player, error) {
 	return items, nil
 }
 
-const findItemByID = `-- name: FindItemByID :one
-SELECT id, name, value FROM item
-WHERE id = $1
+const getGroupByID = `-- name: GetGroupByID :one
+SELECT groups.id, community_id, owner, groups.region, groups.gamemode, open, passcode, groups.vanguards, groups.duelists, groups.strategists, groups.platforms, voice_chat, mic, groups.created_at, groups.updated_at, group_id, player_id, leader, players.id, name, display_name, players.region, platform, players.gamemode, roles, rank, characters, p_voice_chat, p_mic, players.vanguards, players.duelists, players.strategists, players.platforms, g_voice_chat, g_mic, players.created_at, players.updated_at 
+FROM Groups
+JOIN GroupMembers ON Groups.id = GroupMembers.group_id
+JOIN Players ON Players.id = GroupMembers.player_id
+WHERE Groups.id = $1
 `
 
-func (q *Queries) FindItemByID(ctx context.Context, id uuid.UUID) (Item, error) {
-	row := q.db.QueryRow(ctx, findItemByID, id)
-	var i Item
-	err := row.Scan(&i.ID, &i.Name, &i.Value)
-	return i, err
+type GetGroupByIDRow struct {
+	ID            string      `json:"id"`
+	CommunityID   int32       `json:"community_id"`
+	Owner         string      `json:"owner"`
+	Region        Region      `json:"region"`
+	Gamemode      Gamemode    `json:"gamemode"`
+	Open          bool        `json:"open"`
+	Passcode      string      `json:"passcode"`
+	Vanguards     pgtype.Int4 `json:"vanguards"`
+	Duelists      pgtype.Int4 `json:"duelists"`
+	Strategists   pgtype.Int4 `json:"strategists"`
+	Platforms     []Platform  `json:"platforms"`
+	VoiceChat     pgtype.Bool `json:"voice_chat"`
+	Mic           pgtype.Bool `json:"mic"`
+	CreatedAt     time.Time   `json:"created_at"`
+	UpdatedAt     time.Time   `json:"updated_at"`
+	GroupID       string      `json:"group_id"`
+	PlayerID      int32       `json:"player_id"`
+	Leader        bool        `json:"leader"`
+	ID_2          int32       `json:"id_2"`
+	Name          string      `json:"name"`
+	DisplayName   string      `json:"display_name"`
+	Region_2      Region      `json:"region_2"`
+	Platform      Platform    `json:"platform"`
+	Gamemode_2    Gamemode    `json:"gamemode_2"`
+	Roles         []Role      `json:"roles"`
+	Rank          Rankid      `json:"rank"`
+	Characters    []string    `json:"characters"`
+	PVoiceChat    bool        `json:"p_voice_chat"`
+	PMic          bool        `json:"p_mic"`
+	Vanguards_2   pgtype.Int4 `json:"vanguards_2"`
+	Duelists_2    pgtype.Int4 `json:"duelists_2"`
+	Strategists_2 pgtype.Int4 `json:"strategists_2"`
+	Platforms_2   []Platform  `json:"platforms_2"`
+	GVoiceChat    pgtype.Bool `json:"g_voice_chat"`
+	GMic          pgtype.Bool `json:"g_mic"`
+	CreatedAt_2   time.Time   `json:"created_at_2"`
+	UpdatedAt_2   time.Time   `json:"updated_at_2"`
 }
 
-const getInventoryAndPlayer = `-- name: GetInventoryAndPlayer :many
-SELECT player.id, player.name, player.level, player.class, player.created_at, player.updated_at, player.gold, item.id, item.name, item.value
-FROM inventory
-JOIN player ON player.id = player_id
-JOIN item ON item.id = item_id
-`
-
-type GetInventoryAndPlayerRow struct {
-	ID        int32       `json:"id"`
-	Name      string      `json:"name"`
-	Level     int32       `json:"level"`
-	Class     string      `json:"class"`
-	CreatedAt time.Time   `json:"created_at"`
-	UpdatedAt time.Time   `json:"updated_at"`
-	Gold      pgtype.Int8 `json:"gold"`
-	ID_2      uuid.UUID   `json:"id_2"`
-	Name_2    string      `json:"name_2"`
-	Value     int32       `json:"value"`
-}
-
-func (q *Queries) GetInventoryAndPlayer(ctx context.Context) ([]GetInventoryAndPlayerRow, error) {
-	rows, err := q.db.Query(ctx, getInventoryAndPlayer)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetInventoryAndPlayerRow
-	for rows.Next() {
-		var i GetInventoryAndPlayerRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Level,
-			&i.Class,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.Gold,
-			&i.ID_2,
-			&i.Name_2,
-			&i.Value,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getInventoryItem = `-- name: GetInventoryItem :one
-SELECT item.id, item.name, item.value
-FROM inventory
-JOIN item ON item.id = item_id
-WHERE player_id = $1
-AND item_id = $2
-`
-
-type GetInventoryItemParams struct {
-	PlayerID int64     `json:"player_id"`
-	ItemID   uuid.UUID `json:"item_id"`
-}
-
-func (q *Queries) GetInventoryItem(ctx context.Context, arg GetInventoryItemParams) (Item, error) {
-	row := q.db.QueryRow(ctx, getInventoryItem, arg.PlayerID, arg.ItemID)
-	var i Item
-	err := row.Scan(&i.ID, &i.Name, &i.Value)
-	return i, err
-}
-
-const incrPlayerGold = `-- name: IncrPlayerGold :one
-UPDATE player
-SET gold = gold + $1::int
-WHERE id = $2::bigint
-RETURNING id, name, level, class, created_at, updated_at, gold
-`
-
-type IncrPlayerGoldParams struct {
-	Amount   int32 `json:"amount"`
-	PlayerID int64 `json:"player_id"`
-}
-
-func (q *Queries) IncrPlayerGold(ctx context.Context, arg IncrPlayerGoldParams) (Player, error) {
-	row := q.db.QueryRow(ctx, incrPlayerGold, arg.Amount, arg.PlayerID)
-	var i Player
+func (q *Queries) GetGroupByID(ctx context.Context, id string) (GetGroupByIDRow, error) {
+	row := q.db.QueryRow(ctx, getGroupByID, id)
+	var i GetGroupByIDRow
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
-		&i.Level,
-		&i.Class,
+		&i.CommunityID,
+		&i.Owner,
+		&i.Region,
+		&i.Gamemode,
+		&i.Open,
+		&i.Passcode,
+		&i.Vanguards,
+		&i.Duelists,
+		&i.Strategists,
+		&i.Platforms,
+		&i.VoiceChat,
+		&i.Mic,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Gold,
+		&i.GroupID,
+		&i.PlayerID,
+		&i.Leader,
+		&i.ID_2,
+		&i.Name,
+		&i.DisplayName,
+		&i.Region_2,
+		&i.Platform,
+		&i.Gamemode_2,
+		&i.Roles,
+		&i.Rank,
+		&i.Characters,
+		&i.PVoiceChat,
+		&i.PMic,
+		&i.Vanguards_2,
+		&i.Duelists_2,
+		&i.Strategists_2,
+		&i.Platforms_2,
+		&i.GVoiceChat,
+		&i.GMic,
+		&i.CreatedAt_2,
+		&i.UpdatedAt_2,
 	)
 	return i, err
-}
-
-const insertItem = `-- name: InsertItem :one
-INSERT INTO item (id, name, value)
-VALUES (uuid_generate_v4(), $1, $2)
-RETURNING id, name, value
-`
-
-type InsertItemParams struct {
-	Name  string `json:"name"`
-	Value int32  `json:"value"`
-}
-
-func (q *Queries) InsertItem(ctx context.Context, arg InsertItemParams) (Item, error) {
-	row := q.db.QueryRow(ctx, insertItem, arg.Name, arg.Value)
-	var i Item
-	err := row.Scan(&i.ID, &i.Name, &i.Value)
-	return i, err
-}
-
-const removeInventoryItem = `-- name: RemoveInventoryItem :execrows
-DELETE FROM inventory
-WHERE player_id = $1
-AND item_id = $2
-`
-
-type RemoveInventoryItemParams struct {
-	PlayerID int64     `json:"player_id"`
-	ItemID   uuid.UUID `json:"item_id"`
-}
-
-func (q *Queries) RemoveInventoryItem(ctx context.Context, arg RemoveInventoryItemParams) (int64, error) {
-	result, err := q.db.Exec(ctx, removeInventoryItem, arg.PlayerID, arg.ItemID)
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected(), nil
 }

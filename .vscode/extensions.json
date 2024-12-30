@@ -9,5 +9,6 @@
         "yzhang.markdown-all-in-one",
         "redhat.vscode-yaml",
         "IronGreek.vscode-env",
+        "inferrinizzard.prettier-sql-vscode"
     ]
 }

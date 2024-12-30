@@ -7,11 +7,12 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jcserv/rivalslfg/internal/repository"
 	"github.com/jcserv/rivalslfg/internal/transport/rest/httputil"
+	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
 const (
 	APIV1URLPath = "/api/v1/"
-	GetGroup     = APIV1URLPath + "group/:id"
+	GetGroup     = APIV1URLPath + "groups/{id}"
 	GetGroups    = APIV1URLPath + "groups"
 )
 
@@ -32,19 +33,40 @@ func (a *API) RegisterRoutes(r *mux.Router) {
 
 func (a *API) GetGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		httputil.OK(w, map[string]string{
-			"message": "get group",
-		})
+		ctx := r.Context()
+		vars := mux.Vars(r)
+		groupID := vars["id"]
+		if groupID == "" {
+			httputil.BadRequest(w)
+			return
+		}
+
+		repo := repository.New(a.conn)
+
+		group, err := repo.GetGroupByID(ctx, groupID)
+		if err != nil {
+			httputil.InternalServerError(ctx, w, err)
+			log.Error(ctx, err.Error())
+			return
+		}
+
+		httputil.OK(w, group)
 	}
 }
 
 func (a *API) GetGroups() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
+
 		repo := repository.New(a.conn)
-		players, _ := repo.FindAllPlayers(ctx)
-		httputil.OK(w, map[string][]repository.Player{
-			"players": players,
-		})
+
+		groups, err := repo.FindAllGroups(ctx)
+		if err != nil {
+			httputil.InternalServerError(ctx, w, err)
+			log.Error(ctx, err.Error())
+			return
+		}
+
+		httputil.OK(w, groups)
 	}
 }
