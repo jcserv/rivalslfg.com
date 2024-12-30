@@ -12,91 +12,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type Gamemode string
-
-const (
-	GamemodeCompetitive Gamemode = "competitive"
-	GamemodeQuickplay   Gamemode = "quickplay"
-)
-
-func (e *Gamemode) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = Gamemode(s)
-	case string:
-		*e = Gamemode(s)
-	default:
-		return fmt.Errorf("unsupported scan type for Gamemode: %T", src)
-	}
-	return nil
-}
-
-type NullGamemode struct {
-	Gamemode Gamemode `json:"gamemode"`
-	Valid    bool     `json:"valid"` // Valid is true if Gamemode is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullGamemode) Scan(value interface{}) error {
-	if value == nil {
-		ns.Gamemode, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.Gamemode.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullGamemode) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.Gamemode), nil
-}
-
-type Platform string
-
-const (
-	PlatformPc Platform = "pc"
-	PlatformPs Platform = "ps"
-	PlatformXb Platform = "xb"
-)
-
-func (e *Platform) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = Platform(s)
-	case string:
-		*e = Platform(s)
-	default:
-		return fmt.Errorf("unsupported scan type for Platform: %T", src)
-	}
-	return nil
-}
-
-type NullPlatform struct {
-	Platform Platform `json:"platform"`
-	Valid    bool     `json:"valid"` // Valid is true if Platform is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullPlatform) Scan(value interface{}) error {
-	if value == nil {
-		ns.Platform, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.Platform.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullPlatform) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.Platform), nil
-}
-
 type Rankid string
 
 const (
@@ -217,94 +132,6 @@ func (ns NullRankname) Value() (driver.Value, error) {
 	return string(ns.Rankname), nil
 }
 
-type Region string
-
-const (
-	RegionNa Region = "na"
-	RegionEu Region = "eu"
-	RegionMe Region = "me"
-	RegionAp Region = "ap"
-	RegionSa Region = "sa"
-)
-
-func (e *Region) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = Region(s)
-	case string:
-		*e = Region(s)
-	default:
-		return fmt.Errorf("unsupported scan type for Region: %T", src)
-	}
-	return nil
-}
-
-type NullRegion struct {
-	Region Region `json:"region"`
-	Valid  bool   `json:"valid"` // Valid is true if Region is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullRegion) Scan(value interface{}) error {
-	if value == nil {
-		ns.Region, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.Region.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullRegion) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.Region), nil
-}
-
-type Role string
-
-const (
-	RoleVanguard   Role = "vanguard"
-	RoleDuelist    Role = "duelist"
-	RoleStrategist Role = "strategist"
-)
-
-func (e *Role) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = Role(s)
-	case string:
-		*e = Role(s)
-	default:
-		return fmt.Errorf("unsupported scan type for Role: %T", src)
-	}
-	return nil
-}
-
-type NullRole struct {
-	Role  Role `json:"role"`
-	Valid bool `json:"valid"` // Valid is true if Role is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullRole) Scan(value interface{}) error {
-	if value == nil {
-		ns.Role, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.Role.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullRole) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.Role), nil
-}
-
 type Community struct {
 	ID          int32  `json:"id"`
 	Name        string `json:"name"`
@@ -316,14 +143,14 @@ type Group struct {
 	ID          string      `json:"id"`
 	CommunityID int32       `json:"community_id"`
 	Owner       string      `json:"owner"`
-	Region      Region      `json:"region"`
-	Gamemode    Gamemode    `json:"gamemode"`
+	Region      string      `json:"region"`
+	Gamemode    string      `json:"gamemode"`
 	Open        bool        `json:"open"`
 	Passcode    string      `json:"passcode"`
 	Vanguards   pgtype.Int4 `json:"vanguards"`
 	Duelists    pgtype.Int4 `json:"duelists"`
 	Strategists pgtype.Int4 `json:"strategists"`
-	Platforms   []Platform  `json:"platforms"`
+	Platforms   []string    `json:"platforms"`
 	VoiceChat   pgtype.Bool `json:"voice_chat"`
 	Mic         pgtype.Bool `json:"mic"`
 	CreatedAt   time.Time   `json:"created_at"`
@@ -340,10 +167,10 @@ type Player struct {
 	ID          int32       `json:"id"`
 	Name        string      `json:"name"`
 	DisplayName string      `json:"display_name"`
-	Region      Region      `json:"region"`
-	Platform    Platform    `json:"platform"`
-	Gamemode    Gamemode    `json:"gamemode"`
-	Roles       []Role      `json:"roles"`
+	Region      string      `json:"region"`
+	Platform    string      `json:"platform"`
+	Gamemode    string      `json:"gamemode"`
+	Roles       []string    `json:"roles"`
 	Rank        Rankid      `json:"rank"`
 	Characters  []string    `json:"characters"`
 	PVoiceChat  bool        `json:"p_voice_chat"`
@@ -351,7 +178,7 @@ type Player struct {
 	Vanguards   pgtype.Int4 `json:"vanguards"`
 	Duelists    pgtype.Int4 `json:"duelists"`
 	Strategists pgtype.Int4 `json:"strategists"`
-	Platforms   []Platform  `json:"platforms"`
+	Platforms   []string    `json:"platforms"`
 	GVoiceChat  pgtype.Bool `json:"g_voice_chat"`
 	GMic        pgtype.Bool `json:"g_mic"`
 	CreatedAt   time.Time   `json:"created_at"`

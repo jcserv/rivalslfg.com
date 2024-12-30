@@ -42,8 +42,7 @@ func (a *API) GetGroup() http.HandlerFunc {
 		}
 
 		repo := repository.New(a.conn)
-
-		group, err := repo.GetGroupByID(ctx, groupID)
+		group, err := repo.FindGroupByID(ctx, groupID)
 		if err != nil {
 			httputil.InternalServerError(ctx, w, err)
 			log.Error(ctx, err.Error())
@@ -54,6 +53,7 @@ func (a *API) GetGroup() http.HandlerFunc {
 	}
 }
 
+// TODO: Add pagination
 func (a *API) GetGroups() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()

@@ -33,8 +33,5 @@ test-db-down:
 migrate-test:
 	migrate -database "$(TEST_DATABASE_URL)?sslmode=disable" -path ./db/migrations up
 
-migrate-prod:
-	flyctl ssh console -C "migrate -database \"$DATABASE_URL\" -path /app/db/migrations up"
-
 reset-test:
 	make test-db-down && make test-db && make migrate-test
