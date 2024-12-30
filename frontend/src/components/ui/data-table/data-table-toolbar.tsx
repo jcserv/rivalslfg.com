@@ -4,8 +4,6 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-// TODO: filter by region, gamemode, role queue -> LF vanguard/duelist/strategist
-
 import { areRequirementsMet, gamemodes, regions } from "./data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 

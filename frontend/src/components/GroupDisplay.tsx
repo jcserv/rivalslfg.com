@@ -46,7 +46,6 @@ export function GroupDisplay({ group, canUserAccessGroup }: GroupDisplayProps) {
       return getGroupInfo(group);
     }, [group.players]);
 
-  // TODO: Exclude suggested teamups that would violate the role queue restrictions
   const suggestedTeamUps = useMemo(() => {
     return teamUps.filter(
       (teamup) =>
