@@ -11,11 +11,13 @@ RUN go build /app/cmd/rivalslfg
 FROM alpine:latest as release
 WORKDIR /app
 
-# Install migrate binary
-RUN wget https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-amd64.tar.gz \
-    && tar xvz migrate.linux-amd64.tar.gz \
-    && mv migrate.linux-amd64 /usr/local/bin/migrate \
-    && chmod +x /usr/local/bin/migrate
+# Install wget and install migrate binary
+RUN apk add --no-cache wget \
+    && wget https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-amd64.tar.gz \
+    && tar xvzf migrate.linux-amd64.tar.gz \
+    && mv migrate /usr/local/bin/migrate \
+    && chmod +x /usr/local/bin/migrate \
+    && rm migrate.linux-amd64.tar.gz
 
 COPY --from=builder /app/rivalslfg /rivalslfg
 COPY --from=builder /app/db/migrations ./db/migrations
