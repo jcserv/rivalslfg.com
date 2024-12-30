@@ -7,6 +7,7 @@ import { Group as GroupType } from "@/types";
 import { Chat } from "@/components/Chat";
 import { Button } from "@/components/ui";
 import { useState } from "react";
+import { AccessGroupDialog } from "@/components/AccessGroupDialog";
 
 export const Route = createLazyFileRoute("/groups/$groupId")({
   component: Group,
@@ -17,7 +18,7 @@ function Group() {
   const group = groups.find((group) => group.id === groupId);
 
   const isGroupOpen = group?.open || false;
-  const [canUserAccessGroup] = useState(isGroupOpen);
+  const [canUserAccessGroup, setCanUserAccessGroup] = useState(isGroupOpen);
 
   function onLeave() {
     // TODO: This should also be logged in the chat
@@ -29,6 +30,12 @@ function Group() {
       <div className="min-h-[80vh] w-full flex flex-col items-center">
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-8">
+            <AccessGroupDialog
+              open={!canUserAccessGroup}
+              onClose={() => {
+                setCanUserAccessGroup(true);
+              }}
+            />
             <GroupDisplay
               group={group as GroupType}
               canUserAccessGroup={canUserAccessGroup}
