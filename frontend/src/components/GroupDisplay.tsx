@@ -33,9 +33,10 @@ import { useToast } from "@/hooks/use-toast";
 
 interface GroupDisplayProps {
   group: Group;
+  canUserAccessGroup: boolean;
 }
 
-export function GroupDisplay({ group }: GroupDisplayProps) {
+export function GroupDisplay({ group, canUserAccessGroup }: GroupDisplayProps) {
   const { toast } = useToast();
 
   const leader = group.players.find((player) => player.leader);
@@ -122,17 +123,19 @@ export function GroupDisplay({ group }: GroupDisplayProps) {
                 </>
               )}
             </div>
-            <div className="col-span-6 flex justify-end">
-              <div>
-                Suggested Team-ups:
-                <br />
-                <ul>
-                  {suggestedTeamUps.map((teamup) => (
-                    <TeamUpItem key={teamup.name} teamup={teamup} />
-                  ))}
-                </ul>
+            {canUserAccessGroup && (
+              <div className="col-span-6 flex justify-end">
+                <div>
+                  Suggested Team-ups:
+                  <br />
+                  <ul>
+                    {suggestedTeamUps.map((teamup) => (
+                      <TeamUpItem key={teamup.name} teamup={teamup} />
+                    ))}
+                  </ul>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </CardDescription>
       </CardHeader>
@@ -151,7 +154,7 @@ export function GroupDisplay({ group }: GroupDisplayProps) {
           </TableHeader>
           <TableBody>
             {group.players.map((player) => (
-              <TableRow key={player.name}>
+              <TableRow key={player.name} isLoading={!canUserAccessGroup}>
                 <TableCell>
                   {player.name}
                   {player.leader ? " 🚩" : ""}

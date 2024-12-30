@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { Skeleton } from "./skeleton";
 
 const Table = React.forwardRef<
   HTMLTableElement,
@@ -51,19 +52,41 @@ const TableFooter = React.forwardRef<
 ));
 TableFooter.displayName = "TableFooter";
 
-const TableRow = React.forwardRef<
-  HTMLTableRowElement,
-  React.HTMLAttributes<HTMLTableRowElement>
->(({ className, ...props }, ref) => (
-  <tr
-    ref={ref}
-    className={cn(
-      "border-b transition-colors hover:bg-zinc-100/50 data-[state=selected]:bg-zinc-100 dark:hover:bg-zinc-800/50 dark:data-[state=selected]:bg-zinc-800",
-      className,
-    )}
-    {...props}
-  />
-));
+interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
+  isLoading?: boolean;
+}
+
+const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(
+  ({ className, isLoading = false, children, ...props }, ref) => {
+    if (isLoading) {
+      return (
+        <tr
+          ref={ref}
+          className={cn("border-b transition-colors w-full", className)}
+          {...props}
+        >
+          <td colSpan={6} className="p-4 w-full">
+            <Skeleton className="h-8 w-full rounded-md" />
+          </td>
+        </tr>
+      );
+    }
+
+    return (
+      <tr
+        ref={ref}
+        className={cn(
+          "border-b transition-colors hover:bg-zinc-100/50 data-[state=selected]:bg-zinc-100 dark:hover:bg-zinc-800/50 dark:data-[state=selected]:bg-zinc-800",
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </tr>
+    );
+  },
+);
+
 TableRow.displayName = "TableRow";
 
 const TableHead = React.forwardRef<

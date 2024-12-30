@@ -16,6 +16,7 @@ export * from "./multi-select";
 export * from "./popover";
 export * from "./select";
 export * from "./separator";
+export * from "./skeleton";
 export * from "./switch";
 export * from "./table";
 export * from "./tabs";

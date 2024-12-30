@@ -179,7 +179,6 @@ export const columns = (
       accessorKey: string,
       value: string[],
     ) => {
-      console.log(value, accessorKey, row.getValue(accessorKey));
       const compareWith = row.getValue(accessorKey);
       return value.some((str) => {
         const boolValue =

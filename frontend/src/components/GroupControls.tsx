@@ -10,6 +10,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  Skeleton,
   Switch,
 } from "@/components/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,9 +23,13 @@ const formSchema = z.object({
 
 interface GroupControlsProps {
   isGroupOpen: boolean;
+  canUserAccessGroup: boolean;
 }
 
-export function GroupControls({ isGroupOpen }: GroupControlsProps) {
+export function GroupControls({
+  isGroupOpen,
+  canUserAccessGroup,
+}: GroupControlsProps) {
   const passcode = "abcd";
 
   const defaultValues = {
@@ -43,49 +48,56 @@ export function GroupControls({ isGroupOpen }: GroupControlsProps) {
       <CardHeader>
         <div className="flex flex-row items-center justify-between">
           <CardTitle>Settings</CardTitle>
-          {isClosed && (
-            <p>
-              <strong>Passcode:</strong> {passcode}
-            </p>
-          )}
+          {isClosed &&
+            (canUserAccessGroup ? (
+              <p>
+                <strong>Passcode:</strong> {passcode}
+              </p>
+            ) : (
+              <Skeleton className="h-12 w-1/2 rounded-xl" />
+            ))}
         </div>
       </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form>
-            <div className="grid grid-cols-12 gap-4">
-              <div className="col-span-12">
-                <FormField
-                  control={form.control}
-                  name="open"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start gap-2">
-                      <div className="space-y-0.5">
-                        <FormLabel
-                          htmlFor="open"
-                          className="self-center leading-none mt-1"
-                        >
-                          Open
-                        </FormLabel>
-                        <FormDescription>
-                          When this is on, players can join the group.
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          id="open"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+      <CardContent className="h-full">
+        {!canUserAccessGroup ? (
+          <Skeleton className="h-[125px] w-full rounded-xl" />
+        ) : (
+          <Form {...form}>
+            <form>
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-12">
+                  <FormField
+                    control={form.control}
+                    name="open"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start gap-2">
+                        <div className="space-y-0.5">
+                          <FormLabel
+                            htmlFor="open"
+                            className="self-center leading-none mt-1"
+                          >
+                            Open
+                          </FormLabel>
+                          <FormDescription>
+                            When this is on, players can join the group.
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            id="open"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
-            </div>
-          </form>
-        </Form>
+            </form>
+          </Form>
+        )}
       </CardContent>
     </Card>
   );
