@@ -17,3 +17,16 @@ export const gamemodes = [
     icon: "⚡",
   },
 ];
+
+export const areRequirementsMet = [
+  {
+    value: "true",
+    label: "Yes",
+    icon: "✅",
+  },
+  {
+    value: "false",
+    label: "No",
+    icon: "❌",
+  },
+];

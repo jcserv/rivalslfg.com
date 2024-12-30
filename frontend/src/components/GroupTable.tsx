@@ -1,7 +1,8 @@
 import { DataTable } from "./ui/data-table";
 import { columns } from "./GroupTable.Columns";
 
-import { Group, Profile } from "@/types";
+import { areRequirementsMet, getRequirements, Group, Profile } from "@/types";
+import { useMemo } from "react";
 
 interface GroupTableProps {
   groups: Group[];
@@ -14,6 +15,18 @@ export function GroupTable({
   profile,
   isProfileEmpty,
 }: GroupTableProps) {
+  const groupTableData = useMemo(() => {
+    return groups.map((group) => {
+      const requirements = getRequirements(group);
+      const areReqsMet = areRequirementsMet(group, requirements, profile);
+      return {
+        ...group,
+        requirements,
+        areRequirementsMet: areReqsMet,
+      };
+    });
+  }, [groups, profile]);
+
   return (
     <>
       <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
@@ -22,7 +35,10 @@ export function GroupTable({
             <h2 className="text-2xl font-bold tracking-tight">Groups</h2>
           </div>
         </div>
-        <DataTable data={groups} columns={columns(profile, isProfileEmpty)} />
+        <DataTable
+          data={groupTableData}
+          columns={columns(profile, isProfileEmpty)}
+        />
       </div>
     </>
   );

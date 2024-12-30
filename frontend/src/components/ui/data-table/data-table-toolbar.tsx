@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 
 // TODO: filter by region, gamemode, role queue -> LF vanguard/duelist/strategist
 
-import { gamemodes, regions } from "./data";
+import { areRequirementsMet, gamemodes, regions } from "./data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {
@@ -41,6 +41,13 @@ export function DataTableToolbar<TData>({
             column={table.getColumn("gamemode")}
             title="Gamemode"
             options={gamemodes}
+          />
+        )}
+        {table.getColumn("areRequirementsMet") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("areRequirementsMet")}
+            title="Requirements Met"
+            options={areRequirementsMet}
           />
         )}
         {isFiltered && (

@@ -3,13 +3,12 @@ import { ColumnDef, Row } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { toTitleCase } from "@/lib/utils";
 import {
-  areRequirementsMet,
   Gamemode,
   gamemodeEmojis,
   getRankFromRankVal,
   getRegion,
-  getRequirements,
   Group,
+  GroupRequirements,
   Player,
   Profile,
 } from "@/types";
@@ -26,8 +25,13 @@ import {
   TooltipContent,
 } from "./ui";
 
+export type GroupTableData = Group & {
+  requirements: GroupRequirements;
+  areRequirementsMet: boolean;
+};
+
 const defaultFilterFn = (
-  row: Row<Group>,
+  row: Row<GroupTableData>,
   accessorKey: string,
   value: string,
 ) => {
@@ -37,7 +41,7 @@ const defaultFilterFn = (
 export const columns = (
   profile: Profile | null,
   isProfileEmpty: boolean,
-): ColumnDef<Group>[] => [
+): ColumnDef<GroupTableData>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -122,31 +126,34 @@ export const columns = (
     enableHiding: false,
   },
   {
-    accessorKey: "requirements",
+    accessorKey: "areRequirementsMet",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Requirements Met" />
+      <DataTableColumnHeader
+        column={column}
+        title="Requirements Met"
+        className="justify-center"
+      />
     ),
     cell: ({ row }) => {
-      const group = row.original as Group;
-      const requirements = getRequirements(group);
+      const group = row.original as GroupTableData;
+      const areRequirementsMet = row.getValue("areRequirementsMet");
+      const requirements: GroupRequirements = row.original.requirements;
       return (
-        <div className="flex items-center">
+        <div className="flex items-center text-center justify-center">
           <HoverCard>
             <HoverCardTrigger asChild>
-              <span>
-                {areRequirementsMet(group, requirements, profile) ? "✅" : "❌"}
-              </span>
+              <span>{areRequirementsMet ? "✅" : "❌"}</span>
             </HoverCardTrigger>
             <HoverCardContent className="w-full p-2">
               <ul>
                 {requirements.voiceChat && (
                   <li>
-                    <strong>Voice Chat:</strong> ✅
+                    <strong>Voice Chat:</strong> Required
                   </li>
                 )}
                 {requirements.mic && (
                   <li>
-                    <strong>Mic:</strong> ✅
+                    <strong>Mic:</strong> Required
                   </li>
                 )}
                 {group.gamemode !== Gamemode.Quickplay && group.roleQueue && (
@@ -159,21 +166,6 @@ export const columns = (
                       <strong>Max Rank:</strong>{" "}
                       {getRankFromRankVal(requirements.maxRank)}
                     </li>
-                    <li>
-                      <strong>Vanguards:</strong>{" "}
-                      {requirements.requestedRoles.vanguards.curr}/
-                      {requirements.requestedRoles.vanguards.max}
-                    </li>
-                    <li>
-                      <strong>Duelists:</strong>{" "}
-                      {requirements.requestedRoles.duelists.curr}/
-                      {requirements.requestedRoles.duelists.max}
-                    </li>
-                    <li>
-                      <strong>Strategists:</strong>{" "}
-                      {requirements.requestedRoles.strategists.curr}/
-                      {requirements.requestedRoles.strategists.max}
-                    </li>
                   </>
                 )}
               </ul>
@@ -182,21 +174,69 @@ export const columns = (
         </div>
       );
     },
+    filterFn: (
+      row: Row<GroupTableData>,
+      accessorKey: string,
+      value: string[],
+    ) => {
+      console.log(value, accessorKey, row.getValue(accessorKey));
+      const compareWith = row.getValue(accessorKey);
+      return value.some((str) => {
+        const boolValue =
+          str.toLowerCase() === "true" ||
+          str === "1" ||
+          str.toLowerCase() === "yes";
+        return boolValue === compareWith;
+      });
+    },
     enableHiding: false,
   },
   {
     accessorKey: "players",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Size" />
+      <DataTableColumnHeader
+        column={column}
+        title="Team"
+        className="justify-center"
+      />
     ),
     cell: ({ row }) => {
+      const group = row.original as GroupTableData;
       const players: Player[] = row.getValue("players");
       if (!players) {
         return null;
       }
+      const requirements: GroupRequirements = row.original.requirements;
       return (
-        <div className="flex items-center">
-          <span className="text-muted-foreground">{`${players.length}/${TEAM_SIZE}`}</span>
+        <div className="flex items-center text-center justify-center">
+          <ul>
+            {group.roleQueue && requirements.requestedRoles.vanguards.max && (
+              <li>
+                <strong>Vanguards:</strong>{" "}
+                {requirements.requestedRoles.vanguards.curr}/
+                {requirements.requestedRoles.vanguards.max}
+              </li>
+            )}
+            {group.roleQueue && requirements.requestedRoles.duelists.max && (
+              <li>
+                <strong>Duelists:</strong>{" "}
+                {requirements.requestedRoles.duelists.curr}/
+                {requirements.requestedRoles.duelists.max}
+              </li>
+            )}
+            {group.roleQueue && requirements.requestedRoles.strategists.max && (
+              <li>
+                <strong>Strategists:</strong>{" "}
+                {requirements.requestedRoles.strategists.curr}/
+                {requirements.requestedRoles.strategists.max}
+              </li>
+            )}
+            <li>
+              <span className="text-muted-foreground">
+                Team: {`${players.length}/${TEAM_SIZE}`}
+              </span>
+            </li>
+          </ul>
         </div>
       );
     },
