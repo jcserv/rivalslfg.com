@@ -12,9 +12,9 @@ import (
 
 const (
 	APIV1URLPath = "/api/v1/"
-	createGroup  = APIV1URLPath + "groups"
-	getGroup     = APIV1URLPath + "groups/{id}"
-	getGroupByID = APIV1URLPath + "groups"
+	groups       = APIV1URLPath + "groups"
+	group        = APIV1URLPath + "groups/{id}"
+	joinGroup    = group + "/join"
 )
 
 type API struct {
@@ -28,9 +28,12 @@ func NewAPI(groupService *services.GroupService) *API {
 }
 
 func (a *API) RegisterRoutes(r *mux.Router) {
-	r.HandleFunc(createGroup, a.CreateGroup()).Methods(http.MethodPost)
-	r.HandleFunc(getGroup, a.GetGroup()).Methods(http.MethodGet)
-	r.HandleFunc(getGroupByID, a.GetGroups()).Methods(http.MethodGet)
+	r.HandleFunc(groups, a.CreateGroup()).Methods(http.MethodPost)
+	r.HandleFunc(group, a.ReadGroup()).Methods(http.MethodGet)
+	r.HandleFunc(groups, a.ReadGroups()).Methods(http.MethodGet)
+	r.HandleFunc(groups, a.UpdateGroup()).Methods(http.MethodPut)
+	r.HandleFunc(groups, a.DeleteGroup()).Methods(http.MethodDelete)
+	r.HandleFunc(joinGroup, a.JoinGroup()).Methods(http.MethodPost)
 }
 
 func (a *API) CreateGroup() http.HandlerFunc {
@@ -59,7 +62,7 @@ func (a *API) CreateGroup() http.HandlerFunc {
 	}
 }
 
-func (a *API) GetGroup() http.HandlerFunc {
+func (a *API) ReadGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		vars := mux.Vars(r)
@@ -76,12 +79,17 @@ func (a *API) GetGroup() http.HandlerFunc {
 			return
 		}
 
+		if group == nil {
+			httputil.NotFound(w)
+			return
+		}
+
 		httputil.OK(w, group)
 	}
 }
 
 // TODO: Add pagination
-func (a *API) GetGroups() http.HandlerFunc {
+func (a *API) ReadGroups() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
@@ -93,5 +101,20 @@ func (a *API) GetGroups() http.HandlerFunc {
 		}
 
 		httputil.OK(w, groups)
+	}
+}
+
+func (a *API) UpdateGroup() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+}
+
+func (a *API) DeleteGroup() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+}
+
+func (a *API) JoinGroup() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 	}
 }
