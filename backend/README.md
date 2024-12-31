@@ -4,6 +4,8 @@
 
 this folder contains the backend for [rivalslfg](https://rivalslfg.vercel.app/), which is deployed to [fly.io](https://fly.io).
 
+*Generated from [go-api-template](https://github.com/jcserv/go-api-template)*
+
 ## installation
 
 ### prerequisites/stack
