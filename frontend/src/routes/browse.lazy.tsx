@@ -11,7 +11,7 @@ export const Route = createLazyFileRoute("/browse")({
 function BrowsePage() {
   const [profileId] = useLocalStorage(
     "profileId",
-    {},
+    "-1",
     FOURTEEN_DAYS_FROM_TODAY,
   );
   const [profile, isLoadingProfile] = useProfile(profileId);

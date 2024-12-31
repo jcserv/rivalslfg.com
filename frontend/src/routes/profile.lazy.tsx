@@ -11,7 +11,7 @@ export const Route = createLazyFileRoute("/profile")({
 function ProfilePage() {
   const [profileId, setProfileId] = useLocalStorage(
     "profileId",
-    "",
+    "-1",
     FOURTEEN_DAYS_FROM_TODAY,
   );
   const [profile, isLoading] = useProfile(profileId);
@@ -22,7 +22,7 @@ function ProfilePage() {
         <div className="w-1/2">
           {!isLoading && (
             <ProfileForm
-              initialValues={profile as Profile}
+              profile={profile as Profile}
               setProfileId={setProfileId}
             />
           )}

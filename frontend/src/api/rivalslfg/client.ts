@@ -23,35 +23,40 @@ export class RivalsLFGClient extends HTTPClient {
     return data;
   }
 
-  // TODO: This should be a PUT request
-  async createPlayer(profile: Profile): Promise<string> {
-    const response = await fetch(`${this.baseURL}/api/v1/players`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+  async createPlayer(
+    profile: Profile,
+    id: number | undefined,
+  ): Promise<string> {
+    const response = await fetch(
+      `${this.baseURL}/api/v1/players${id ? `/${id}` : ""}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          displayName: profile.name,
+          region: profile.region,
+          platform: profile.platform,
+          gamemode: profile.gamemode,
+          roles: profile.roles,
+          rank: profile.rank,
+          characters: profile.characters,
+          voiceChat: profile.voiceChat,
+          mic: profile.mic,
+          roleQueue: {
+            vanguards: profile.roleQueue?.vanguards ?? 0,
+            duelists: profile.roleQueue?.duelists ?? 0,
+            strategists: profile.roleQueue?.strategists ?? 0,
+          },
+          groupSettings: {
+            platforms: profile.groupSettings?.platforms ?? [],
+            voiceChat: profile.groupSettings?.voiceChat ?? false,
+            mic: profile.groupSettings?.mic ?? false,
+          },
+        }),
       },
-      body: JSON.stringify({
-        displayName: profile.name,
-        region: profile.region,
-        platform: profile.platform,
-        gamemode: profile.gamemode,
-        roles: profile.roles,
-        rank: profile.rank,
-        characters: profile.characters,
-        voiceChat: profile.voiceChat,
-        mic: profile.mic,
-        roleQueue: {
-          vanguards: profile.roleQueue?.vanguards ?? 0,
-          duelists: profile.roleQueue?.duelists ?? 0,
-          strategists: profile.roleQueue?.strategists ?? 0,
-        },
-        groupSettings: {
-          platforms: profile.groupSettings?.platforms ?? [],
-          voiceChat: profile.groupSettings?.voiceChat ?? false,
-          mic: profile.groupSettings?.mic ?? false,
-        },
-      }),
-    });
+    );
     return response.json().then((data) => data.id);
   }
 

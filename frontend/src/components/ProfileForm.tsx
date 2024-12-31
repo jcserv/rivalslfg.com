@@ -65,12 +65,11 @@ import {
   Switch,
 } from "./ui";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Gamemode, Platform, Profile, Rank, Region, Roles } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { TEAM_SIZE } from "@/types/constants";
-import { useMutation } from "@tanstack/react-query";
-import { rivalslfgAPIClient } from "@/routes/__root";
+import { useCreateProfile } from "@/hooks";
 
 const formSchema = z.object({
   name: z.string().min(1, "Please enter your in-game name"),
@@ -122,46 +121,45 @@ const formSchema = z.object({
 
 interface ProfileFormProps {
   isGroup?: boolean;
-  initialValues?: Profile;
+  profile?: Profile;
   setProfileId: (profileId: string) => void;
 }
 
 export function ProfileForm({
   isGroup = false,
-  initialValues,
+  profile,
   setProfileId,
 }: ProfileFormProps) {
   const [roleQueueEnabled, setRoleQueueEnabled] = useState(
-    initialValues?.roleQueue ? true : false,
+    profile?.roleQueue ? true : false,
   );
-  const { mutateAsync } = useMutation({
-    mutationFn: (profile: Profile) => {
-      return rivalslfgAPIClient.createPlayer(profile);
-    },
-  });
+  const createProfile = useCreateProfile();
   const { toast } = useToast();
 
-  const defaultValues = {
-    region: "",
-    platform: "",
-    gamemode: "",
-    roles: [] as string[],
-    rank: "",
-    characters: [] as string[],
-    voiceChat: false,
-    mic: false,
-    roleQueue: {
-      vanguards: 2,
-      duelists: 2,
-      strategists: 2,
-    },
-    groupSettings: {
-      platforms: [],
+  const defaultValues = useMemo(
+    () => ({
+      region: "",
+      platform: "",
+      gamemode: "",
+      roles: [] as string[],
+      rank: "",
+      characters: [] as string[],
       voiceChat: false,
       mic: false,
-    },
-    ...initialValues,
-  };
+      roleQueue: {
+        vanguards: 2,
+        duelists: 2,
+        strategists: 2,
+      },
+      groupSettings: {
+        platforms: [],
+        voiceChat: false,
+        mic: false,
+      },
+      ...profile,
+    }),
+    [profile],
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -174,7 +172,10 @@ export function ProfileForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const playerId = await mutateAsync(values as Profile);
+      const playerId = await createProfile({
+        profile: values as Profile,
+        id: profile?.id,
+      });
       setProfileId(playerId);
       toast({
         title: "Preferences saved",
@@ -503,7 +504,7 @@ export function ProfileForm({
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-8 max-w-3xl mx-auto"
           >
-            {initialValues?.name ? (
+            {profile?.name ? (
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="item-1">
                   <AccordionTrigger>User Info</AccordionTrigger>
@@ -521,7 +522,7 @@ export function ProfileForm({
                   {isGroup ? "Group" : "Advanced"}
                 </AccordionTrigger>
                 <AccordionContent className="flex flex-col gap-2 m-auto">
-                  <div className="flex items-center space-x-2 px-2">
+                  <div className="flex items-center space-x-2 p-2">
                     <Checkbox
                       id="roleQueue"
                       checked={roleQueueEnabled}
@@ -547,7 +548,7 @@ export function ProfileForm({
                           control={form.control}
                           name="roleQueue.vanguards"
                           render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="mx-2">
                               <FormLabel>Vanguards</FormLabel>
                               <FormControl>
                                 <Input

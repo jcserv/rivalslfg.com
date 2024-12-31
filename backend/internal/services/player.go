@@ -16,8 +16,8 @@ func NewPlayerService(repo *repository.Queries) *PlayerService {
 	}
 }
 
-func (s *PlayerService) CreatePlayer(ctx context.Context, arg repository.CreatePlayerParams) (int32, error) {
-	return s.repo.CreatePlayer(ctx, arg)
+func (s *PlayerService) UpsertPlayer(ctx context.Context, arg repository.UpsertPlayerParams) (int32, error) {
+	return s.repo.UpsertPlayer(ctx, arg)
 }
 
 func (s *PlayerService) FindPlayer(ctx context.Context, id int32, name string) (*repository.Player, error) {

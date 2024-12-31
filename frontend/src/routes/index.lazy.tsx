@@ -12,10 +12,10 @@ export const Route = createLazyFileRoute("/")({
 function Index() {
   const [profileId, setProfileId] = useLocalStorage(
     "profileId",
-    "",
+    "-1",
     FOURTEEN_DAYS_FROM_TODAY,
   );
-  const [profile, isLoading] = useProfile(profileId);
+  const [profile] = useProfile(profileId);
 
   return (
     <section className="p-2 md:p-4">
@@ -33,21 +33,17 @@ function Index() {
             <TabsTrigger value="create">Create Group</TabsTrigger>
           </TabsList>
           <TabsContent value="find">
-            {!isLoading && (
-              <ProfileForm
-                initialValues={profile as Profile}
-                setProfileId={setProfileId}
-              />
-            )}
+            <ProfileForm
+              profile={profile as Profile}
+              setProfileId={setProfileId}
+            />
           </TabsContent>
           <TabsContent value="create">
-            {!isLoading && (
-              <ProfileForm
-                isGroup
-                initialValues={profile as Profile}
-                setProfileId={setProfileId}
-              />
-            )}
+            <ProfileForm
+              isGroup
+              profile={profile as Profile}
+              setProfileId={setProfileId}
+            />
           </TabsContent>
         </Tabs>
       </div>

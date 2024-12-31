@@ -11,7 +11,10 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createPlayer = `-- name: CreatePlayer :one
+const upsertPlayer = `-- name: UpsertPlayer :one
+WITH id_check AS (
+    SELECT id FROM Players WHERE id = $17
+)
 INSERT INTO Players (
     name,
     display_name,
@@ -23,37 +26,54 @@ INSERT INTO Players (
     characters,
     voice_chat,
     mic,
-
     vanguards,
     duelists,
     strategists,
-
     platforms,
     g_voice_chat,
     g_mic
 ) VALUES (
-    $1, -- name
-    $2, -- display_name
-    $3, -- region
-    $4, -- platform
-    $5, -- gamemode
-    $6, -- roles
-    $7, -- rank
-    $8, -- characters
-    $9, -- voice_chat
-    $10, -- mic
-
-    $11, -- vanguards
-    $12, -- duelists
-    $13, -- strategists
-
-    $14, -- platforms
-    $15, -- g_voice_chat
-    $16  -- g_mic
-) RETURNING id
+    $1,
+    $2,
+    $3,
+    $4,
+    $5,
+    $6,
+    $7,
+    $8,
+    $9,
+    $10,
+    $11,
+    $12,
+    $13,
+    $14,
+    $15,
+    $16
+)
+ON CONFLICT (name) DO UPDATE SET
+    display_name = EXCLUDED.display_name,
+    region = EXCLUDED.region,
+    platform = EXCLUDED.platform,
+    gamemode = EXCLUDED.gamemode,
+    roles = EXCLUDED.roles,
+    rank = EXCLUDED.rank,
+    characters = EXCLUDED.characters,
+    voice_chat = EXCLUDED.voice_chat,
+    mic = EXCLUDED.mic,
+    vanguards = EXCLUDED.vanguards,
+    duelists = EXCLUDED.duelists,
+    strategists = EXCLUDED.strategists,
+    platforms = EXCLUDED.platforms,
+    g_voice_chat = EXCLUDED.g_voice_chat,
+    g_mic = EXCLUDED.g_mic,
+    updated_at = NOW()
+WHERE 
+    (SELECT 1 FROM id_check) IS NULL OR -- no specific id provided
+    Players.id = $17 -- match provided id
+RETURNING id
 `
 
-type CreatePlayerParams struct {
+type UpsertPlayerParams struct {
 	Name        string      `json:"name"`
 	DisplayName string      `json:"display_name"`
 	Region      string      `json:"region"`
@@ -70,10 +90,11 @@ type CreatePlayerParams struct {
 	Platforms   []string    `json:"platforms"`
 	GVoiceChat  pgtype.Bool `json:"g_voice_chat"`
 	GMic        pgtype.Bool `json:"g_mic"`
+	ID          int32       `json:"id"`
 }
 
-func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (int32, error) {
-	row := q.db.QueryRow(ctx, createPlayer,
+func (q *Queries) UpsertPlayer(ctx context.Context, arg UpsertPlayerParams) (int32, error) {
+	row := q.db.QueryRow(ctx, upsertPlayer,
 		arg.Name,
 		arg.DisplayName,
 		arg.Region,
@@ -90,6 +111,7 @@ func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (int
 		arg.Platforms,
 		arg.GVoiceChat,
 		arg.GMic,
+		arg.ID,
 	)
 	var id int32
 	err := row.Scan(&id)

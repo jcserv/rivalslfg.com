@@ -46,7 +46,7 @@ func (c *CreateGroup) ToParams() repository.CreateGroupWithOwnerParams {
 	}
 }
 
-type CreatePlayer struct {
+type UpdatePlayer struct {
 	DisplayName   string                    `json:"displayName"`
 	Region        string                    `json:"region"`
 	Platform      string                    `json:"platform"`
@@ -60,7 +60,7 @@ type CreatePlayer struct {
 	GroupSettings *repository.GroupSettings `json:"groupSettings"`
 }
 
-func (c *CreatePlayer) Validate() error {
+func (c *UpdatePlayer) Validate() error {
 	if c.DisplayName == "" {
 		return fmt.Errorf("display_name is required")
 	}
@@ -76,8 +76,24 @@ func (c *CreatePlayer) Validate() error {
 	return nil
 }
 
-func (c *CreatePlayer) ToParams() repository.CreatePlayerParams {
-	return repository.CreatePlayerParams{
+func (c *UpdatePlayer) ToParams(id int32) repository.UpsertPlayerParams {
+	var vanguards, duelists, strategists pgtype.Int4
+	if c.RoleQueue != nil {
+		vanguards = pgtype.Int4{Int32: int32(c.RoleQueue.Vanguards), Valid: true}
+		duelists = pgtype.Int4{Int32: int32(c.RoleQueue.Duelists), Valid: true}
+		strategists = pgtype.Int4{Int32: int32(c.RoleQueue.Strategists), Valid: true}
+	}
+
+	var platforms []string
+	var gVoiceChat, gMic pgtype.Bool
+	if c.GroupSettings != nil {
+		platforms = c.GroupSettings.Platforms
+		gVoiceChat = pgtype.Bool{Bool: c.GroupSettings.VoiceChat, Valid: true}
+		gMic = pgtype.Bool{Bool: c.GroupSettings.Mic, Valid: true}
+	}
+
+	return repository.UpsertPlayerParams{
+		ID:          id,
 		Name:        strings.ToLower(c.DisplayName),
 		DisplayName: c.DisplayName,
 		Region:      c.Region,
@@ -88,11 +104,11 @@ func (c *CreatePlayer) ToParams() repository.CreatePlayerParams {
 		Characters:  c.Characters,
 		VoiceChat:   c.VoiceChat,
 		Mic:         c.Mic,
-		Vanguards:   pgtype.Int4{Int32: int32(c.RoleQueue.Vanguards), Valid: true},
-		Duelists:    pgtype.Int4{Int32: int32(c.RoleQueue.Duelists), Valid: true},
-		Strategists: pgtype.Int4{Int32: int32(c.RoleQueue.Strategists), Valid: true},
-		Platforms:   c.GroupSettings.Platforms,
-		GVoiceChat:  pgtype.Bool{Bool: c.GroupSettings.VoiceChat, Valid: true},
-		GMic:        pgtype.Bool{Bool: c.GroupSettings.Mic, Valid: true},
+		Vanguards:   vanguards,
+		Duelists:    duelists,
+		Strategists: strategists,
+		Platforms:   platforms,
+		GVoiceChat:  gVoiceChat,
+		GMic:        gMic,
 	}
 }

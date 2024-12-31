@@ -10,10 +10,11 @@ import (
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
-func (a *API) CreatePlayer() http.HandlerFunc {
+func (a *API) UpsertPlayer() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		var input CreatePlayer
+
+		var input UpdatePlayer
 		err := json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
 			httputil.BadRequest(w)
@@ -25,7 +26,17 @@ func (a *API) CreatePlayer() http.HandlerFunc {
 			return
 		}
 
-		playerID, err := a.playerService.CreatePlayer(ctx, input.ToParams())
+		playerID := int32(-1)
+		if playerIDStr := r.URL.Query().Get("id"); playerIDStr != "" {
+			playerIDVal, err := strconv.ParseInt(playerIDStr, 10, 32)
+			if err != nil {
+				httputil.BadRequest(w)
+				return
+			}
+			playerID = int32(playerIDVal)
+		}
+
+		outPlayerID, err := a.playerService.UpsertPlayer(ctx, input.ToParams(playerID))
 		if err != nil {
 			httputil.InternalServerError(ctx, w, err)
 			log.Error(ctx, err.Error())
@@ -33,7 +44,7 @@ func (a *API) CreatePlayer() http.HandlerFunc {
 		}
 
 		httputil.OK(w, map[string]int32{
-			"id": playerID,
+			"id": outPlayerID,
 		})
 	}
 }
