@@ -13,10 +13,8 @@ var (
 )
 
 func Init(isProd bool) *zap.Logger {
-	var config zap.Config
-	if isProd {
-		config = zap.NewProductionConfig()
-	} else {
+	config := zap.NewProductionConfig()
+	if !isProd {
 		config = zap.NewDevelopmentConfig()
 		config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 		config.EncoderConfig.TimeKey = "time"

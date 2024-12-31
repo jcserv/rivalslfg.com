@@ -1,9 +1,31 @@
-# rivalslfg
+# rivalslfg.com (backend)
 
-## Features
+![visitors](https://img.shields.io/endpoint?url=https://vu-mi.com/api/v1/views?id=jcserv/rivalslfg.com/backend)
 
-1. Create Group
-2. List Groups
+this folder contains the backend for [rivalslfg](https://rivalslfg.vercel.app/), which is deployed to [fly.io](https://fly.io).
+
+## installation
+
+### prerequisites/stack
+- [go](https://go.dev/doc/install)
+- [docker](https://docs.docker.com/get-started/get-docker/)
+- [sqlc](https://docs.sqlc.dev/en/stable/overview/install.html)
+- [golang-migrate CLI](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate)
+- OPTIONAL:
+  - [postgres](https://www.postgresql.org/)
+  - [flyctl](https://fly.io/docs/flyctl/installing/)
+
+### running locally
+
+1. clone the repo
+2. `cp .env.example .env`, fill in the required environment variables
+3. run `make dev-db`
+4. run `make migrate`
+5. run `make dev`
+
+## todo
+
+1. List Groups
    - Filter by:
      -  Region
      -  Gamemode
@@ -16,24 +38,12 @@
        - Platforms
        - Voice Chat
        - Mic
-3. Get Group by ID
-4. Update Group Info
-5. Join Group (if private, authenticate provided passcode)
-6. Remove Player from Group
+2. Update Group Info
+3. Join Group (if private, authenticate provided passcode)
+4. Remove Player from Group
 
-7. Create Player
-8. Update Player Info
-9.  Authenticate as Player
+5. Create Player
+6. Update Player Info
+7.  Authenticate as Player
 
-10. Chat
-
-## Endpoints
-
-- GET /groups/:id
-- GET /groups
-
-
-## Requirements
-- Docker
-- [sqlc](https://docs.sqlc.dev/en/stable/overview/install.html)
-- [golang-migrate CLI](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate)
+8.  Chat
