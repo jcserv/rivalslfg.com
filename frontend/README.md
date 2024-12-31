@@ -7,6 +7,7 @@ this folder contains the frontend for [rivalslfg](https://rivalslfg.vercel.app/)
 ## setup
 
 ### prerequisites
+
 - [node](https://nodejs.org/en)
 - [pnpm](https://pnpm.io/installation)
 

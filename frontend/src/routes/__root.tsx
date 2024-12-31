@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui";
 
 export const queryClient = new QueryClient();
 export const rivalslfgAPIClient = new RivalsLFGClient(
-  import.meta.env.VITE_API_URL
+  import.meta.env.VITE_API_URL,
 );
 
 export const Route = createRootRoute({
