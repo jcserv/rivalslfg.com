@@ -5,6 +5,7 @@ import (
 
 	"github.com/jcserv/rivalslfg/internal/utils/env"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 var (
@@ -12,12 +13,19 @@ var (
 )
 
 func Init(isProd bool) *zap.Logger {
-	var logger *zap.Logger
+	var config zap.Config
 	if isProd {
-		logger, _ = zap.NewProduction()
+		config = zap.NewProductionConfig()
 	} else {
-		logger, _ = zap.NewDevelopment()
+		config = zap.NewDevelopmentConfig()
+		config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+		config.EncoderConfig.TimeKey = "time"
+		config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+		config.EncoderConfig.CallerKey = "caller"
+		config.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 	}
+
+	logger, _ := config.Build(zap.AddCallerSkip(1))
 	return logger
 }
 
@@ -30,14 +38,18 @@ func GetLogger(ctx context.Context) *zap.Logger {
 	return logger
 }
 
+func Info(ctx context.Context, msg string) {
+	GetLogger(ctx).Info(msg)
+}
+
+func Warn(ctx context.Context, msg string) {
+	GetLogger(ctx).Warn(msg)
+}
+
 func Error(ctx context.Context, msg string) {
 	GetLogger(ctx).Error(msg)
 }
 
 func Fatal(ctx context.Context, msg string) {
 	GetLogger(ctx).Fatal(msg)
-}
-
-func Info(ctx context.Context, msg string) {
-	GetLogger(ctx).Info(msg)
 }
