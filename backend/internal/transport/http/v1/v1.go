@@ -6,7 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jcserv/rivalslfg/internal/services"
-	"github.com/jcserv/rivalslfg/internal/transport/rest/httputil"
+	"github.com/jcserv/rivalslfg/internal/transport/http/httputil"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 

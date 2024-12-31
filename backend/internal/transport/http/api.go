@@ -1,12 +1,12 @@
-package rest
+package api
 
 import (
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/jcserv/rivalslfg/internal/services"
-	"github.com/jcserv/rivalslfg/internal/transport/rest/httputil"
-	v1 "github.com/jcserv/rivalslfg/internal/transport/rest/v1"
+	"github.com/jcserv/rivalslfg/internal/transport/http/httputil"
+	v1 "github.com/jcserv/rivalslfg/internal/transport/http/v1"
 )
 
 const (

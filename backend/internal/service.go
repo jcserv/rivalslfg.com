@@ -9,12 +9,12 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jcserv/rivalslfg/internal/repository"
 	"github.com/jcserv/rivalslfg/internal/services"
-	"github.com/jcserv/rivalslfg/internal/transport/rest"
+	_http "github.com/jcserv/rivalslfg/internal/transport/http"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
 type Service struct {
-	api          *rest.API
+	api          *_http.API
 	cfg          *Configuration
 	groupService *services.GroupService
 }
@@ -38,7 +38,7 @@ func NewService() (*Service, error) {
 		return nil, err
 	}
 
-	s.api = rest.NewAPI(services.NewGroupService(repository.New(conn)))
+	s.api = _http.NewAPI(services.NewGroupService(repository.New(conn)))
 	return s, nil
 }
 
