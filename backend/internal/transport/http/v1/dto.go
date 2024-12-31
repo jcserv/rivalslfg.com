@@ -2,6 +2,7 @@ package v1
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jcserv/rivalslfg/internal/repository"
@@ -46,22 +47,17 @@ func (c *CreateGroup) ToParams() repository.CreateGroupWithOwnerParams {
 }
 
 type CreatePlayer struct {
-	// Name        string      `json:"name"`
-	DisplayName string      `json:"display_name"`
-	Region      string      `json:"region"`
-	Platform    string      `json:"platform"`
-	Gamemode    string      `json:"gamemode"`
-	Roles       []string    `json:"roles"`
-	Rank        string      `json:"rank"`
-	Characters  []string    `json:"characters"`
-	VoiceChat   bool        `json:"voice_chat"`
-	Mic         bool        `json:"mic"`
-	Vanguards   pgtype.Int4 `json:"vanguards"`
-	Duelists    pgtype.Int4 `json:"duelists"`
-	Strategists pgtype.Int4 `json:"strategists"`
-	Platforms   []string    `json:"platforms"`
-	GVoiceChat  pgtype.Bool `json:"g_voice_chat"`
-	GMic        pgtype.Bool `json:"g_mic"`
+	DisplayName   string                    `json:"displayName"`
+	Region        string                    `json:"region"`
+	Platform      string                    `json:"platform"`
+	Gamemode      string                    `json:"gamemode"`
+	Roles         []string                  `json:"roles"`
+	Rank          string                    `json:"rank"`
+	Characters    []string                  `json:"characters"`
+	VoiceChat     bool                      `json:"voiceChat"`
+	Mic           bool                      `json:"mic"`
+	RoleQueue     *repository.RoleQueue     `json:"roleQueue"`
+	GroupSettings *repository.GroupSettings `json:"groupSettings"`
 }
 
 func (c *CreatePlayer) Validate() error {
@@ -82,7 +78,7 @@ func (c *CreatePlayer) Validate() error {
 
 func (c *CreatePlayer) ToParams() repository.CreatePlayerParams {
 	return repository.CreatePlayerParams{
-		Name:        c.DisplayName,
+		Name:        strings.ToLower(c.DisplayName),
 		DisplayName: c.DisplayName,
 		Region:      c.Region,
 		Platform:    c.Platform,
@@ -92,11 +88,11 @@ func (c *CreatePlayer) ToParams() repository.CreatePlayerParams {
 		Characters:  c.Characters,
 		VoiceChat:   c.VoiceChat,
 		Mic:         c.Mic,
-		Vanguards:   c.Vanguards,
-		Duelists:    c.Duelists,
-		Strategists: c.Strategists,
-		Platforms:   c.Platforms,
-		GVoiceChat:  c.GVoiceChat,
-		GMic:        c.GMic,
+		Vanguards:   pgtype.Int4{Int32: int32(c.RoleQueue.Vanguards), Valid: true},
+		Duelists:    pgtype.Int4{Int32: int32(c.RoleQueue.Duelists), Valid: true},
+		Strategists: pgtype.Int4{Int32: int32(c.RoleQueue.Strategists), Valid: true},
+		Platforms:   c.GroupSettings.Platforms,
+		GVoiceChat:  pgtype.Bool{Bool: c.GroupSettings.VoiceChat, Valid: true},
+		GMic:        pgtype.Bool{Bool: c.GroupSettings.Mic, Valid: true},
 	}
 }

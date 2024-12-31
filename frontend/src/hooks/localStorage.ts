@@ -23,8 +23,10 @@ function getStorageValue(key: string, initialValue: any) {
   return entry;
 }
 
+type LocalStorageKey = "profileId";
+
 export const useLocalStorage = (
-  key: string,
+  key: LocalStorageKey,
   initialValue: any,
   expiration?: Date,
 ) => {

@@ -6,7 +6,7 @@ import { useMemo } from "react";
 
 interface GroupTableProps {
   groups: Group[];
-  profile: Profile | null;
+  profile: Profile | undefined;
   isProfileEmpty: boolean;
 }
 
@@ -35,10 +35,7 @@ export function GroupTable({
             <h2 className="text-2xl font-bold tracking-tight">Groups</h2>
           </div>
         </div>
-        <DataTable
-          data={groupTableData}
-          columns={columns(profile, isProfileEmpty)}
-        />
+        <DataTable data={groupTableData} columns={columns(isProfileEmpty)} />
       </div>
     </>
   );

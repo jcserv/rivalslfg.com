@@ -1,30 +1,31 @@
-import { ProfileForm } from "@/components";
-import { useLocalStorage } from "@/hooks/localStorage";
-import { Profile } from "@/types";
 import { createLazyFileRoute } from "@tanstack/react-router";
+
+import { ProfileForm } from "@/components";
+import { useProfile, useLocalStorage } from "@/hooks";
+import { FOURTEEN_DAYS_FROM_TODAY, Profile } from "@/types";
 
 export const Route = createLazyFileRoute("/profile")({
   component: ProfilePage,
 });
 
 function ProfilePage() {
-  const fourteenDaysFromToday = new Date(
-    new Date().setDate(new Date().getDate() + 14),
+  const [profileId, setProfileId] = useLocalStorage(
+    "profileId",
+    "",
+    FOURTEEN_DAYS_FROM_TODAY,
   );
-  const [profile, setProfile] = useLocalStorage(
-    "profile",
-    {},
-    fourteenDaysFromToday,
-  );
+  const [profile, isLoading] = useProfile(profileId);
 
   return (
     <section className="p-2 md:p-4">
       <div className="w-full flex flex-col items-center">
         <div className="w-1/2">
-          <ProfileForm
-            initialValues={profile as Profile}
-            setProfile={setProfile}
-          />
+          {!isLoading && (
+            <ProfileForm
+              initialValues={profile as Profile}
+              setProfileId={setProfileId}
+            />
+          )}
         </div>
       </div>
     </section>

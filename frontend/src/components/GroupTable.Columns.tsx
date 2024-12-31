@@ -10,7 +10,6 @@ import {
   Group,
   GroupRequirements,
   Player,
-  Profile,
 } from "@/types";
 import { TEAM_SIZE } from "@/types/constants";
 import { Link } from "@tanstack/react-router";
@@ -39,7 +38,6 @@ const defaultFilterFn = (
 };
 
 export const columns = (
-  profile: Profile | null,
   isProfileEmpty: boolean,
 ): ColumnDef<GroupTableData>[] => [
   {

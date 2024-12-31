@@ -166,6 +166,7 @@ export function canJoinGroup(userRank: RankKey, groupRanks: RankKey[]) {
 }
 
 export type Profile = {
+  id: number;
   name: string;
   region: Region;
   platform: Platform;
@@ -285,7 +286,7 @@ export function getRequirements(group: Group): GroupRequirements {
 export function areRequirementsMet(
   group: Group,
   requirements: GroupRequirements,
-  profile: Profile | null,
+  profile: Profile | undefined,
 ): boolean {
   const { minRank, maxRank, mic, voiceChat, platforms } = requirements;
   if (!profile) return false;

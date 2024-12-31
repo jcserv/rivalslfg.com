@@ -4,7 +4,7 @@
 
 this folder contains the frontend for [rivalslfg](https://rivalslfg.vercel.app/), which is deployed to [vercel](https://vercel.com).
 
-*Generated from [react-vite-shadcn-template](https://github.com/jcserv/react-vite-shadcn-template)*
+_Generated from [react-vite-shadcn-template](https://github.com/jcserv/react-vite-shadcn-template)_
 
 ## setup
 

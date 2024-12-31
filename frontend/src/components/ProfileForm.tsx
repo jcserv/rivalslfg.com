@@ -69,6 +69,8 @@ import { useState } from "react";
 import { Gamemode, Platform, Profile, Rank, Region, Roles } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { TEAM_SIZE } from "@/types/constants";
+import { useMutation } from "@tanstack/react-query";
+import { rivalslfgAPIClient } from "@/routes/__root";
 
 const formSchema = z.object({
   name: z.string().min(1, "Please enter your in-game name"),
@@ -121,17 +123,22 @@ const formSchema = z.object({
 interface ProfileFormProps {
   isGroup?: boolean;
   initialValues?: Profile;
-  setProfile: (profile: Profile) => void;
+  setProfileId: (profileId: string) => void;
 }
 
 export function ProfileForm({
   isGroup = false,
   initialValues,
-  setProfile,
+  setProfileId,
 }: ProfileFormProps) {
   const [roleQueueEnabled, setRoleQueueEnabled] = useState(
     initialValues?.roleQueue ? true : false,
   );
+  const { mutateAsync } = useMutation({
+    mutationFn: (profile: Profile) => {
+      return rivalslfgAPIClient.createPlayer(profile);
+    },
+  });
   const { toast } = useToast();
 
   const defaultValues = {
@@ -165,9 +172,10 @@ export function ProfileForm({
     form.reset(defaultValues);
   }
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      setProfile(values as Profile);
+      const playerId = await mutateAsync(values as Profile);
+      setProfileId(playerId);
       toast({
         title: "Preferences saved",
         variant: "success",

@@ -1,22 +1,24 @@
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
 
-import { Group } from "@/types";
-import { useLocalStorage } from "@/hooks/localStorage";
+import { useLocalStorage, useGroups, useProfile } from "@/hooks";
 import { ErrorBanner, GroupTable } from "@/components";
-import { FOURTEEN_DAYS_FROM_TODAY } from "@/types";
-
-import { useGroups } from "@/hooks/groups";
+import { Group, FOURTEEN_DAYS_FROM_TODAY } from "@/types";
 
 export const Route = createLazyFileRoute("/browse")({
   component: BrowsePage,
 });
 
 function BrowsePage() {
-  const [profile] = useLocalStorage("profile", {}, FOURTEEN_DAYS_FROM_TODAY);
-  const isProfileEmpty = !profile || Object.keys(profile).length === 0;
-  const [groups] = useGroups();
+  const [profileId] = useLocalStorage(
+    "profileId",
+    {},
+    FOURTEEN_DAYS_FROM_TODAY,
+  );
+  const [profile, isLoadingProfile] = useProfile(profileId);
+  const [groups, isLoadingGroups] = useGroups();
 
-  console.log(groups);
+  const isProfileEmpty = !profile || Object.keys(profile).length === 0;
+  const isLoading = isLoadingProfile || isLoadingGroups;
 
   return (
     <section className="p-2 md:p-4">
@@ -34,7 +36,7 @@ function BrowsePage() {
           </ErrorBanner>
         )}
         <div className="w-3/4">
-          {groups && (
+          {!isLoading && groups && (
             <GroupTable
               groups={groups as Group[]}
               profile={profile}

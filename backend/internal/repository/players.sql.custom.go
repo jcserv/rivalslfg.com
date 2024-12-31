@@ -28,9 +28,7 @@ SELECT
         'platforms', platforms,
         'g_voice_chat', voice_chat,
         'g_mic', mic
-    ) AS group_settings,
-    created_at,
-    updated_at
+    ) AS group_settings
 FROM Players
 WHERE (id = $1 OR name = $2)
 `
