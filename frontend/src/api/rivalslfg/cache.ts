@@ -13,6 +13,19 @@ export const fetchGroups = async (): Promise<Group[]> => {
   return groups;
 };
 
+export const fetchGroup = async (id: string): Promise<Group> => {
+  const cached = (await rivalslfgStore.state.groups).find(
+    (group) => group.id === id,
+  );
+  if (cached) {
+    return cached;
+  }
+
+  const group = await rivalslfgAPIClient.getGroup(id);
+  rivalsStoreActions.setGroup(group);
+  return group;
+};
+
 export const fetchProfile = async (id: string): Promise<Profile> => {
   const cached = await rivalslfgStore.state.profile;
   if (cached) {

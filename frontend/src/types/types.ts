@@ -212,7 +212,25 @@ type GroupInfo = {
   currCharacters: Set<string>;
 };
 
-export function getGroupInfo(group: Group): GroupInfo {
+export function getGroupInfo(group: Group | undefined): GroupInfo {
+  if (!group)
+    return {
+      minRank: 0,
+      maxRank: 0,
+      currVanguards: 0,
+      currDuelists: 0,
+      currStrategists: 0,
+      currCharacters: new Set<string>(),
+    };
+  if (!group.players)
+    return {
+      minRank: 0,
+      maxRank: 0,
+      currVanguards: 0,
+      currDuelists: 0,
+      currStrategists: 0,
+      currCharacters: new Set<string>(),
+    };
   return group.players.reduce(
     (acc, player) => {
       const rankKey = player.rank as RankKey;

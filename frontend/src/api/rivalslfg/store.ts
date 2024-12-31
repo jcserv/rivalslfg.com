@@ -17,12 +17,19 @@ export const rivalslfgStore = new Store<RivalsLFGStore>(initialState);
 
 export const rivalsStoreKeys = {
   all: ["groups", "profile"] as const,
+  group: (id: string) => ["group", id] as const,
   profile: (id: string) => ["profile", id] as const,
 };
 
 export const rivalsStoreActions = {
   setGroups(groups: Group[]) {
     rivalslfgStore.setState((prev) => ({ ...prev, groups }));
+  },
+  setGroup(group: Group) {
+    rivalslfgStore.setState((prev) => ({
+      ...prev,
+      groups: [...prev.groups, group],
+    }));
   },
   setProfile(profile: Profile) {
     rivalslfgStore.setState((prev) => ({ ...prev, profile }));

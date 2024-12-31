@@ -1,13 +1,15 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 
-import groups from "@/assets/groups.json";
-import { GroupDisplay } from "@/components/GroupDisplay";
-import { GroupControls } from "@/components/GroupControls";
 import { Group as GroupType } from "@/types";
-import { Chat } from "@/components/Chat";
 import { Button } from "@/components/ui";
-import { useState } from "react";
-import { AccessGroupDialog } from "@/components/AccessGroupDialog";
+import { useGroup } from "@/hooks";
+import {
+  GroupDisplay,
+  GroupControls,
+  Chat,
+  AccessGroupDialog,
+} from "@/components";
 
 export const Route = createLazyFileRoute("/groups/$groupId")({
   component: Group,
@@ -15,10 +17,13 @@ export const Route = createLazyFileRoute("/groups/$groupId")({
 
 function Group() {
   const { groupId } = Route.useParams();
-  const group = groups.find((group) => group.id === groupId);
-
+  const [group, isLoading, error] = useGroup(groupId);
   const isGroupOpen = group?.open || false;
-  const [canUserAccessGroup, setCanUserAccessGroup] = useState(isGroupOpen);
+
+  const [canUserAccessGroup, setCanUserAccessGroup] = useState(false);
+  useEffect(() => {
+    setCanUserAccessGroup(isGroupOpen);
+  }, [isGroupOpen]);
 
   function onLeave() {
     // TODO: This should also be logged in the chat
@@ -36,10 +41,12 @@ function Group() {
                 setCanUserAccessGroup(true);
               }}
             />
-            <GroupDisplay
-              group={group as GroupType}
-              canUserAccessGroup={canUserAccessGroup}
-            />
+            {!isLoading && (
+              <GroupDisplay
+                group={group as GroupType}
+                canUserAccessGroup={canUserAccessGroup}
+              />
+            )}
             <div className="flex flex-row justify-center mt-4">
               {canUserAccessGroup && (
                 <Button variant="destructive" onClick={onLeave}>
@@ -48,13 +55,15 @@ function Group() {
               )}
             </div>
           </div>
-          <div className="col-span-4 space-y-4">
-            <GroupControls
-              isGroupOpen={isGroupOpen}
-              canUserAccessGroup={canUserAccessGroup}
-            />
-            <Chat canUserAccessGroup={canUserAccessGroup} />
-          </div>
+          {!isLoading && !error && (
+            <div className="col-span-4 space-y-4">
+              <GroupControls
+                isGroupOpen={isGroupOpen}
+                canUserAccessGroup={canUserAccessGroup}
+              />
+              <Chat canUserAccessGroup={canUserAccessGroup} />
+            </div>
+          )}
         </div>
       </div>
     </section>

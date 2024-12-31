@@ -32,19 +32,17 @@ import { Copy, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface GroupDisplayProps {
-  group: Group;
+  group: Group | undefined;
   canUserAccessGroup: boolean;
 }
 
 export function GroupDisplay({ group, canUserAccessGroup }: GroupDisplayProps) {
   const { toast } = useToast();
 
-  const leader = group.players.find((player) => player.leader);
-
   const { currVanguards, currDuelists, currStrategists, currCharacters } =
     useMemo(() => {
       return getGroupInfo(group);
-    }, [group.players]);
+    }, [group]);
 
   const suggestedTeamUps = useMemo(() => {
     return teamUps.filter(
@@ -59,11 +57,13 @@ export function GroupDisplay({ group, canUserAccessGroup }: GroupDisplayProps) {
     console.log(player);
   }
 
+  if (!group) return null;
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>
-          {leader?.name}&apos;s Group
+          {group?.name}
           <Button variant="outline" size="icon" className="ml-2">
             <Copy
               className="w-4 h-4"

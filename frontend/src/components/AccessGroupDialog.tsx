@@ -1,3 +1,8 @@
+import { useRouter } from "@tanstack/react-router";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,9 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Form, FormField, FormItem, FormLabel, FormMessage } from "./ui";
 
 const formSchema = z.object({
@@ -28,6 +30,7 @@ interface AccessGroupDialogProps {
 
 export function AccessGroupDialog({ open, onClose }: AccessGroupDialogProps) {
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -82,7 +85,10 @@ export function AccessGroupDialog({ open, onClose }: AccessGroupDialogProps) {
                 />
               </div>
             </div>
-            <DialogFooter>
+            <DialogFooter className="flex flex-row justify-between sm:justify-between">
+              <Button variant="outline" onClick={() => router.history.back()}>
+                Back
+              </Button>
               <Button type="submit">Submit</Button>
             </DialogFooter>
           </form>
