@@ -15,7 +15,7 @@
      -  Group Settings
        - Platforms
        - Voice Chat
-       - Mic  
+       - Mic
 3. Get Group by ID
 4. Update Group Info
 5. Join Group (if private, authenticate provided passcode)

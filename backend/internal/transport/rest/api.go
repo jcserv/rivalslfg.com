@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jackc/pgx/v5"
+	"github.com/jcserv/rivalslfg/internal/services"
 	"github.com/jcserv/rivalslfg/internal/transport/rest/httputil"
 	v1 "github.com/jcserv/rivalslfg/internal/transport/rest/v1"
 )
@@ -17,9 +17,9 @@ type API struct {
 	V1API *v1.API
 }
 
-func NewAPI(conn *pgx.Conn) *API {
+func NewAPI(groupService *services.GroupService) *API {
 	return &API{
-		V1API: v1.NewAPI(conn),
+		V1API: v1.NewAPI(groupService),
 	}
 }
 

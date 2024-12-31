@@ -1,34 +1,62 @@
 package v1
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jackc/pgx/v5"
-	"github.com/jcserv/rivalslfg/internal/repository"
+	"github.com/jcserv/rivalslfg/internal/services"
 	"github.com/jcserv/rivalslfg/internal/transport/rest/httputil"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
 const (
 	APIV1URLPath = "/api/v1/"
-	GetGroup     = APIV1URLPath + "groups/{id}"
-	GetGroups    = APIV1URLPath + "groups"
+	createGroup  = APIV1URLPath + "groups"
+	getGroup     = APIV1URLPath + "groups/{id}"
+	getGroupByID = APIV1URLPath + "groups"
 )
 
 type API struct {
-	conn *pgx.Conn
+	groupService *services.GroupService
 }
 
-func NewAPI(conn *pgx.Conn) *API {
+func NewAPI(groupService *services.GroupService) *API {
 	return &API{
-		conn: conn,
+		groupService: groupService,
 	}
 }
 
 func (a *API) RegisterRoutes(r *mux.Router) {
-	r.HandleFunc(GetGroup, a.GetGroup()).Methods(http.MethodGet)
-	r.HandleFunc(GetGroups, a.GetGroups()).Methods(http.MethodGet)
+	r.HandleFunc(createGroup, a.CreateGroup()).Methods(http.MethodPost)
+	r.HandleFunc(getGroup, a.GetGroup()).Methods(http.MethodGet)
+	r.HandleFunc(getGroupByID, a.GetGroups()).Methods(http.MethodGet)
+}
+
+func (a *API) CreateGroup() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		var input CreateGroup
+		err := json.NewDecoder(r.Body).Decode(&input)
+		if err != nil {
+			httputil.BadRequest(w)
+			return
+		}
+
+		if err := input.Validate(); err != nil {
+			httputil.BadRequest(w)
+			return
+		}
+
+		groupID, err := a.groupService.CreateGroupWithOwner(ctx, input.ToParams())
+		if err != nil {
+			httputil.InternalServerError(ctx, w, err)
+			log.Error(ctx, err.Error())
+			return
+		}
+
+		httputil.OK(w, groupID)
+	}
 }
 
 func (a *API) GetGroup() http.HandlerFunc {
@@ -41,8 +69,7 @@ func (a *API) GetGroup() http.HandlerFunc {
 			return
 		}
 
-		repo := repository.New(a.conn)
-		group, err := repo.FindGroupByID(ctx, groupID)
+		group, err := a.groupService.GetGroupByID(ctx, groupID)
 		if err != nil {
 			httputil.InternalServerError(ctx, w, err)
 			log.Error(ctx, err.Error())
@@ -58,9 +85,7 @@ func (a *API) GetGroups() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		repo := repository.New(a.conn)
-
-		groups, err := repo.FindAllGroups(ctx)
+		groups, err := a.groupService.GetGroups(ctx)
 		if err != nil {
 			httputil.InternalServerError(ctx, w, err)
 			log.Error(ctx, err.Error())
