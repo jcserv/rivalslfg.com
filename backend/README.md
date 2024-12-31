@@ -31,8 +31,8 @@ this folder contains the backend for [rivalslfg](https://rivalslfg.vercel.app/),
 
 ## todo
 
-1. List Groups
-   - Filter by:
+1. [X]List Groups
+   - [ ] Filter by:
      -  Region
      -  Gamemode
      -  Requirements Met (provided player info)
@@ -44,12 +44,20 @@ this folder contains the backend for [rivalslfg](https://rivalslfg.vercel.app/),
        - Platforms
        - Voice Chat
        - Mic
-2. Update Group Info
-3. Join Group (if private, authenticate provided passcode)
-4. Remove Player from Group
+2. [ ] Upsert Group
+3. [ ] Join Group (if private, authenticate provided passcode)
+4. [ ] Remove Player from Group
 
-5. Create Player
-6. Update Player Info
-7.  Authenticate as Player
+5. [X] Upsert Player
+6. [X] Get Player
+7. Authenticate as Player
 
 8.  Chat
+9.  Matchmaking
+   - Probably requires atomic locks
+
+Bugs:
+- No auth right now, so users can modify other users' info if they know their id
+
+Before release:
+- [ ] Squash migrations into one, remove seed data

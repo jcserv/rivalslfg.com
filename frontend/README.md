@@ -23,3 +23,34 @@ _Generated from [react-vite-shadcn-template](https://github.com/jcserv/react-vit
 ## references
 
 - [favicon.io/](https://favicon.io/)
+
+### TODO
+
+FE-Only:
+- [ ] Better username validation
+  - 14 chars max
+  - Must be at least 3 characters
+  - Invalid characters: ! @ # $ % ^ & * ( ) = +
+  - [ { ] } \ | 
+  - ; :
+  - / ?
+  - Allowed: . - _ ' < > 
+- Group should be private by default
+- [ ] Chat
+- [ ] Matchmaking
+- [ ] Set default filters based on user profile (region=, gamemode=, canjoin=)
+
+API Integration:
+- [X] Integrate Find Group Form
+- [ ] Integrate Create Group Form
+- [X] Integrate Profile Form 
+- [X] Integrate Browse Page
+- [ ] Browse Page Pagination & Filtering
+- [X] Integrate Group Page
+- [ ] Integrate Join Group
+- [ ] Chat
+- [ ] Matchmaking
+
+Bugs: 
+- [ ] Fix flicker on group page
+- [ ] Group table does not show until groups are loaded, should load in but with empty data.
