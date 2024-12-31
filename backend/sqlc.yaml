@@ -10,6 +10,10 @@ sql:
         out: "internal/repository"
         sql_package: "pgx/v5"
         overrides:
+          - db_type: "Player"
+            go_type:
+              import: "github.com/jcserv/rivalslfg/internal/repository"
+              type: "Player"
           - db_type: "uuid"
             go_type:
               import: "github.com/google/uuid"

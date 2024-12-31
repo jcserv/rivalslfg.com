@@ -8,12 +8,12 @@ import (
 )
 
 type CreateGroup struct {
-	PlayerID      int            `json:"playerId"`
-	Region        string         `json:"region"`
-	Gamemode      string         `json:"gamemode"`
-	Open          bool           `json:"open"`
-	RoleQueue     *RoleQueue     `json:"roleQueue"`
-	GroupSettings *GroupSettings `json:"groupSettings"`
+	PlayerID      int                       `json:"playerId"`
+	Region        string                    `json:"region"`
+	Gamemode      string                    `json:"gamemode"`
+	Open          bool                      `json:"open"`
+	RoleQueue     *repository.RoleQueue     `json:"roleQueue"`
+	GroupSettings *repository.GroupSettings `json:"groupSettings"`
 }
 
 func (c *CreateGroup) Validate() error {
@@ -43,16 +43,4 @@ func (c *CreateGroup) ToParams() repository.CreateGroupWithOwnerParams {
 		VoiceChat:   pgtype.Bool{Bool: c.GroupSettings.VoiceChat, Valid: true},
 		Mic:         pgtype.Bool{Bool: c.GroupSettings.Mic, Valid: true},
 	}
-}
-
-type RoleQueue struct {
-	Vanguards   int `json:"vanguards"`
-	Duelists    int `json:"duelists"`
-	Strategists int `json:"strategists"`
-}
-
-type GroupSettings struct {
-	Platforms []string `json:"platforms"`
-	VoiceChat bool     `json:"voiceChat"`
-	Mic       bool     `json:"mic"`
 }

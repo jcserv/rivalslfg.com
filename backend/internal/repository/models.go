@@ -7,9 +7,6 @@ package repository
 import (
 	"database/sql/driver"
 	"fmt"
-	"time"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Rankid string
@@ -130,57 +127,4 @@ func (ns NullRankname) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.Rankname), nil
-}
-
-type Community struct {
-	ID          int32  `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Link        string `json:"link"`
-}
-
-type Group struct {
-	ID          string      `json:"id"`
-	CommunityID int32       `json:"community_id"`
-	Owner       string      `json:"owner"`
-	Region      string      `json:"region"`
-	Gamemode    string      `json:"gamemode"`
-	Open        bool        `json:"open"`
-	Passcode    string      `json:"passcode"`
-	Vanguards   pgtype.Int4 `json:"vanguards"`
-	Duelists    pgtype.Int4 `json:"duelists"`
-	Strategists pgtype.Int4 `json:"strategists"`
-	Platforms   []string    `json:"platforms"`
-	VoiceChat   pgtype.Bool `json:"voice_chat"`
-	Mic         pgtype.Bool `json:"mic"`
-	CreatedAt   time.Time   `json:"created_at"`
-	UpdatedAt   time.Time   `json:"updated_at"`
-}
-
-type Groupmember struct {
-	GroupID  string `json:"group_id"`
-	PlayerID int32  `json:"player_id"`
-	Leader   bool   `json:"leader"`
-}
-
-type Player struct {
-	ID          int32       `json:"id"`
-	Name        string      `json:"name"`
-	DisplayName string      `json:"display_name"`
-	Region      string      `json:"region"`
-	Platform    string      `json:"platform"`
-	Gamemode    string      `json:"gamemode"`
-	Roles       []string    `json:"roles"`
-	Rank        Rankid      `json:"rank"`
-	Characters  []string    `json:"characters"`
-	PVoiceChat  bool        `json:"p_voice_chat"`
-	PMic        bool        `json:"p_mic"`
-	Vanguards   pgtype.Int4 `json:"vanguards"`
-	Duelists    pgtype.Int4 `json:"duelists"`
-	Strategists pgtype.Int4 `json:"strategists"`
-	Platforms   []string    `json:"platforms"`
-	GVoiceChat  pgtype.Bool `json:"g_voice_chat"`
-	GMic        pgtype.Bool `json:"g_mic"`
-	CreatedAt   time.Time   `json:"created_at"`
-	UpdatedAt   time.Time   `json:"updated_at"`
 }

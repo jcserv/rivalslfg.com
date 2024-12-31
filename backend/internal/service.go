@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"sync"
 
+	"github.com/gorilla/handlers"
 	"github.com/jackc/pgx/v5"
 	"github.com/jcserv/rivalslfg/internal/repository"
 	"github.com/jcserv/rivalslfg/internal/services"
@@ -38,7 +40,8 @@ func NewService() (*Service, error) {
 		return nil, err
 	}
 
-	s.api = _http.NewAPI(services.NewGroupService(repository.New(conn)))
+	repo := repository.New(conn)
+	s.api = _http.NewAPI(services.NewGroupService(repo), services.NewPlayerService(repo))
 	return s, nil
 }
 
@@ -76,6 +79,10 @@ func (s *Service) ConnectDB(ctx context.Context) (*pgx.Conn, error) {
 func (s *Service) StartHTTP(ctx context.Context) error {
 	log.Info(ctx, fmt.Sprintf("Starting HTTP server on port %s", s.cfg.HTTPPort))
 	r := s.api.RegisterRoutes()
-	http.ListenAndServe(fmt.Sprintf(":%s", s.cfg.HTTPPort), r)
+	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"})
+	origins := handlers.AllowedOrigins([]string{os.Getenv("ORIGIN_ALLOWED")})
+	methods := handlers.AllowedMethods([]string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions})
+
+	http.ListenAndServe(fmt.Sprintf(":%s", s.cfg.HTTPPort), handlers.CORS(origins, headers, methods)(r))
 	return nil
 }

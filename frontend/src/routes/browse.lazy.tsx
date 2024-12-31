@@ -1,21 +1,22 @@
-import { GroupTable } from "@/components/GroupTable";
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
 
-import groups from "@/assets/groups.json";
 import { Group } from "@/types";
 import { useLocalStorage } from "@/hooks/localStorage";
-import { ErrorBanner } from "@/components";
+import { ErrorBanner, GroupTable } from "@/components";
+import { FOURTEEN_DAYS_FROM_TODAY } from "@/types";
+
+import { useGroups } from "@/hooks/groups";
 
 export const Route = createLazyFileRoute("/browse")({
   component: BrowsePage,
 });
 
 function BrowsePage() {
-  const fourteenDaysFromToday = new Date(
-    new Date().setDate(new Date().getDate() + 14),
-  );
-  const [profile] = useLocalStorage("profile", {}, fourteenDaysFromToday);
+  const [profile] = useLocalStorage("profile", {}, FOURTEEN_DAYS_FROM_TODAY);
   const isProfileEmpty = !profile || Object.keys(profile).length === 0;
+  const [groups] = useGroups();
+
+  console.log(groups);
 
   return (
     <section className="p-2 md:p-4">
@@ -33,11 +34,13 @@ function BrowsePage() {
           </ErrorBanner>
         )}
         <div className="w-3/4">
-          <GroupTable
-            groups={groups as Group[]}
-            profile={profile}
-            isProfileEmpty={isProfileEmpty}
-          />
+          {groups && (
+            <GroupTable
+              groups={groups as Group[]}
+              profile={profile}
+              isProfileEmpty={isProfileEmpty}
+            />
+          )}
         </div>
       </div>
     </section>

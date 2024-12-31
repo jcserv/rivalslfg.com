@@ -21,6 +21,10 @@ dev-db-down:
 migrate:
 	migrate -database "$(DATABASE_URL)?sslmode=disable" -path ./db/migrations up
 
+# Usage: make makemigration name=your_migration_name
+migration:
+	migrate create -ext sql -dir db/migrations -seq $(name)
+
 reset:
 	make dev-db-down && make dev-db
 

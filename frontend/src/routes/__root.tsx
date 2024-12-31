@@ -1,22 +1,39 @@
-import { Header, Footer } from "@/components";
-import { Toaster } from "@/components/ui";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-/*
-Root (/): Displays the info about the application, with a button to find a lobby or create a new one.
-Profile (/profile): Displays the profile form. User is redirected to this page if they have not filled it out yet.
-Find Lobby (/lobby/find): Displays the lobby search form. User is redirected to this page if they select to find a lobby.
-Create Lobby (/lobby/create): Displays the lobby creation form. User is redirected to this page if they select to create a lobby.
-*/
+import { RivalsLFGClient } from "@/api";
+import { Header, Footer, ErrorBanner } from "@/components";
+import { Toaster } from "@/components/ui";
+
+export const queryClient = new QueryClient();
+export const rivalslfgAPIClient = new RivalsLFGClient(
+  import.meta.env.VITE_API_URL
+);
 
 export const Route = createRootRoute({
   component: () => (
     <>
+      <QueryClientProvider client={queryClient}>
+        <Header />
+        <hr />
+        <Outlet />
+        <Footer />
+        <Toaster />
+      </QueryClientProvider>
+    </>
+  ),
+  errorComponent: ({ error }) => (
+    <>
       <Header />
       <hr />
-      <Outlet />
+      <div className="flex w-full h-[80vh] justify-center align-middle">
+        <ErrorBanner
+          message="An unexpected error occurred. Please open a Github issue with the below error details."
+          error={error.message}
+          className="h-1/3"
+        />
+      </div>
       <Footer />
-      <Toaster />
     </>
   ),
 });
