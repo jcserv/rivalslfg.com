@@ -12,7 +12,7 @@ type Group struct {
 	GroupSettings *GroupSettings `json:"groupSettings"`
 }
 
-type Groupmember struct {
+type GroupMember struct {
 	GroupID  string `json:"group_id"`
 	PlayerID int32  `json:"player_id"`
 	Leader   bool   `json:"leader"`

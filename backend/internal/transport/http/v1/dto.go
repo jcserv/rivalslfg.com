@@ -44,3 +44,59 @@ func (c *CreateGroup) ToParams() repository.CreateGroupWithOwnerParams {
 		Mic:         pgtype.Bool{Bool: c.GroupSettings.Mic, Valid: true},
 	}
 }
+
+type CreatePlayer struct {
+	// Name        string      `json:"name"`
+	DisplayName string      `json:"display_name"`
+	Region      string      `json:"region"`
+	Platform    string      `json:"platform"`
+	Gamemode    string      `json:"gamemode"`
+	Roles       []string    `json:"roles"`
+	Rank        string      `json:"rank"`
+	Characters  []string    `json:"characters"`
+	VoiceChat   bool        `json:"voice_chat"`
+	Mic         bool        `json:"mic"`
+	Vanguards   pgtype.Int4 `json:"vanguards"`
+	Duelists    pgtype.Int4 `json:"duelists"`
+	Strategists pgtype.Int4 `json:"strategists"`
+	Platforms   []string    `json:"platforms"`
+	GVoiceChat  pgtype.Bool `json:"g_voice_chat"`
+	GMic        pgtype.Bool `json:"g_mic"`
+}
+
+func (c *CreatePlayer) Validate() error {
+	if c.DisplayName == "" {
+		return fmt.Errorf("display_name is required")
+	}
+	if c.Region == "" {
+		return fmt.Errorf("region is required")
+	}
+	if c.Gamemode == "" {
+		return fmt.Errorf("gamemode is required")
+	}
+	if c.Rank == "" {
+		return fmt.Errorf("rank is required")
+	}
+	return nil
+}
+
+func (c *CreatePlayer) ToParams() repository.CreatePlayerParams {
+	return repository.CreatePlayerParams{
+		Name:        c.DisplayName,
+		DisplayName: c.DisplayName,
+		Region:      c.Region,
+		Platform:    c.Platform,
+		Gamemode:    c.Gamemode,
+		Roles:       c.Roles,
+		Rank:        repository.Rankid(c.Rank),
+		Characters:  c.Characters,
+		VoiceChat:   c.VoiceChat,
+		Mic:         c.Mic,
+		Vanguards:   c.Vanguards,
+		Duelists:    c.Duelists,
+		Strategists: c.Strategists,
+		Platforms:   c.Platforms,
+		GVoiceChat:  c.GVoiceChat,
+		GMic:        c.GMic,
+	}
+}

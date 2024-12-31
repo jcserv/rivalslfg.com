@@ -31,7 +31,9 @@ func (a *API) CreateGroup() http.HandlerFunc {
 			return
 		}
 
-		httputil.OK(w, groupID)
+		httputil.OK(w, map[string]string{
+			"id": groupID,
+		})
 	}
 }
 
