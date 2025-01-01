@@ -37,9 +37,7 @@ type GroupSettings struct {
 }
 
 type Player struct {
-	ID            int32          `json:"id"`
 	Name          string         `json:"name"`
-	DisplayName   string         `json:"displayName"`
 	Region        string         `json:"region"`
 	Platform      string         `json:"platform"`
 	Gamemode      string         `json:"gamemode"`

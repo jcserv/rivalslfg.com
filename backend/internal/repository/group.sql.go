@@ -7,83 +7,68 @@ package repository
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createGroupWithOwner = `-- name: CreateGroupWithOwner :one
-WITH player_info AS (
-    SELECT Players.id AS player_id, Players.display_name
-    FROM Players
-    WHERE Players.id = $1 -- player_id
-),
-new_group AS (
-    INSERT INTO Groups (
-        community_id,
-        owner,
-        region,
-        gamemode,
-        open,
-        vanguards,
-        duelists,
-        strategists,
-        platforms,
-        voice_chat,
-        mic
-    ) 
-    SELECT 
-        $2,                  -- community_id
-        player_info.display_name,  -- owner
-        $3,                -- region
-        $4,                -- gamemode
-        $5,                -- open
-        $6,                -- vanguards
-        $7,                -- duelists
-        $8,                -- strategists
-        $9,                -- platforms
-        $10,                -- voice_chat
-        $11                -- mic
-    FROM player_info
-    RETURNING id
-)
-INSERT INTO GroupMembers (group_id, player_id, leader)
+const findGroups = `-- name: FindGroups :many
 SELECT 
-    new_group.id,
-    player_info.player_id,
-    TRUE
-FROM new_group, player_info
-RETURNING group_id
+    g.id,
+	community_id,
+	owner,
+	g.region,
+	g.gamemode,
+	open,
+	jsonb_build_object(
+		'vanguards', g.vanguards,
+		'duelists', g.duelists,
+		'strategists', g.strategists
+	) AS role_queue,
+	 jsonb_build_object(
+		'platforms', g.platforms,
+		'voiceChat', g.voice_chat,
+		'mic', g.mic
+	) AS group_settings,
+    players
+FROM Groups g
 `
 
-type CreateGroupWithOwnerParams struct {
-	ID          int32       `json:"id"`
-	CommunityID int32       `json:"community_id"`
-	Region      string      `json:"region"`
-	Gamemode    string      `json:"gamemode"`
-	Open        bool        `json:"open"`
-	Vanguards   pgtype.Int4 `json:"vanguards"`
-	Duelists    pgtype.Int4 `json:"duelists"`
-	Strategists pgtype.Int4 `json:"strategists"`
-	Platforms   []string    `json:"platforms"`
-	VoiceChat   pgtype.Bool `json:"voice_chat"`
-	Mic         pgtype.Bool `json:"mic"`
+type FindGroupsRow struct {
+	ID            string `json:"id"`
+	CommunityID   int32  `json:"community_id"`
+	Owner         string `json:"owner"`
+	Region        string `json:"region"`
+	Gamemode      string `json:"gamemode"`
+	Open          bool   `json:"open"`
+	RoleQueue     []byte `json:"role_queue"`
+	GroupSettings []byte `json:"group_settings"`
+	Players       []byte `json:"players"`
 }
 
-func (q *Queries) CreateGroupWithOwner(ctx context.Context, arg CreateGroupWithOwnerParams) (string, error) {
-	row := q.db.QueryRow(ctx, createGroupWithOwner,
-		arg.ID,
-		arg.CommunityID,
-		arg.Region,
-		arg.Gamemode,
-		arg.Open,
-		arg.Vanguards,
-		arg.Duelists,
-		arg.Strategists,
-		arg.Platforms,
-		arg.VoiceChat,
-		arg.Mic,
-	)
-	var group_id string
-	err := row.Scan(&group_id)
-	return group_id, err
+func (q *Queries) FindGroups(ctx context.Context) ([]FindGroupsRow, error) {
+	rows, err := q.db.Query(ctx, findGroups)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindGroupsRow
+	for rows.Next() {
+		var i FindGroupsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CommunityID,
+			&i.Owner,
+			&i.Region,
+			&i.Gamemode,
+			&i.Open,
+			&i.RoleQueue,
+			&i.GroupSettings,
+			&i.Players,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

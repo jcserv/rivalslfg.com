@@ -17,9 +17,9 @@ type API struct {
 	V1API *v1.API
 }
 
-func NewAPI(groupService *services.GroupService, playerService *services.PlayerService) *API {
+func NewAPI(groupService *services.GroupService) *API {
 	return &API{
-		V1API: v1.NewAPI(groupService, playerService),
+		V1API: v1.NewAPI(groupService),
 	}
 }
 

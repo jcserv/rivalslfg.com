@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -9,33 +8,33 @@ import (
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
-func (a *API) CreateGroup() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		var input CreateGroup
-		err := json.NewDecoder(r.Body).Decode(&input)
-		if err != nil {
-			httputil.BadRequest(w)
-			return
-		}
+// func (a *API) CreateGroup() http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		ctx := r.Context()
+// 		var input CreateGroup
+// 		err := json.NewDecoder(r.Body).Decode(&input)
+// 		if err != nil {
+// 			httputil.BadRequest(w)
+// 			return
+// 		}
 
-		if err := input.Validate(); err != nil {
-			httputil.BadRequest(w)
-			return
-		}
+// 		if err := input.Validate(); err != nil {
+// 			httputil.BadRequest(w)
+// 			return
+// 		}
 
-		groupID, err := a.groupService.CreateGroupWithOwner(ctx, input.ToParams())
-		if err != nil {
-			httputil.InternalServerError(ctx, w, err)
-			log.Error(ctx, err.Error())
-			return
-		}
+// 		groupID, err := a.groupService.CreateGroupWithOwner(ctx, input.ToParams())
+// 		if err != nil {
+// 			httputil.InternalServerError(ctx, w, err)
+// 			log.Error(ctx, err.Error())
+// 			return
+// 		}
 
-		httputil.OK(w, map[string]string{
-			"id": groupID,
-		})
-	}
-}
+// 		httputil.OK(w, map[string]string{
+// 			"id": groupID,
+// 		})
+// 	}
+// }
 
 func (a *API) ReadGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

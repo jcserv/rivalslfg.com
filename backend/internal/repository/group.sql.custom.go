@@ -25,37 +25,8 @@ SELECT
 		'voiceChat', g.voice_chat,
 		'mic', g.mic
 	) AS group_settings,
-    COALESCE(
-        json_agg(
-            jsonb_build_object(
-                'id', p.id,
-                'name', p.name,
-                'displayName', p.display_name,
-                'region', p.region,
-                'platform', p.platform,
-                'gamemode', p.gamemode,
-                'roles', p.roles,
-                'rank', p.rank,
-                'characters', p.characters,
-                'voiceChat', p.voice_chat,
-                'mic', p.mic,
-				'roleQueue', jsonb_build_object(
-					'vanguards', p.vanguards,
-					'duelists', p.duelists,
-					'strategists', p.strategists
-				),
-				'groupSettings', jsonb_build_object(
-					'platforms', p.platforms,
-					'voiceChat', p.g_voice_chat,
-					'mic', p.g_mic
-				)
-            )
-        ), '[]'
-    ) as players
-FROM Groups g
-LEFT JOIN GroupMembers gm ON g.id = gm.group_id
-LEFT JOIN Players p ON p.id = gm.player_id
-GROUP BY g.id`
+    players
+FROM Groups g`
 
 func (q *Queries) FindAllGroups(ctx context.Context) ([]GroupWithPlayers, error) {
 	rows, err := q.db.Query(ctx, findAllGroups)
@@ -104,39 +75,9 @@ SELECT
 		'voiceChat', g.voice_chat,
 		'mic', g.mic
 	) AS group_settings,
-	COALESCE(
-		json_agg(
-			jsonb_build_object(
-				'id', p.id,
-                'name', p.name,
-                'displayName', p.display_name,
-                'region', p.region,
-                'platform', p.platform,
-                'gamemode', p.gamemode,
-                'roles', p.roles,
-                'rank', p.rank,
-                'characters', p.characters,
-                'voiceChat', p.voice_chat,
-                'mic', p.mic,
-				'roleQueue', jsonb_build_object(
-					'vanguards', p.vanguards,
-					'duelists', p.duelists,
-					'strategists', p.strategists
-				),
-				'groupSettings', jsonb_build_object(
-					'platforms', p.platforms,
-					'voiceChat', p.g_voice_chat,
-					'mic', p.g_mic
-				)
-			)
-		) FILTER (WHERE p.id IS NOT NULL), 
-		'[]'
-	) as players
+	players,
 FROM Groups g
-LEFT JOIN GroupMembers gm ON g.id = gm.group_id
-LEFT JOIN Players p ON p.id = gm.player_id
-WHERE g.id = $1
-GROUP BY g.id`
+WHERE g.id = $1`
 
 func (q *Queries) FindGroupByID(ctx context.Context, id string) (*GroupWithPlayers, error) {
 	var g GroupWithPlayers

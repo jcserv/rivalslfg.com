@@ -1,2 +1,0 @@
-ALTER TABLE players
-DROP CONSTRAINT players_name_region_key;
