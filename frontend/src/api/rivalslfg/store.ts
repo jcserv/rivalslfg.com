@@ -1,4 +1,4 @@
-import { Store } from "@tanstack/store";
+import { Store } from "@tanstack/react-store";
 
 import { Group } from "@/types";
 import { queryClient } from "@/routes/__root";
@@ -17,13 +17,11 @@ export const rivalslfgStore = new Store<RivalsLFGStore>(initialState);
 
 export const rivalsStoreKeys = {
   all: ["authedGroups", "groups"] as const,
+  groups: ["groups"] as const,
   group: (id: string) => ["group", id] as const,
 };
 
 export const rivalsStoreActions = {
-  getIsAuthed(groupId: string) {
-    return rivalslfgStore.state.authedGroups.get(groupId) || false;
-  },
   setAuthedGroup(groupId: string) {
     rivalslfgStore.setState((prev) => ({
       ...prev,

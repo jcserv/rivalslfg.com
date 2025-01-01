@@ -1,5 +1,6 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { RivalsLFGClient } from "@/api";
 import { Header, Footer, ErrorBanner } from "@/components";
@@ -14,6 +15,7 @@ export const Route = createRootRoute({
   component: () => (
     <>
       <QueryClientProvider client={queryClient}>
+        <ReactQueryDevtools initialIsOpen={false} />
         <Header />
         <hr />
         <Outlet />

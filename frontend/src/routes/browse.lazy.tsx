@@ -2,7 +2,7 @@ import { createLazyFileRoute, Link } from "@tanstack/react-router";
 
 import { ErrorBanner, GroupTable } from "@/components";
 import { useLocalStorage, useGroups } from "@/hooks";
-import { Group, FOURTEEN_DAYS_FROM_TODAY } from "@/types";
+import { FOURTEEN_DAYS_FROM_TODAY } from "@/types";
 
 export const Route = createLazyFileRoute("/browse")({
   component: BrowsePage,
@@ -31,13 +31,11 @@ function BrowsePage() {
           </ErrorBanner>
         )}
         <div className="w-3/4">
-          {!isLoading && groups && (
-            <GroupTable
-              groups={groups as Group[]}
-              profile={profile}
-              isProfileEmpty={isProfileEmpty}
-            />
-          )}
+          <GroupTable
+            groups={!isLoading && groups ? groups : []}
+            profile={profile}
+            isProfileEmpty={isProfileEmpty}
+          />
         </div>
       </div>
     </section>

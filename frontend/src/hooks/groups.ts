@@ -1,13 +1,19 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { rivalsStoreKeys, fetchGroups, fetchGroup, joinGroup } from "@/api";
-import { Group, ONE_MINUTE_IN_MILLISECONDS, Profile } from "@/types";
+import {
+  rivalsStoreKeys,
+  fetchGroups,
+  fetchGroup,
+  joinGroup,
+  upsertGroup,
+} from "@/api";
+import { Group, Profile } from "@/types";
 
 export function useGroups(): [Group[] | undefined, boolean, Error | null] {
   const query = useQuery({
-    queryKey: rivalsStoreKeys.all,
+    queryKey: rivalsStoreKeys.groups,
     queryFn: () => fetchGroups(),
-    staleTime: ONE_MINUTE_IN_MILLISECONDS * 5,
+    staleTime: 0,
   });
 
   return [query.data, query.isLoading, query.error];
@@ -19,10 +25,24 @@ export function useGroup(
   const query = useQuery({
     queryKey: rivalsStoreKeys.group(id),
     queryFn: () => fetchGroup(id),
-    staleTime: ONE_MINUTE_IN_MILLISECONDS * 5,
+    staleTime: 0,
   });
 
   return [query.data, query.isLoading, query.error];
+}
+
+type UpsertGroupArgs = {
+  profile: Profile;
+  id: string;
+};
+
+export function useUpsertGroup() {
+  const { mutateAsync } = useMutation({
+    mutationFn: (input: UpsertGroupArgs) => {
+      return upsertGroup(input.profile, input.id);
+    },
+  });
+  return mutateAsync;
 }
 
 type JoinGroupArgs = {

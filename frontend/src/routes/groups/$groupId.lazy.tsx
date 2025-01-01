@@ -8,9 +8,8 @@ import {
   AccessGroupDialog,
 } from "@/components";
 import { Button } from "@/components/ui";
-import { useGroup } from "@/hooks";
+import { useGroup, useIsAuthed } from "@/hooks";
 import { getPlayerFromProfile, Group, Profile } from "@/types";
-import { rivalsStoreActions } from "@/api";
 
 export const Route = createLazyFileRoute("/groups/$groupId")({
   component: GroupPage,
@@ -18,7 +17,7 @@ export const Route = createLazyFileRoute("/groups/$groupId")({
 
 function GroupPage() {
   const { groupId } = Route.useParams();
-  const isAuthed = rivalsStoreActions.getIsAuthed(groupId);
+  const isAuthed = useIsAuthed(groupId);
 
   // Initialize access state as null to represent "unknown" state
   const [canUserAccessGroup, setCanUserAccessGroup] = useState<boolean | null>(
@@ -27,6 +26,13 @@ function GroupPage() {
 
   const [g, isLoading, error] = useGroup(groupId);
   const [group, setGroup] = useState<Group | undefined>(g);
+
+  useEffect(() => {
+    if (g) {
+      setGroup(g);
+    }
+  }, [g]);
+
   const isGroupOpen = group?.open || false;
 
   useEffect(() => {

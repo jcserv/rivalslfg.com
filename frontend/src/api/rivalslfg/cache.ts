@@ -9,6 +9,9 @@ export const upsertGroup = async (
 ): Promise<string> => {
   const groupId = await rivalslfgAPIClient.upsertGroup(profile, id);
   const newGroup = getGroupFromProfile(profile, groupId);
+  rivalsStoreActions.setAuthedGroup(groupId);
+
+  // TODO: It'd be nice to have an upsertGroup action in the store so that this is just one action
   if (id) {
     rivalsStoreActions.replaceGroup(newGroup);
   } else {
@@ -19,11 +22,6 @@ export const upsertGroup = async (
 };
 
 export const fetchGroups = async (): Promise<Group[]> => {
-  const cached = rivalslfgStore.state.groups;
-  if (cached.length > 0) {
-    return cached;
-  }
-
   const groups = await rivalslfgAPIClient.getGroups();
   rivalsStoreActions.setGroups(groups);
   return groups;

@@ -40,6 +40,8 @@ FE-Only:
 - [ ] Chat
 - [ ] Matchmaking
 - [ ] Set default filters based on user profile (region=, gamemode=, canjoin=) (\*)
+- [ ] Filter or sort characters based on selected roles
+- [ ] vice versa, derive roles from characters?
 - [ ] Remove player from group
 
 API Integration:
@@ -50,13 +52,15 @@ API Integration:
 - [x] Integrate Browse Page
 - [ ] Browse Page Pagination & Filtering (\*)
 - [x] Integrate Group Page
-- [ ] Integrate Join Group
+- [x] Integrate Join Group
 - [ ] Integrate remove player from group
 - [ ] Chat
 - [ ] Matchmaking
 
 Bugs:
 
-- [x] Fix flicker on group page
+- [x] Fix flicker on group page?
+  - [ ] repro'd when joining a public group
 - [x] Group table does not show until groups are loaded, should load in but with empty data.
 - [ ] After creating a group, the owner should not have to authenticate (sessions integration will probs solve this)
+  - repro: create a group, click away, then come back to the group page. this works, but then if you refresh the dialog will open again

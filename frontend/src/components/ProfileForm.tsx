@@ -5,7 +5,6 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 
-import { upsertGroup } from "@/api";
 import {
   Accordion,
   AccordionContent,
@@ -61,7 +60,7 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from "@/components/ui/multi-select";
-import { useToast } from "@/hooks";
+import { useToast, useUpsertGroup } from "@/hooks";
 import { cn } from "@/lib/utils";
 import {
   Gamemode,
@@ -142,6 +141,7 @@ export function ProfileForm({
   const [roleQueueEnabled, setRoleQueueEnabled] = useState(
     profile?.roleQueue ? true : false,
   );
+  const upsertGroup = useUpsertGroup();
   const { toast } = useToast();
   const router = useRouter();
 
@@ -183,7 +183,10 @@ export function ProfileForm({
     try {
       let groupId = "";
       if (isGroup) {
-        groupId = await upsertGroup(values as Profile, "");
+        groupId = await upsertGroup({
+          profile: values as Profile,
+          id: "",
+        });
       }
 
       setProfile(values as Profile);
