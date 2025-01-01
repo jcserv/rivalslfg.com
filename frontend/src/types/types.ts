@@ -211,6 +211,19 @@ export function getGroupFromProfile(owner: Profile, id: string): Group {
   };
 }
 
+export function getPlayerFromProfile(profile: Profile): Player {
+  return {
+    name: profile.name,
+    leader: false,
+    platform: profile.platform,
+    roles: profile.roles,
+    rank: profile.rank,
+    characters: profile.characters,
+    voiceChat: profile.voiceChat,
+    mic: profile.mic,
+  };
+}
+
 export type RoleQueue = {
   vanguards: number;
   duelists: number;

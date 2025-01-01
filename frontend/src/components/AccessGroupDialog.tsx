@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useJoinGroup, useLocalStorage, useToast } from "@/hooks";
-import { FOURTEEN_DAYS_FROM_TODAY, StatusCodes } from "@/types";
+import { FOURTEEN_DAYS_FROM_TODAY, Profile, StatusCodes } from "@/types";
 
 const formSchema = z.object({
   passcode: z
@@ -33,12 +33,14 @@ const formSchema = z.object({
 interface AccessGroupDialogProps {
   groupId: string;
   open: boolean;
+  onJoin: (p: Profile) => void;
   onClose: () => void;
 }
 
 export function AccessGroupDialog({
   groupId,
   open,
+  onJoin,
   onClose,
 }: AccessGroupDialogProps) {
   const joinGroup = useJoinGroup();
@@ -68,6 +70,7 @@ export function AccessGroupDialog({
         title: "Access granted",
         variant: "success",
       });
+      onJoin(profile);
       onClose();
     } catch (error) {
       console.error("Form submission error", error);

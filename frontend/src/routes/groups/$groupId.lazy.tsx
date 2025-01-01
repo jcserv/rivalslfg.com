@@ -9,15 +9,16 @@ import {
 } from "@/components";
 import { Button } from "@/components/ui";
 import { useGroup } from "@/hooks";
-import { Group as GroupType } from "@/types";
+import { getPlayerFromProfile, Group, Profile } from "@/types";
 
 export const Route = createLazyFileRoute("/groups/$groupId")({
-  component: Group,
+  component: GroupPage,
 });
 
-function Group() {
+function GroupPage() {
   const { groupId } = Route.useParams();
-  const [group, isLoading, error] = useGroup(groupId);
+  const [g, isLoading, error] = useGroup(groupId);
+  const [group, setGroup] = useState<Group | undefined>(g);
   const isGroupOpen = group?.open || false;
 
   // Initialize access state as null to represent "unknown" state
@@ -31,6 +32,14 @@ function Group() {
       setCanUserAccessGroup(isGroupOpen);
     }
   }, [isLoading, isGroupOpen]);
+
+  function onJoin(p: Profile) {
+    if (!group) return;
+    setGroup({
+      ...group,
+      players: [...group.players, getPlayerFromProfile(p)],
+    });
+  }
 
   function onLeave() {
     // TODO: This should also be logged in the chat
@@ -46,13 +55,14 @@ function Group() {
             <AccessGroupDialog
               groupId={groupId}
               open={!accessStateUnknown && !canUserAccessGroup}
+              onJoin={onJoin}
               onClose={() => {
                 setCanUserAccessGroup(true);
               }}
             />
             {!isLoading && (
               <GroupDisplay
-                group={group as GroupType}
+                group={group}
                 canUserAccessGroup={canUserAccessGroup}
               />
             )}
