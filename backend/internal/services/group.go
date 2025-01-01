@@ -25,7 +25,7 @@ func (s *GroupService) UpsertGroup(ctx context.Context, arg repository.UpsertGro
 }
 
 func (s *GroupService) GetGroups(ctx context.Context) ([]repository.GroupWithPlayers, error) {
-	groups, err := s.repo.FindAllGroups(ctx)
+	groups, err := s.repo.GetGroups(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (s *GroupService) GetGroups(ctx context.Context) ([]repository.GroupWithPla
 }
 
 func (s *GroupService) GetGroupByID(ctx context.Context, id string) (*repository.GroupWithPlayers, error) {
-	group, err := s.repo.FindGroupByID(ctx, id)
+	group, err := s.repo.GetGroupByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}

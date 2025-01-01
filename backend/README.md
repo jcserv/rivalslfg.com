@@ -28,10 +28,11 @@ this folder contains the backend for [rivalslfg](https://rivalslfg.vercel.app/),
 ## todo
 
 1. [X] List Groups
-   - [ ] Filter by:
+   - [ ] Filter by: (*)
      -  Region
      -  Gamemode
      -  Requirements Met (provided player info)
+
      -  Visibility
      -  Platform
      -  Gamemode
@@ -45,11 +46,19 @@ this folder contains the backend for [rivalslfg](https://rivalslfg.vercel.app/),
 4. [ ] Remove Player from Group
 
 5. Chat
+
 6. Matchmaking
-   - Probably requires atomic locks
+   - Find groups the user can join
+     - Prioritize groups that are close to completion
+   - Acquire lock on group
+   - Join
+   - Release lock
+   - If no groups are found, create a new group with as many queued players as possible?
 
 Bugs:
 - No auth right now, so users can modify other users' info if they know their id
 
 Before release:
 - [ ] Squash migrations into one, remove seed data
+
+* indicates these are good first issues

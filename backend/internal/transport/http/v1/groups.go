@@ -40,7 +40,7 @@ func (a *API) UpsertGroup() http.HandlerFunc {
 	}
 }
 
-func (a *API) ReadGroup() http.HandlerFunc {
+func (a *API) GetGroupByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		vars := mux.Vars(r)
@@ -67,7 +67,7 @@ func (a *API) ReadGroup() http.HandlerFunc {
 }
 
 // TODO: Add pagination
-func (a *API) ReadGroups() http.HandlerFunc {
+func (a *API) GetGroups() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 

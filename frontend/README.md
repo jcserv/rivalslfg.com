@@ -28,7 +28,7 @@ _Generated from [react-vite-shadcn-template](https://github.com/jcserv/react-vit
 
 FE-Only:
 
-- [ ] Better username validation
+- [ ] Better username validation (*)
   - 14 chars max
   - Must be at least 3 characters
   - Invalid characters: ! @ # $ % ^ & \* ( ) = +
@@ -36,10 +36,10 @@ FE-Only:
   - ; :
   - / ?
   - Allowed: . - \_ ' < >
-- Group should be private by default
+- [X] Group should be private by default
 - [ ] Chat
 - [ ] Matchmaking
-- [ ] Set default filters based on user profile (region=, gamemode=, canjoin=)
+- [ ] Set default filters based on user profile (region=, gamemode=, canjoin=) (*)
 
 API Integration:
 
@@ -47,7 +47,7 @@ API Integration:
 - [x] Integrate Create Group Form
 - [x] Integrate Profile Form
 - [x] Integrate Browse Page
-- [ ] Browse Page Pagination & Filtering
+- [ ] Browse Page Pagination & Filtering (*)
 - [x] Integrate Group Page
 - [ ] Integrate Join Group
 - [ ] Chat
@@ -56,5 +56,5 @@ API Integration:
 Bugs:
 
 - [ ] Fix flicker on group page
-- [ ] Group table does not show until groups are loaded, should load in but with empty data.
+- [X] Group table does not show until groups are loaded, should load in but with empty data.
 - [ ] After creating a group, the owner should not have to authenticate (sessions integration will probs solve this)

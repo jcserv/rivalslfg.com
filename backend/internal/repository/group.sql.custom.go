@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-const findAllGroups = `
+const getGroups = `
 SELECT 
     g.id,
 	community_id,
@@ -28,8 +28,8 @@ SELECT
     players
 FROM Groups g`
 
-func (q *Queries) FindAllGroups(ctx context.Context) ([]GroupWithPlayers, error) {
-	rows, err := q.db.Query(ctx, findAllGroups)
+func (q *Queries) GetGroups(ctx context.Context) ([]GroupWithPlayers, error) {
+	rows, err := q.db.Query(ctx, getGroups)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (q *Queries) FindAllGroups(ctx context.Context) ([]GroupWithPlayers, error)
 	return result, nil
 }
 
-const findGroupByID = `
+const getGroupByID = `
 SELECT 
 	g.id,
 	community_id,
@@ -80,9 +80,9 @@ SELECT
 FROM Groups g
 WHERE g.id = $1`
 
-func (q *Queries) FindGroupByID(ctx context.Context, id string) (*GroupWithPlayers, error) {
+func (q *Queries) GetGroupByID(ctx context.Context, id string) (*GroupWithPlayers, error) {
 	var g GroupWithPlayers
-	err := q.db.QueryRow(ctx, findGroupByID, id).Scan(
+	err := q.db.QueryRow(ctx, getGroupByID, id).Scan(
 		&g.ID,
 		&g.CommunityID,
 		&g.Owner,

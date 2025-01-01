@@ -31,8 +31,8 @@ func NewAPI(groupService *services.GroupService) *API {
 
 func (a *API) RegisterRoutes(r *mux.Router) {
 	r.HandleFunc(groups, a.UpsertGroup()).Methods(http.MethodPost)
-	r.HandleFunc(group, a.ReadGroup()).Methods(http.MethodGet)
-	r.HandleFunc(groups, a.ReadGroups()).Methods(http.MethodGet)
+	r.HandleFunc(group, a.GetGroupByID()).Methods(http.MethodGet)
+	r.HandleFunc(groups, a.GetGroups()).Methods(http.MethodGet)
 	r.HandleFunc(groups, a.DeleteGroup()).Methods(http.MethodDelete)
 	r.HandleFunc(joinGroup, a.JoinGroup()).Methods(http.MethodPost)
 }
