@@ -7,7 +7,7 @@ import {
 } from "@/components/ui";
 
 interface ChatProps {
-  canUserAccessGroup: boolean;
+  canUserAccessGroup: boolean | null;
 }
 
 export function Chat({ canUserAccessGroup }: ChatProps) {

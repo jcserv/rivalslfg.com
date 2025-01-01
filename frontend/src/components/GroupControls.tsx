@@ -23,7 +23,7 @@ const formSchema = z.object({
 
 interface GroupControlsProps {
   isGroupOpen: boolean;
-  canUserAccessGroup: boolean;
+  canUserAccessGroup: boolean | null;
 }
 
 export function GroupControls({

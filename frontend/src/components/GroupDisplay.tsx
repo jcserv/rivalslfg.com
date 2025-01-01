@@ -33,7 +33,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface GroupDisplayProps {
   group: Group | undefined;
-  canUserAccessGroup: boolean;
+  canUserAccessGroup: boolean | null;
 }
 
 export function GroupDisplay({ group, canUserAccessGroup }: GroupDisplayProps) {

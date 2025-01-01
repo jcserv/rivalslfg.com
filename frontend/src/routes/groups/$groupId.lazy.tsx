@@ -20,23 +20,36 @@ function Group() {
   const [group, isLoading, error] = useGroup(groupId);
   const isGroupOpen = group?.open || false;
 
-  const [canUserAccessGroup, setCanUserAccessGroup] = useState(false);
+  // Initialize access state as null to represent "unknown" state
+  const [canUserAccessGroup, setCanUserAccessGroup] = useState<boolean | null>(
+    null,
+  );
+
   useEffect(() => {
-    setCanUserAccessGroup(isGroupOpen);
-  }, [isGroupOpen]);
+    // Only set access state when we have loaded the group data
+    if (!isLoading) {
+      setCanUserAccessGroup(isGroupOpen);
+    }
+  }, [isLoading, isGroupOpen]);
+
+  console.log({
+    isLoading,
+    canUserAccessGroup,
+  });
 
   function onLeave() {
     // TODO: This should also be logged in the chat
     console.log("i'm leavin here D:");
   }
 
+  const accessStateUnknown = isLoading || canUserAccessGroup === null;
   return (
     <section className="p-2 md:p-4">
       <div className="min-h-[80vh] w-full flex flex-col items-center">
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-8">
             <AccessGroupDialog
-              open={!canUserAccessGroup}
+              open={!accessStateUnknown && !canUserAccessGroup}
               onClose={() => {
                 setCanUserAccessGroup(true);
               }}
