@@ -58,7 +58,6 @@ export function GroupDisplay({ group, canUserAccessGroup }: GroupDisplayProps) {
   }
 
   if (!group) return null;
-
   return (
     <Card>
       <CardHeader>

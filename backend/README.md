@@ -42,12 +42,14 @@ this folder contains the backend for [rivalslfg](https://rivalslfg.vercel.app/),
        - Voice Chat
        - Mic
 2. [X] Upsert Group
-3. [ ] Join Group (if private, authenticate provided passcode)
-4. [ ] Remove Player from Group
+3. [ ] Delete Group
+4. [ ] Join Group (if private, authenticate provided passcode)
+5. [ ] Remove Player from Group
+6. [ ] Leave Group
 
-5. Chat
+7. Chat
 
-6. Matchmaking
+8. Matchmaking
    - Find groups the user can join
      - Prioritize groups that are close to completion
    - Acquire lock on group

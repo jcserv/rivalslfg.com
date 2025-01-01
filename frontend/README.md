@@ -40,6 +40,7 @@ FE-Only:
 - [ ] Chat
 - [ ] Matchmaking
 - [ ] Set default filters based on user profile (region=, gamemode=, canjoin=) (*)
+- [ ] Remove player from group
 
 API Integration:
 
@@ -50,6 +51,7 @@ API Integration:
 - [ ] Browse Page Pagination & Filtering (*)
 - [x] Integrate Group Page
 - [ ] Integrate Join Group
+- [ ] Integrate remove player from group
 - [ ] Chat
 - [ ] Matchmaking
 
