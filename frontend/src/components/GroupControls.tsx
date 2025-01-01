@@ -1,3 +1,7 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
 import {
   Card,
   CardContent,
@@ -13,9 +17,6 @@ import {
   Skeleton,
   Switch,
 } from "@/components/ui";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 const formSchema = z.object({
   open: z.boolean(),

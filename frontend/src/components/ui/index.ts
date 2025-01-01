@@ -6,6 +6,7 @@ export * from "./button-group";
 export * from "./card";
 export * from "./checkbox";
 export * from "./command";
+export * from "./data-table";
 export * from "./dialog";
 export * from "./dropdown-menu";
 export * from "./form";

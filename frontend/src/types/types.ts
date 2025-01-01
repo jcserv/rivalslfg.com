@@ -1,4 +1,4 @@
-import { toTitleCase } from "@/lib/utils";
+import { toTitleCase } from "@/lib";
 
 export enum Region {
   NA = "North America",

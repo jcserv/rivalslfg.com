@@ -1,15 +1,15 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { createLazyFileRoute } from "@tanstack/react-router";
 
-import { Group as GroupType } from "@/types";
-import { Button } from "@/components/ui";
-import { useGroup } from "@/hooks";
 import {
   GroupDisplay,
   GroupControls,
   Chat,
   AccessGroupDialog,
 } from "@/components";
+import { Button } from "@/components/ui";
+import { useGroup } from "@/hooks";
+import { Group as GroupType } from "@/types";
 
 export const Route = createLazyFileRoute("/groups/$groupId")({
   component: Group,

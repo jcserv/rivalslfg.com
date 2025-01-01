@@ -1,8 +1,8 @@
-import { DataTable } from "./ui/data-table";
-import { columns } from "./GroupTable.Columns";
-
-import { areRequirementsMet, getRequirements, Group, Profile } from "@/types";
 import { useMemo } from "react";
+
+import { DataTable } from "@/components/ui";
+import { columns } from "@/components/GroupTable.Columns";
+import { areRequirementsMet, getRequirements, Group, Profile } from "@/types";
 
 interface GroupTableProps {
   groups: Group[];

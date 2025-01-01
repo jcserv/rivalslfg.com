@@ -1,7 +1,20 @@
-import { useForm, UseFormReturn } from "react-hook-form";
+import { useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "@tanstack/react-router";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
-import { cn } from "@/lib/utils";
+
+import { upsertGroup } from "@/api/rivalslfg/cache";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Input,
+  Label,
+  Switch,
+} from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,6 +32,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Command,
   CommandEmpty,
@@ -32,7 +46,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -48,6 +61,17 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from "@/components/ui/multi-select";
+import { useToast } from "@/hooks";
+import { cn } from "@/lib/utils";
+import {
+  Gamemode,
+  Platform,
+  Profile,
+  Rank,
+  Region,
+  Roles,
+  TEAM_SIZE,
+} from "@/types";
 
 import characters from "@/assets/characters.json";
 import gamemodes from "@/assets/gamemodes.json";
@@ -55,22 +79,6 @@ import platforms from "@/assets/platforms.json";
 import ranks from "@/assets/ranks.json";
 import regions from "@/assets/regions.json";
 import roles from "@/assets/roles.json";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-  Input,
-  Label,
-  Switch,
-} from "./ui";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useMemo, useState } from "react";
-import { Gamemode, Platform, Profile, Rank, Region, Roles } from "@/types";
-import { useToast } from "@/hooks/use-toast";
-import { TEAM_SIZE } from "@/types/constants";
-import { upsertGroup } from "@/api/rivalslfg/cache";
-import { useRouter } from "@tanstack/react-router";
 
 const formSchema = z.object({
   name: z.string().min(1, "Please enter your in-game name"),

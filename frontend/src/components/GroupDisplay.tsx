@@ -1,11 +1,7 @@
-import {
-  getGroupInfo,
-  getPlatform,
-  getRank,
-  getRegion,
-  Group,
-  Player,
-} from "@/types";
+import { useMemo } from "react";
+import { Copy, X } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -22,14 +18,19 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
+import { TeamUpItem } from "@/components/TeamUp";
+import { useToast } from "@/hooks";
 import { strArrayToTitleCase, toTitleCase } from "@/lib";
-import { useMemo } from "react";
+import {
+  getGroupInfo,
+  getPlatform,
+  getRank,
+  getRegion,
+  Group,
+  Player,
+} from "@/types";
 
 import teamUps from "@/assets/teamups.json";
-import { TeamUpItem } from "./TeamUp";
-import { Button } from "./ui/button";
-import { Copy, X } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 
 interface GroupDisplayProps {
   group: Group | undefined;

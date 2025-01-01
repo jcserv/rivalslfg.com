@@ -1,7 +1,7 @@
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
 
-import { useLocalStorage, useGroups } from "@/hooks";
 import { ErrorBanner, GroupTable } from "@/components";
+import { useLocalStorage, useGroups } from "@/hooks";
 import { Group, FOURTEEN_DAYS_FROM_TODAY } from "@/types";
 
 export const Route = createLazyFileRoute("/browse")({

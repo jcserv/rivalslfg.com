@@ -1,8 +1,9 @@
+import { createLazyFileRoute } from "@tanstack/react-router";
+
 import { InfoBanner, ProfileForm } from "@/components";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui";
-import { useLocalStorage } from "@/hooks/localStorage";
+import { useLocalStorage } from "@/hooks";
 import { FOURTEEN_DAYS_FROM_TODAY, Profile } from "@/types";
-import { createLazyFileRoute } from "@tanstack/react-router";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,
