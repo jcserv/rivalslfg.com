@@ -1,5 +1,7 @@
 package repository
 
+import "time"
+
 type Group struct {
 	ID            string         `json:"id"`
 	CommunityID   int32          `json:"communityId"`
@@ -10,6 +12,7 @@ type Group struct {
 	Passcode      string         `json:"passcode"`
 	RoleQueue     *RoleQueue     `json:"roleQueue"`
 	GroupSettings *GroupSettings `json:"groupSettings"`
+	LastActiveAt  time.Time      `json:"lastActiveAt"`
 }
 
 type GroupMember struct {

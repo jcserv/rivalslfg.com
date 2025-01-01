@@ -76,6 +76,7 @@ SELECT
 		'mic', g.mic
 	) AS group_settings,
 	players,
+	last_active_at,
 FROM Groups g
 WHERE g.id = $1`
 
@@ -91,6 +92,7 @@ func (q *Queries) FindGroupByID(ctx context.Context, id string) (*GroupWithPlaye
 		&g.RoleQueue,
 		&g.GroupSettings,
 		&g.Players,
+		&g.LastActiveAt,
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {
@@ -100,6 +102,5 @@ func (q *Queries) FindGroupByID(ctx context.Context, id string) (*GroupWithPlaye
 	}
 
 	g.Name = fmt.Sprintf("%s's Group", g.Owner)
-
 	return &g, nil
 }
