@@ -21,6 +21,9 @@ export const rivalsStoreKeys = {
 };
 
 export const rivalsStoreActions = {
+  getIsAuthed(groupId: string) {
+    return rivalslfgStore.state.authedGroups.get(groupId) || false;
+  },
   setAuthedGroup(groupId: string) {
     rivalslfgStore.setState((prev) => ({
       ...prev,
