@@ -30,7 +30,10 @@ INSERT INTO Groups (
     mic,
     last_active_at
 ) VALUES (
-    COALESCE($1, generate_group_id()),
+    CASE 
+        WHEN $1 IS NULL OR $1 = '' THEN generate_group_id()
+        ELSE $1
+    END,
     $2,
     $3,
     $4,

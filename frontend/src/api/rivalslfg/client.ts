@@ -11,7 +11,6 @@ export class RivalsLFGClient extends HTTPClient {
 
   async upsertGroup(owner: Profile, id: string = ""): Promise<string> {
     const newGroup = getGroupFromProfile(owner, id);
-
     try {
       const response = await fetch(`${this.baseURL}/api/v1/groups`, {
         method: "POST",

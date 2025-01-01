@@ -17,7 +17,10 @@ INSERT INTO Groups (
     mic,
     last_active_at
 ) VALUES (
-    COALESCE(@id, generate_group_id()),
+    CASE 
+        WHEN @id IS NULL OR @id = '' THEN generate_group_id()
+        ELSE @id
+    END,
     @owner,
     @region,
     @gamemode,
