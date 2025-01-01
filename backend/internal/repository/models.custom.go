@@ -17,8 +17,8 @@ type GroupDTO struct {
 
 type GroupWithPlayers struct {
 	GroupDTO
-	Name    string      `json:"name"`
-	Players []PlayerDTO `json:"players"`
+	Name    string          `json:"name"`
+	Players []PlayerInGroup `json:"players"`
 }
 
 type RoleQueue struct {
@@ -33,7 +33,7 @@ type GroupSettings struct {
 	Mic       bool     `json:"mic"`
 }
 
-type PlayerDTO struct {
+type Profile struct {
 	Name          string         `json:"name"`
 	Region        string         `json:"region"`
 	Platform      string         `json:"platform"`

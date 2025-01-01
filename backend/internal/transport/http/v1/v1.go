@@ -10,10 +10,11 @@ import (
 const (
 	APIV1URLPath = "/api/v1/"
 	byId         = "/{id}"
+	join         = "/join"
 
 	groups    = APIV1URLPath + "groups"
 	group     = groups + byId
-	joinGroup = group + "/join"
+	joinGroup = group + join
 
 	players = APIV1URLPath + "players"
 	player  = players + byId
