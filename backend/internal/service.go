@@ -41,7 +41,7 @@ func NewService() (*Service, error) {
 	}
 
 	repo := repository.New(conn)
-	s.api = _http.NewAPI(services.NewGroupService(repo), services.NewPlayerService(repo))
+	s.api = _http.NewAPI(services.NewGroupService(repo))
 	return s, nil
 }
 

@@ -69,7 +69,6 @@ import { useMemo, useState } from "react";
 import { Gamemode, Platform, Profile, Rank, Region, Roles } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { TEAM_SIZE } from "@/types/constants";
-import { useCreateProfile } from "@/hooks";
 
 const formSchema = z.object({
   name: z.string().min(1, "Please enter your in-game name"),
@@ -122,18 +121,17 @@ const formSchema = z.object({
 interface ProfileFormProps {
   isGroup?: boolean;
   profile?: Profile;
-  setProfileId: (profileId: string) => void;
+  setProfile: (profile: Profile) => void;
 }
 
 export function ProfileForm({
   isGroup = false,
   profile,
-  setProfileId,
+  setProfile,
 }: ProfileFormProps) {
   const [roleQueueEnabled, setRoleQueueEnabled] = useState(
     profile?.roleQueue ? true : false,
   );
-  const createProfile = useCreateProfile();
   const { toast } = useToast();
 
   const defaultValues = useMemo(
@@ -172,11 +170,7 @@ export function ProfileForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const playerId = await createProfile({
-        profile: values as Profile,
-        id: profile?.id,
-      });
-      setProfileId(playerId);
+      setProfile(values as Profile);
       toast({
         title: "Preferences saved",
         variant: "success",
