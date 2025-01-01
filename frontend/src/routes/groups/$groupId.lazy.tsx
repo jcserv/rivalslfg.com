@@ -18,29 +18,19 @@ export const Route = createLazyFileRoute("/groups/$groupId")({
 function GroupPage() {
   const { groupId } = Route.useParams();
   const isAuthed = useIsAuthed(groupId);
-
-  // Initialize access state as null to represent "unknown" state
-  const [canUserAccessGroup, setCanUserAccessGroup] = useState<boolean | null>(
-    null,
-  );
-
   const [g, isLoading, error] = useGroup(groupId);
   const [group, setGroup] = useState<Group | undefined>(g);
+  const [showAccessDialog, setShowAccessDialog] = useState(false);
+  const [canUserAccessGroup, setCanUserAccessGroup] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (g) {
       setGroup(g);
+      const hasAccess = g.open || isAuthed;
+      setCanUserAccessGroup(hasAccess);
+      setShowAccessDialog(!isLoading && g && !hasAccess);
     }
-  }, [g]);
-
-  const isGroupOpen = group?.open || false;
-
-  useEffect(() => {
-    // Only set access state when we have loaded the group data
-    if (!isLoading) {
-      setCanUserAccessGroup(isGroupOpen || isAuthed);
-    }
-  }, [isLoading, isGroupOpen]);
+  }, [g, isLoading, isAuthed]);
 
   function onJoin(p: Profile) {
     if (!group) return;
@@ -51,11 +41,9 @@ function GroupPage() {
   }
 
   function onLeave() {
-    // TODO: This should also be logged in the chat
     console.log("i'm leavin here D:");
   }
 
-  const accessStateUnknown = isLoading || canUserAccessGroup === null;
   return (
     <section className="p-2 md:p-4">
       <div className="min-h-[80vh] w-full flex flex-col items-center">
@@ -63,9 +51,10 @@ function GroupPage() {
           <div className="col-span-8">
             <AccessGroupDialog
               groupId={groupId}
-              open={!accessStateUnknown && !canUserAccessGroup}
+              open={showAccessDialog}
               onJoin={onJoin}
               onClose={() => {
+                setShowAccessDialog(false);
                 setCanUserAccessGroup(true);
               }}
             />
@@ -86,7 +75,7 @@ function GroupPage() {
           {!isLoading && !error && (
             <div className="col-span-4 space-y-4">
               <GroupControls
-                isGroupOpen={isGroupOpen}
+                isGroupOpen={group?.open ?? false}
                 canUserAccessGroup={canUserAccessGroup}
               />
               <Chat canUserAccessGroup={canUserAccessGroup} />
