@@ -23,7 +23,8 @@ func Init(isProd bool) *zap.Logger {
 		config.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 	}
 
-	logger, _ := config.Build(zap.AddCallerSkip(1))
+	l, _ := config.Build()
+	logger = l.WithOptions(zap.AddCallerSkip(1))
 	return logger
 }
 
@@ -34,6 +35,13 @@ func GetLogger(ctx context.Context) *zap.Logger {
 		return Init(isProd)
 	}
 	return logger
+}
+
+func Debug(ctx context.Context, msg string) {
+	if !env.GetBool("DEBUG", false) {
+		return
+	}
+	GetLogger(ctx).Debug(msg)
 }
 
 func Info(ctx context.Context, msg string) {

@@ -76,7 +76,7 @@ SELECT
 		'mic', g.mic
 	) AS group_settings,
 	players,
-	last_active_at,
+	last_active_at
 FROM Groups g
 WHERE g.id = $1`
 

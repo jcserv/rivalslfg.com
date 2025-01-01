@@ -1,6 +1,21 @@
 import { rivalslfgStore, rivalsStoreActions } from "@/api/rivalslfg/store";
 import { rivalslfgAPIClient } from "@/routes/__root";
-import { Group } from "@/types";
+import { getGroupFromProfile, Group, Profile } from "@/types";
+
+export const upsertGroup = async (
+  profile: Profile,
+  id: string,
+): Promise<string> => {
+  const groupId = await rivalslfgAPIClient.upsertGroup(profile, id);
+  const newGroup = getGroupFromProfile(profile, groupId);
+  if (id) {
+    rivalsStoreActions.replaceGroup(newGroup);
+  } else {
+    rivalsStoreActions.setGroup(newGroup);
+  }
+
+  return groupId;
+};
 
 export const fetchGroups = async (): Promise<Group[]> => {
   const cached = await rivalslfgStore.state.groups;
@@ -13,7 +28,7 @@ export const fetchGroups = async (): Promise<Group[]> => {
   return groups;
 };
 
-export const fetchGroup = async (id: string): Promise<Group> => {
+export const fetchGroup = async (id: string): Promise<Group | undefined> => {
   const cached = (await rivalslfgStore.state.groups).find(
     (group) => group.id === id,
   );
@@ -22,6 +37,9 @@ export const fetchGroup = async (id: string): Promise<Group> => {
   }
 
   const group = await rivalslfgAPIClient.getGroup(id);
+  if (!group) {
+    return undefined;
+  }
   rivalsStoreActions.setGroup(group);
   return group;
 };

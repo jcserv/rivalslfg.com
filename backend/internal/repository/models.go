@@ -7,6 +7,9 @@ package repository
 import (
 	"database/sql/driver"
 	"fmt"
+	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Rankid string
@@ -127,4 +130,31 @@ func (ns NullRankname) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.Rankname), nil
+}
+
+type Community struct {
+	ID          int32  `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Link        string `json:"link"`
+}
+
+type Group struct {
+	ID           string      `json:"id"`
+	CommunityID  int32       `json:"community_id"`
+	Owner        string      `json:"owner"`
+	Region       string      `json:"region"`
+	Gamemode     string      `json:"gamemode"`
+	Players      []byte      `json:"players"`
+	Open         bool        `json:"open"`
+	Passcode     string      `json:"passcode"`
+	Vanguards    pgtype.Int4 `json:"vanguards"`
+	Duelists     pgtype.Int4 `json:"duelists"`
+	Strategists  pgtype.Int4 `json:"strategists"`
+	Platforms    []string    `json:"platforms"`
+	VoiceChat    pgtype.Bool `json:"voice_chat"`
+	Mic          pgtype.Bool `json:"mic"`
+	CreatedAt    time.Time   `json:"created_at"`
+	UpdatedAt    time.Time   `json:"updated_at"`
+	LastActiveAt time.Time   `json:"last_active_at"`
 }

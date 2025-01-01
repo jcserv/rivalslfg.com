@@ -44,7 +44,7 @@ FE-Only:
 API Integration:
 
 - [x] Integrate Find Group Form
-- [ ] Integrate Create Group Form
+- [x] Integrate Create Group Form
 - [x] Integrate Profile Form
 - [x] Integrate Browse Page
 - [ ] Browse Page Pagination & Filtering
@@ -57,3 +57,4 @@ Bugs:
 
 - [ ] Fix flicker on group page
 - [ ] Group table does not show until groups are loaded, should load in but with empty data.
+- [ ] After creating a group, the owner should not have to authenticate (sessions integration will probs solve this)

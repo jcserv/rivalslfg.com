@@ -69,6 +69,8 @@ import { useMemo, useState } from "react";
 import { Gamemode, Platform, Profile, Rank, Region, Roles } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { TEAM_SIZE } from "@/types/constants";
+import { upsertGroup } from "@/api/rivalslfg/cache";
+import { useRouter } from "@tanstack/react-router";
 
 const formSchema = z.object({
   name: z.string().min(1, "Please enter your in-game name"),
@@ -133,6 +135,7 @@ export function ProfileForm({
     profile?.roleQueue ? true : false,
   );
   const { toast } = useToast();
+  const router = useRouter();
 
   const defaultValues = useMemo(
     () => ({
@@ -170,11 +173,26 @@ export function ProfileForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      let groupId = "";
+      if (isGroup) {
+        groupId = await upsertGroup(values as Profile, "");
+      }
+
       setProfile(values as Profile);
+
+      if (!isGroup) {
+        toast({
+          title: "Preferences saved",
+          variant: "success",
+        });
+        return;
+      }
+
       toast({
-        title: "Preferences saved",
+        title: "Group created",
         variant: "success",
       });
+      router.navigate({ to: `/groups/${groupId}` });
     } catch (error) {
       console.error("Form submission error", error);
       toast({

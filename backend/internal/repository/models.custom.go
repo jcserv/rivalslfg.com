@@ -2,7 +2,7 @@ package repository
 
 import "time"
 
-type Group struct {
+type GroupDTO struct {
 	ID            string         `json:"id"`
 	CommunityID   int32          `json:"communityId"`
 	Owner         string         `json:"owner"`
@@ -15,16 +15,10 @@ type Group struct {
 	LastActiveAt  time.Time      `json:"lastActiveAt"`
 }
 
-type GroupMember struct {
-	GroupID  string `json:"group_id"`
-	PlayerID int32  `json:"player_id"`
-	Leader   bool   `json:"leader"`
-}
-
 type GroupWithPlayers struct {
-	Group
-	Name    string   `json:"name"`
-	Players []Player `json:"players"`
+	GroupDTO
+	Name    string      `json:"name"`
+	Players []PlayerDTO `json:"players"`
 }
 
 type RoleQueue struct {
@@ -39,7 +33,7 @@ type GroupSettings struct {
 	Mic       bool     `json:"mic"`
 }
 
-type Player struct {
+type PlayerDTO struct {
 	Name          string         `json:"name"`
 	Region        string         `json:"region"`
 	Platform      string         `json:"platform"`
@@ -51,4 +45,15 @@ type Player struct {
 	Mic           bool           `json:"mic"`
 	RoleQueue     *RoleQueue     `json:"roleQueue"`
 	GroupSettings *GroupSettings `json:"groupSettings"`
+}
+
+type PlayerInGroup struct {
+	Name       string   `json:"name"`
+	Leader     bool     `json:"leader"`
+	Platform   string   `json:"platform"`
+	Roles      []string `json:"roles"`
+	Rank       string   `json:"rank"`
+	Characters []string `json:"characters"`
+	VoiceChat  bool     `json:"voiceChat"`
+	Mic        bool     `json:"mic"`
 }

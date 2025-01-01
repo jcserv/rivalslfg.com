@@ -7,68 +7,94 @@ package repository
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const findGroups = `-- name: FindGroups :many
-SELECT 
-    g.id,
-	community_id,
-	owner,
-	g.region,
-	g.gamemode,
-	open,
-	jsonb_build_object(
-		'vanguards', g.vanguards,
-		'duelists', g.duelists,
-		'strategists', g.strategists
-	) AS role_queue,
-	 jsonb_build_object(
-		'platforms', g.platforms,
-		'voiceChat', g.voice_chat,
-		'mic', g.mic
-	) AS group_settings,
-    players
-FROM Groups g
+const upsertGroup = `-- name: UpsertGroup :one
+WITH id_check AS (
+    SELECT id FROM Groups WHERE id = $1
+)
+INSERT INTO Groups (
+    id,
+    owner,
+    region,
+    gamemode,
+    players,
+    open,
+    vanguards,
+    duelists,
+    strategists,
+    platforms,
+    voice_chat,
+    mic,
+    last_active_at
+) VALUES (
+    COALESCE($1, generate_group_id()),
+    $2,
+    $3,
+    $4,
+    COALESCE($5, '[]'::jsonb),
+    $6,
+    $7,
+    $8,
+    $9,
+    $10,
+    $11,
+    $12,
+    NOW()
+)
+ON CONFLICT (id) DO UPDATE SET
+    owner = EXCLUDED.owner,
+    region = EXCLUDED.region,
+    gamemode = EXCLUDED.gamemode,
+    players = EXCLUDED.players,
+    open = EXCLUDED.open,
+    vanguards = EXCLUDED.vanguards,
+    duelists = EXCLUDED.duelists,
+    strategists = EXCLUDED.strategists,
+    platforms = EXCLUDED.platforms,
+    voice_chat = EXCLUDED.voice_chat,
+    mic = EXCLUDED.mic,
+    last_active_at = NOW(),
+    updated_at = NOW()
+WHERE 
+    (SELECT 1 FROM id_check) IS NULL OR -- no specific id provided
+    Groups.id = $1 -- match provided id
+RETURNING id
 `
 
-type FindGroupsRow struct {
-	ID            string `json:"id"`
-	CommunityID   int32  `json:"community_id"`
-	Owner         string `json:"owner"`
-	Region        string `json:"region"`
-	Gamemode      string `json:"gamemode"`
-	Open          bool   `json:"open"`
-	RoleQueue     []byte `json:"role_queue"`
-	GroupSettings []byte `json:"group_settings"`
-	Players       []byte `json:"players"`
+type UpsertGroupParams struct {
+	ID          interface{} `json:"id"`
+	Owner       string      `json:"owner"`
+	Region      string      `json:"region"`
+	Gamemode    string      `json:"gamemode"`
+	Players     interface{} `json:"players"`
+	Open        bool        `json:"open"`
+	Vanguards   pgtype.Int4 `json:"vanguards"`
+	Duelists    pgtype.Int4 `json:"duelists"`
+	Strategists pgtype.Int4 `json:"strategists"`
+	Platforms   []string    `json:"platforms"`
+	VoiceChat   pgtype.Bool `json:"voice_chat"`
+	Mic         pgtype.Bool `json:"mic"`
 }
 
-func (q *Queries) FindGroups(ctx context.Context) ([]FindGroupsRow, error) {
-	rows, err := q.db.Query(ctx, findGroups)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []FindGroupsRow
-	for rows.Next() {
-		var i FindGroupsRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.CommunityID,
-			&i.Owner,
-			&i.Region,
-			&i.Gamemode,
-			&i.Open,
-			&i.RoleQueue,
-			&i.GroupSettings,
-			&i.Players,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) UpsertGroup(ctx context.Context, arg UpsertGroupParams) (string, error) {
+	row := q.db.QueryRow(ctx, upsertGroup,
+		arg.ID,
+		arg.Owner,
+		arg.Region,
+		arg.Gamemode,
+		arg.Players,
+		arg.Open,
+		arg.Vanguards,
+		arg.Duelists,
+		arg.Strategists,
+		arg.Platforms,
+		arg.VoiceChat,
+		arg.Mic,
+	)
+	var id string
+	err := row.Scan(&id)
+	return id, err
 }

@@ -16,13 +16,13 @@ func NewGroupService(repo *repository.Queries) *GroupService {
 	}
 }
 
-// func (s *GroupService) CreateGroupWithOwner(ctx context.Context, arg repository.CreateGroupWithOwnerParams) (string, error) {
-// 	groupID, err := s.repo.CreateGroupWithOwner(ctx, arg)
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	return groupID, nil
-// }
+func (s *GroupService) UpsertGroup(ctx context.Context, arg repository.UpsertGroupParams) (string, error) {
+	groupID, err := s.repo.UpsertGroup(ctx, arg)
+	if err != nil {
+		return "", err
+	}
+	return groupID, nil
+}
 
 func (s *GroupService) GetGroups(ctx context.Context) ([]repository.GroupWithPlayers, error) {
 	groups, err := s.repo.FindAllGroups(ctx)

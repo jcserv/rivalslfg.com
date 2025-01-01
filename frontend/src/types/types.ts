@@ -180,6 +180,37 @@ export type Profile = {
   groupSettings?: GroupSettings;
 };
 
+export function getGroupFromProfile(owner: Profile, id: string): Group {
+  const groupSettings = owner.groupSettings ?? {
+    platforms: [],
+    voiceChat: false,
+    mic: false,
+  };
+
+  return {
+    id,
+    name: `${owner.name}'s Group`,
+    owner: owner.name,
+    region: owner.region,
+    gamemode: owner.gamemode,
+    players: [
+      {
+        name: owner.name,
+        leader: true,
+        platform: owner.platform,
+        roles: owner.roles,
+        rank: owner.rank,
+        characters: owner.characters,
+        voiceChat: owner.voiceChat,
+        mic: owner.mic,
+      },
+    ],
+    open: false,
+    roleQueue: owner.roleQueue,
+    groupSettings,
+  };
+}
+
 export type RoleQueue = {
   vanguards: number;
   duelists: number;
@@ -194,10 +225,11 @@ export type GroupSettings = {
 
 export type Group = {
   id: string;
+  owner: string;
   name: string;
-  open: boolean;
   region: Region;
   gamemode: Gamemode;
+  open: boolean;
   players: Player[];
   groupSettings: GroupSettings;
   roleQueue?: RoleQueue;
@@ -355,6 +387,8 @@ export type Player = {
   roles: string[];
   characters: string[];
   platform: string;
+  voiceChat: boolean;
+  mic: boolean;
 };
 
 export type TeamUp = {

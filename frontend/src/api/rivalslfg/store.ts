@@ -25,7 +25,13 @@ export const rivalsStoreActions = {
   setGroup(group: Group) {
     rivalslfgStore.setState((prev) => ({
       ...prev,
-      groups: [...prev.groups, group],
+      groups: [group, ...prev.groups],
+    }));
+  },
+  replaceGroup(group: Group) {
+    rivalslfgStore.setState((prev) => ({
+      ...prev,
+      groups: prev.groups.map((g) => (g.id === group.id ? group : g)),
     }));
   },
   clearStore() {

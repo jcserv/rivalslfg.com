@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/jcserv/rivalslfg/internal/utils/log"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type responseWriter struct {
@@ -31,17 +32,31 @@ func (rw *responseWriter) WriteHeader(code int) {
 	}
 }
 
+func middlewareLogger() *zap.Logger {
+	config := zap.NewDevelopmentConfig()
+	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	config.EncoderConfig.TimeKey = "time"
+	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	config.EncoderConfig.CallerKey = "caller"
+	config.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
+
+	l, _ := config.Build()
+	return l
+}
+
 func LogIncomingRequests() mux.MiddlewareFunc {
+	logger := middlewareLogger()
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := r.Context()
 			startTime := time.Now()
 			wrapped := wrapResponseWriter(w)
 
 			defer func() {
 				if err := recover(); err != nil {
 					wrapped.WriteHeader(http.StatusInternalServerError)
-					log.Error(ctx, fmt.Sprintf("panic: %v", err))
+					logger.Error(fmt.Sprintf("panic: %v", err))
+					return
 				}
 			}()
 
@@ -50,7 +65,7 @@ func LogIncomingRequests() mux.MiddlewareFunc {
 			duration := time.Since(startTime)
 			status := wrapped.Status()
 			if status == 0 {
-				status = 200 // Default to 200 if status wasn't set
+				status = 200
 			}
 
 			logMsg := fmt.Sprintf("%d | %s %s (%v)",
@@ -61,11 +76,11 @@ func LogIncomingRequests() mux.MiddlewareFunc {
 			)
 
 			if status >= 500 {
-				log.Error(ctx, logMsg)
+				logger.Error(logMsg)
 			} else if status >= 400 {
-				log.Warn(ctx, logMsg)
+				logger.Warn(logMsg)
 			} else {
-				log.Info(ctx, logMsg)
+				logger.Info(logMsg)
 			}
 		})
 	}
