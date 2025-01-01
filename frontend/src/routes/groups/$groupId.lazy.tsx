@@ -32,11 +32,6 @@ function Group() {
     }
   }, [isLoading, isGroupOpen]);
 
-  console.log({
-    isLoading,
-    canUserAccessGroup,
-  });
-
   function onLeave() {
     // TODO: This should also be logged in the chat
     console.log("i'm leavin here D:");

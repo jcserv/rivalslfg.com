@@ -1,7 +1,11 @@
 import { ColumnDef, Row } from "@tanstack/react-table";
+import { Link } from "@tanstack/react-router";
+import { Eye, EyeOff } from "lucide-react";
 
-import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { toTitleCase } from "@/lib/utils";
+import { HoverCardContent, HoverCard, HoverCardTrigger } from "@/components/ui";
+import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
+import { TooltipItem } from "@/components/TooltipItem";
 import {
   Gamemode,
   gamemodeEmojis,
@@ -10,19 +14,8 @@ import {
   Group,
   GroupRequirements,
   Player,
+  TEAM_SIZE,
 } from "@/types";
-import { TEAM_SIZE } from "@/types/constants";
-import { Link } from "@tanstack/react-router";
-import { Eye, EyeOff } from "lucide-react";
-import {
-  HoverCardContent,
-  HoverCard,
-  HoverCardTrigger,
-  TooltipProvider,
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "./ui";
 
 export type GroupTableData = Group & {
   requirements: GroupRequirements;
@@ -46,30 +39,31 @@ export const columns = (
       <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => {
-      const open = row.original.open;
+      const { open, areRequirementsMet } = row.original;
+      const canJoin = !isProfileEmpty && areRequirementsMet;
       return (
         <div className="flex space-x-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                {open ? (
-                  <Eye className="w-4 h-4" />
-                ) : (
-                  <EyeOff className="w-4 h-4" />
-                )}
-              </TooltipTrigger>
-              <TooltipContent>{open ? "Public" : "Private"}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <span className="max-w-[500px] truncate font-medium">
-            <Link
-              to={`/groups/${row.original.id}`}
-              className={!isProfileEmpty ? "hover:underline" : ""}
-              disabled={isProfileEmpty}
-            >
-              {row.getValue("name")}
-            </Link>
-          </span>
+          <TooltipItem content={open ? "Public" : "Private"}>
+            {open ? (
+              <Eye className="w-4 h-4" />
+            ) : (
+              <EyeOff className="w-4 h-4" />
+            )}
+          </TooltipItem>
+          <TooltipItem
+            content="Unable to join, requirements not met"
+            disabled={!canJoin}
+          >
+            <span className="max-w-[500px] truncate font-medium cursor-">
+              <Link
+                to={`/groups/${row.original.id}`}
+                className={canJoin ? "hover:underline" : "cursor-default"}
+                disabled={!canJoin}
+              >
+                {row.getValue("name")}
+              </Link>
+            </span>
+          </TooltipItem>
         </div>
       );
     },

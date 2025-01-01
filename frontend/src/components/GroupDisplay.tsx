@@ -22,7 +22,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { strArrayToTitleCase, toTitleCase } from "@/lib/utils";
+import { strArrayToTitleCase, toTitleCase } from "@/lib";
 import { useMemo } from "react";
 
 import teamUps from "@/assets/teamups.json";
