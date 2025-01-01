@@ -21,7 +21,9 @@ function GroupPage() {
   const [g, isLoading, error] = useGroup(groupId);
   const [group, setGroup] = useState<Group | undefined>(g);
   const [showAccessDialog, setShowAccessDialog] = useState(false);
-  const [canUserAccessGroup, setCanUserAccessGroup] = useState<boolean | null>(null);
+  const [canUserAccessGroup, setCanUserAccessGroup] = useState<boolean | null>(
+    null,
+  );
 
   useEffect(() => {
     if (g) {

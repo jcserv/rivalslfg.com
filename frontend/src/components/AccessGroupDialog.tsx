@@ -82,6 +82,11 @@ export function AccessGroupDialog({
     }
   }
 
+  const handleBack = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent form submission
+    router.history.back();
+  };
+
   return (
     <Dialog open={open}>
       <DialogContent className="sm:max-w-[425px]" showClose={false}>
@@ -111,7 +116,7 @@ export function AccessGroupDialog({
               </div>
             </div>
             <DialogFooter className="flex flex-row justify-between sm:justify-between">
-              <Button variant="outline" onClick={() => router.history.back()}>
+              <Button variant="outline" onClick={handleBack}>
                 Back
               </Button>
               <Button type="submit">Submit</Button>
