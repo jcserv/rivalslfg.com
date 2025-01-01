@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { rivalsStoreKeys, fetchGroups, fetchGroup } from "@/api";
-import { Group, ONE_MINUTE_IN_MILLISECONDS } from "@/types";
+import { rivalsStoreKeys, fetchGroups, fetchGroup, joinGroup } from "@/api";
+import { Group, ONE_MINUTE_IN_MILLISECONDS, Profile } from "@/types";
 
 export function useGroups(): [Group[] | undefined, boolean, Error | null] {
   const query = useQuery({
@@ -23,4 +23,19 @@ export function useGroup(
   });
 
   return [query.data, query.isLoading, query.error];
+}
+
+type JoinGroupArgs = {
+  groupId: string;
+  player: Profile;
+  passcode: string;
+};
+
+export function useJoinGroup() {
+  const { mutateAsync } = useMutation({
+    mutationFn: (input: JoinGroupArgs) => {
+      return joinGroup(input.groupId, input.player, input.passcode);
+    },
+  });
+  return mutateAsync;
 }

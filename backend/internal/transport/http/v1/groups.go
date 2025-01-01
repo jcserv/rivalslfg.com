@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/jcserv/rivalslfg/internal/services"
 	"github.com/jcserv/rivalslfg/internal/transport/http/httputil"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
@@ -89,5 +90,43 @@ func (a *API) DeleteGroup() http.HandlerFunc {
 
 func (a *API) JoinGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		var input JoinGroup
+		err := json.NewDecoder(r.Body).Decode(&input)
+		if err != nil {
+			log.Debug(ctx, err.Error())
+			httputil.BadRequest(w)
+			return
+		}
+
+		vars := mux.Vars(r)
+		groupID := vars["id"]
+		input.GroupID = groupID
+
+		params, err := input.Parse()
+		if err != nil {
+			log.Debug(ctx, err.Error())
+			httputil.BadRequest(w)
+			return
+		}
+
+		err = a.groupService.JoinGroup(ctx, *params)
+		if err != nil {
+			if serviceErr, ok := err.(services.Error); ok {
+				if serviceErr.Code() == http.StatusNotFound {
+					httputil.NotFound(w)
+					return
+				}
+				if serviceErr.Code() == http.StatusForbidden {
+					httputil.Forbidden(w)
+					return
+				}
+			}
+			httputil.InternalServerError(ctx, w, err)
+			log.Error(ctx, err.Error())
+			return
+		}
+		httputil.OK(w, nil)
 	}
 }

@@ -11,6 +11,44 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const joinGroup = `-- name: JoinGroup :one
+WITH group_status AS (
+    SELECT 
+        CASE
+            WHEN NOT EXISTS (SELECT 1 FROM Groups WHERE g.id = $1) THEN 404
+            WHEN NOT g.open AND g.passcode != $2 THEN 403
+            ELSE 200
+        END as status,
+        players
+    FROM Groups g
+    WHERE id = $1
+)
+UPDATE Groups g
+SET 
+    players = CASE 
+        WHEN (SELECT status FROM group_status) = 200 
+        THEN jsonb_insert(COALESCE(players, '[]'::jsonb), '{-1}', $3::jsonb)
+        ELSE players
+    END,
+    last_active_at = NOW(),
+    updated_at = NOW()
+WHERE g.id = $1
+RETURNING (SELECT status FROM group_status) as result
+`
+
+type JoinGroupParams struct {
+	ID       string `json:"id"`
+	Passcode string `json:"passcode"`
+	Player   []byte `json:"player"`
+}
+
+func (q *Queries) JoinGroup(ctx context.Context, arg JoinGroupParams) (int32, error) {
+	row := q.db.QueryRow(ctx, joinGroup, arg.ID, arg.Passcode, arg.Player)
+	var result int32
+	err := row.Scan(&result)
+	return result, err
+}
+
 const upsertGroup = `-- name: UpsertGroup :one
 WITH id_check AS (
     SELECT id FROM Groups WHERE id = $1

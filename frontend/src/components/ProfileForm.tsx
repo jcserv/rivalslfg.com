@@ -5,7 +5,7 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 
-import { upsertGroup } from "@/api/rivalslfg/cache";
+import { upsertGroup } from "@/api";
 import {
   Accordion,
   AccordionContent,

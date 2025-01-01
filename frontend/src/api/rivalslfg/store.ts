@@ -4,21 +4,29 @@ import { Group } from "@/types";
 import { queryClient } from "@/routes/__root";
 
 interface RivalsLFGStore {
+  authedGroups: Map<string, boolean>;
   groups: Group[];
 }
 
 const initialState: RivalsLFGStore = {
+  authedGroups: new Map<string, boolean>(),
   groups: [],
 };
 
 export const rivalslfgStore = new Store<RivalsLFGStore>(initialState);
 
 export const rivalsStoreKeys = {
-  all: ["groups"] as const,
+  all: ["authedGroups", "groups"] as const,
   group: (id: string) => ["group", id] as const,
 };
 
 export const rivalsStoreActions = {
+  setAuthedGroup(groupId: string) {
+    rivalslfgStore.setState((prev) => ({
+      ...prev,
+      authedGroups: new Map([...prev.authedGroups, [groupId, true]]),
+    }));
+  },
   setGroups(groups: Group[]) {
     rivalslfgStore.setState((prev) => ({ ...prev, groups }));
   },

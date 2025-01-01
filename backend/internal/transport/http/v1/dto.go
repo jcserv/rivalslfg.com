@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -50,6 +51,34 @@ func (c *UpsertGroup) Parse() (*repository.UpsertGroupParams, error) {
 		params.Platforms = c.GroupSettings.Platforms
 		params.VoiceChat = pgtype.Bool{Bool: c.GroupSettings.VoiceChat, Valid: true}
 		params.Mic = pgtype.Bool{Bool: c.GroupSettings.Mic, Valid: true}
+	}
+
+	return params, nil
+}
+
+type JoinGroup struct {
+	GroupID  string              `json:"groupId"`
+	Player   *repository.Profile `json:"player"`
+	Passcode string              `json:"passcode"`
+}
+
+func (c *JoinGroup) Parse() (*repository.JoinGroupParams, error) {
+	if c.GroupID == "" {
+		return nil, fmt.Errorf("groupId is required")
+	}
+	if c.Player == nil {
+		return nil, fmt.Errorf("player is required")
+	}
+
+	player, err := json.Marshal(c.Player)
+	if err != nil {
+		return nil, err
+	}
+
+	params := &repository.JoinGroupParams{
+		ID:       c.GroupID,
+		Passcode: c.Passcode,
+		Player:   player,
 	}
 
 	return params, nil

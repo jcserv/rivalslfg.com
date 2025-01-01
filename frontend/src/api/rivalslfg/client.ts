@@ -1,5 +1,6 @@
 import { HTTPClient } from "@/api/base/client";
 import { getGroupFromProfile, Group, Profile } from "@/types";
+import { StatusCode, StatusCodes } from "@/types/http";
 
 export class RivalsLFGClient extends HTTPClient {
   private readonly baseURL: string;
@@ -55,6 +56,32 @@ export class RivalsLFGClient extends HTTPClient {
     } catch (error) {
       console.error("Error fetching group with id", error);
       return undefined;
+    }
+  }
+
+  async joinGroup(
+    groupId: string,
+    player: Profile,
+    passcode: string,
+  ): Promise<StatusCode> {
+    try {
+      const response = await fetch(
+        `${this.baseURL}/api/v1/groups/${groupId}/join`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            player,
+            passcode,
+          }),
+        },
+      );
+      return response.status as StatusCode;
+    } catch (error) {
+      console.error("Error joining group", error);
+      return StatusCodes.InternalServerError as StatusCode;
     }
   }
 }

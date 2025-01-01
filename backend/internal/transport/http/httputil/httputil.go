@@ -28,6 +28,10 @@ func NotFound(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusNotFound)
 }
 
+func Forbidden(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusForbidden)
+}
+
 func InternalServerError(ctx context.Context, w http.ResponseWriter, err error) {
 	log.Error(ctx, err.Error())
 	w.WriteHeader(http.StatusInternalServerError)

@@ -44,6 +44,7 @@ function Group() {
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-8">
             <AccessGroupDialog
+              groupId={groupId}
               open={!accessStateUnknown && !canUserAccessGroup}
               onClose={() => {
                 setCanUserAccessGroup(true);

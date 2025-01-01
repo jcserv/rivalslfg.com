@@ -1,6 +1,7 @@
 import { rivalslfgStore, rivalsStoreActions } from "@/api/rivalslfg/store";
 import { rivalslfgAPIClient } from "@/routes/__root";
 import { getGroupFromProfile, Group, Profile } from "@/types";
+import { StatusCode, StatusCodes } from "@/types/http";
 
 export const upsertGroup = async (
   profile: Profile,
@@ -18,7 +19,7 @@ export const upsertGroup = async (
 };
 
 export const fetchGroups = async (): Promise<Group[]> => {
-  const cached = await rivalslfgStore.state.groups;
+  const cached = rivalslfgStore.state.groups;
   if (cached.length > 0) {
     return cached;
   }
@@ -29,9 +30,7 @@ export const fetchGroups = async (): Promise<Group[]> => {
 };
 
 export const fetchGroup = async (id: string): Promise<Group | undefined> => {
-  const cached = (await rivalslfgStore.state.groups).find(
-    (group) => group.id === id,
-  );
+  const cached = rivalslfgStore.state.groups.find((group) => group.id === id);
   if (cached) {
     return cached;
   }
@@ -42,4 +41,16 @@ export const fetchGroup = async (id: string): Promise<Group | undefined> => {
   }
   rivalsStoreActions.setGroup(group);
   return group;
+};
+
+export const joinGroup = async (
+  groupId: string,
+  player: Profile,
+  passcode: string,
+): Promise<StatusCode> => {
+  const result = await rivalslfgAPIClient.joinGroup(groupId, player, passcode);
+  if (result === StatusCodes.OK) {
+    rivalsStoreActions.setAuthedGroup(groupId);
+  }
+  return result;
 };

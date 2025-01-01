@@ -20,7 +20,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { useJoinGroup, useLocalStorage, useToast } from "@/hooks";
+import { FOURTEEN_DAYS_FROM_TODAY, StatusCodes } from "@/types";
 
 const formSchema = z.object({
   passcode: z
@@ -30,11 +31,19 @@ const formSchema = z.object({
 });
 
 interface AccessGroupDialogProps {
+  groupId: string;
   open: boolean;
   onClose: () => void;
 }
 
-export function AccessGroupDialog({ open, onClose }: AccessGroupDialogProps) {
+export function AccessGroupDialog({
+  groupId,
+  open,
+  onClose,
+}: AccessGroupDialogProps) {
+  const joinGroup = useJoinGroup();
+  const [profile] = useLocalStorage("profile", {}, FOURTEEN_DAYS_FROM_TODAY);
+
   const { toast } = useToast();
   const router = useRouter();
 
@@ -45,9 +54,16 @@ export function AccessGroupDialog({ open, onClose }: AccessGroupDialogProps) {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log("values", values);
+      const status = await joinGroup({
+        groupId,
+        player: profile,
+        passcode: values.passcode,
+      });
+      if (status !== StatusCodes.OK) {
+        throw new Error(`${status}`);
+      }
       toast({
         title: "Access granted",
         variant: "success",
