@@ -64,3 +64,6 @@ Before release:
 - [ ] Squash migrations into one, remove seed data
 
 * indicates these are good first issues
+
+tweaks:
+- add group count field to group table? (can be derived from players json but not sure if that's a performance issue)

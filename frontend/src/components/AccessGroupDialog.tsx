@@ -20,8 +20,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useJoinGroup, useLocalStorage, useToast } from "@/hooks";
-import { FOURTEEN_DAYS_FROM_TODAY, Profile, StatusCodes } from "@/types";
+import { useProfile } from "@/hooks";
+import { Profile } from "@/types";
 
 const formSchema = z.object({
   passcode: z
@@ -31,22 +31,12 @@ const formSchema = z.object({
 });
 
 interface AccessGroupDialogProps {
-  groupId: string;
   open: boolean;
-  onJoin: (p: Profile) => void;
-  onClose: () => void;
+  onJoin: (p: Profile, passcode: string) => void;
 }
 
-export function AccessGroupDialog({
-  groupId,
-  open,
-  onJoin,
-  onClose,
-}: AccessGroupDialogProps) {
-  const joinGroup = useJoinGroup();
-  const [profile] = useLocalStorage("profile", {}, FOURTEEN_DAYS_FROM_TODAY);
-
-  const { toast } = useToast();
+export function AccessGroupDialog({ open, onJoin }: AccessGroupDialogProps) {
+  const [profile] = useProfile();
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,29 +47,7 @@ export function AccessGroupDialog({
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      const status = await joinGroup({
-        groupId,
-        player: profile,
-        passcode: values.passcode,
-      });
-      if (status !== StatusCodes.OK) {
-        throw new Error(`${status}`);
-      }
-      toast({
-        title: "Access granted",
-        variant: "success",
-      });
-      onJoin(profile);
-      onClose();
-    } catch (error) {
-      console.error("Form submission error", error);
-      toast({
-        title: "Access denied",
-        description: "Please try again.",
-        variant: "destructive",
-      });
-    }
+    onJoin(profile, values.passcode);
   }
 
   const handleBack = (e: React.MouseEvent) => {

@@ -19,7 +19,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { TeamUpItem } from "@/components/TeamUp";
-import { useToast } from "@/hooks";
+import { useProfile, useToast } from "@/hooks";
 import { strArrayToTitleCase, toTitleCase } from "@/lib";
 import {
   getGroupInfo,
@@ -35,9 +35,15 @@ import teamUps from "@/assets/teamups.json";
 interface GroupDisplayProps {
   group: Group | undefined;
   canUserAccessGroup: boolean | null;
+  isOwner: boolean;
 }
 
-export function GroupDisplay({ group, canUserAccessGroup }: GroupDisplayProps) {
+export function GroupDisplay({
+  group,
+  canUserAccessGroup,
+  isOwner,
+}: GroupDisplayProps) {
+  const [profile] = useProfile();
   const { toast } = useToast();
 
   const { currVanguards, currDuelists, currStrategists, currCharacters } =
@@ -148,7 +154,7 @@ export function GroupDisplay({ group, canUserAccessGroup }: GroupDisplayProps) {
               <TableHead>Roles</TableHead>
               <TableHead>Characters</TableHead>
               <TableHead>Platform</TableHead>
-              <TableHead>Kick</TableHead>
+              {isOwner && <TableHead>Kick</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -162,15 +168,19 @@ export function GroupDisplay({ group, canUserAccessGroup }: GroupDisplayProps) {
                 <TableCell>{strArrayToTitleCase(player.roles)}</TableCell>
                 <TableCell>{player.characters.join(", ")}</TableCell>
                 <TableCell>{getPlatform(player.platform)}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => onKick(player)}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </TableCell>
+                {isOwner && (
+                  <TableCell>
+                    {player.name !== profile.name && (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => onKick(player)}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

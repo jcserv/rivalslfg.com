@@ -2,19 +2,14 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 
 import { InfoBanner, ProfileForm } from "@/components";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui";
-import { useLocalStorage } from "@/hooks";
-import { FOURTEEN_DAYS_FROM_TODAY, Profile } from "@/types";
+import { useProfile } from "@/hooks";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,
 });
 
 function Index() {
-  const [profile, setProfile] = useLocalStorage(
-    "profile",
-    "-1",
-    FOURTEEN_DAYS_FROM_TODAY,
-  );
+  const [profile, setProfile] = useProfile();
 
   return (
     <section className="p-2 md:p-4">

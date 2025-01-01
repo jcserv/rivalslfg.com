@@ -6,6 +6,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jcserv/rivalslfg/internal/repository"
+	"github.com/jcserv/rivalslfg/internal/services"
 )
 
 type UpsertGroup struct {
@@ -62,7 +63,7 @@ type JoinGroup struct {
 	Passcode string              `json:"passcode"`
 }
 
-func (c *JoinGroup) Parse() (*repository.JoinGroupParams, error) {
+func (c *JoinGroup) Parse() (*services.JoinGroupArgs, error) {
 	if c.GroupID == "" {
 		return nil, fmt.Errorf("groupId is required")
 	}
@@ -75,11 +76,16 @@ func (c *JoinGroup) Parse() (*repository.JoinGroupParams, error) {
 		return nil, err
 	}
 
-	params := &repository.JoinGroupParams{
-		ID:       c.GroupID,
-		Passcode: c.Passcode,
-		Player:   player,
+	args := &services.JoinGroupArgs{
+		CheckCanJoinGroup: repository.CheckCanJoinGroupParams{
+			ID:         c.GroupID,
+			Passcode:   c.Passcode,
+			PlayerName: c.Player.Name,
+		},
+		JoinGroup: repository.JoinGroupParams{
+			Player: player,
+			ID:     c.GroupID,
+		},
 	}
-
-	return params, nil
+	return args, nil
 }

@@ -2,9 +2,11 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/jcserv/rivalslfg/internal/repository"
+	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
 type GroupService struct {
@@ -41,23 +43,36 @@ func (s *GroupService) GetGroupByID(ctx context.Context, id string) (*repository
 	return group, nil
 }
 
-func (s *GroupService) JoinGroup(ctx context.Context, arg repository.JoinGroupParams) error {
-	// TODO: Acquire lock on group
+type JoinGroupArgs struct {
+	CheckCanJoinGroup repository.CheckCanJoinGroupParams
+	JoinGroup         repository.JoinGroupParams
+}
 
-	result, err := s.repo.JoinGroup(ctx, arg)
+func (s *GroupService) JoinGroup(ctx context.Context, arg JoinGroupArgs) error {
+	// TODO: Acquire lock on group
+	// TODO: Check against requirements of group
+	status, err := s.repo.CheckCanJoinGroup(ctx, arg.CheckCanJoinGroup)
 	if err != nil {
 		return err
 	}
-	switch result {
-	case 200:
+
+	log.Debug(ctx, fmt.Sprintf("status %d", status))
+
+	switch status {
+	case http.StatusOK: // User already in group
 		return nil
-	case 403:
-		return NewError(http.StatusForbidden, "Passcode does not match", nil)
-	case 404:
-		return NewError(http.StatusNotFound, "Group not found", nil)
+	case http.StatusAccepted:
+		if err := s.repo.JoinGroup(ctx, arg.JoinGroup); err != nil {
+			return NewError(http.StatusInternalServerError, "Failed to add player.", err)
+		}
+		// TODO: Emit message to notify players
+		return nil
+	case http.StatusForbidden:
+		return NewError(http.StatusForbidden, "Passcode does not match.", nil)
+	case http.StatusNotFound:
+		return NewError(http.StatusNotFound, "Group not found.", nil)
 	default:
-		return NewError(http.StatusInternalServerError, "Unknown error", nil)
+		return NewError(http.StatusInternalServerError, "An unexpected error occurred.", nil)
 	}
 
-	// TODO: Emit message to notify players
 }

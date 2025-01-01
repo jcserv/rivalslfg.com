@@ -11,42 +11,51 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const joinGroup = `-- name: JoinGroup :one
-WITH group_status AS (
-    SELECT 
-        CASE
-            WHEN NOT EXISTS (SELECT 1 FROM Groups WHERE g.id = $1) THEN 404
-            WHEN NOT g.open AND g.passcode != $2 THEN 403
-            ELSE 200
-        END as status,
-        players
-    FROM Groups g
-    WHERE id = $1
-)
+const checkCanJoinGroup = `-- name: CheckCanJoinGroup :one
+SELECT 
+    CASE
+        WHEN NOT EXISTS (SELECT 1 FROM Groups WHERE g.id = $1) THEN 404
+        WHEN NOT g.open AND g.passcode != $2 THEN 403
+        WHEN EXISTS (
+            SELECT 1 FROM jsonb_array_elements(g.players) AS p
+            WHERE p->>'name' = $3::text
+        ) THEN 200
+        ELSE 202
+    END as status
+FROM Groups g
+WHERE g.id = $1
+`
+
+type CheckCanJoinGroupParams struct {
+	ID         string `json:"id"`
+	Passcode   string `json:"passcode"`
+	PlayerName string `json:"player_name"`
+}
+
+func (q *Queries) CheckCanJoinGroup(ctx context.Context, arg CheckCanJoinGroupParams) (int32, error) {
+	row := q.db.QueryRow(ctx, checkCanJoinGroup, arg.ID, arg.Passcode, arg.PlayerName)
+	var status int32
+	err := row.Scan(&status)
+	return status, err
+}
+
+const joinGroup = `-- name: JoinGroup :exec
 UPDATE Groups g
 SET 
-    players = CASE 
-        WHEN (SELECT status FROM group_status) = 200 
-        THEN jsonb_insert(COALESCE(players, '[]'::jsonb), '{-1}', $3::jsonb)
-        ELSE players
-    END,
+    players = jsonb_insert(COALESCE(players, '[]'::jsonb), '{-1}', $1::jsonb),
     last_active_at = NOW(),
     updated_at = NOW()
-WHERE g.id = $1
-RETURNING (SELECT status FROM group_status) as result
+WHERE g.id = $2
 `
 
 type JoinGroupParams struct {
-	ID       string `json:"id"`
-	Passcode string `json:"passcode"`
-	Player   []byte `json:"player"`
+	Player []byte `json:"player"`
+	ID     string `json:"id"`
 }
 
-func (q *Queries) JoinGroup(ctx context.Context, arg JoinGroupParams) (int32, error) {
-	row := q.db.QueryRow(ctx, joinGroup, arg.ID, arg.Passcode, arg.Player)
-	var result int32
-	err := row.Scan(&result)
-	return result, err
+func (q *Queries) JoinGroup(ctx context.Context, arg JoinGroupParams) error {
+	_, err := q.db.Exec(ctx, joinGroup, arg.Player, arg.ID)
+	return err
 }
 
 const upsertGroup = `-- name: UpsertGroup :one

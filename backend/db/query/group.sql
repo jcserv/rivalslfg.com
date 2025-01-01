@@ -53,26 +53,24 @@ WHERE
     Groups.id = @id -- match provided id
 RETURNING id;
 
--- name: JoinGroup :one
-WITH group_status AS (
-    SELECT 
-        CASE
-            WHEN NOT EXISTS (SELECT 1 FROM Groups WHERE g.id = $1) THEN 404
-            WHEN NOT g.open AND g.passcode != $2 THEN 403
-            ELSE 200
-        END as status,
-        players
-    FROM Groups g
-    WHERE id = $1
-)
+-- name: CheckCanJoinGroup :one
+SELECT 
+    CASE
+        WHEN NOT EXISTS (SELECT 1 FROM Groups WHERE g.id = @id) THEN 404
+        WHEN NOT g.open AND g.passcode != @passcode THEN 403
+        WHEN EXISTS (
+            SELECT 1 FROM jsonb_array_elements(g.players) AS p
+            WHERE p->>'name' = @player_name::text
+        ) THEN 200
+        ELSE 202
+    END as status
+FROM Groups g
+WHERE g.id = @id;
+
+-- name: JoinGroup :exec
 UPDATE Groups g
 SET 
-    players = CASE 
-        WHEN (SELECT status FROM group_status) = 200 
-        THEN jsonb_insert(COALESCE(players, '[]'::jsonb), '{-1}', sqlc.arg(player)::jsonb)
-        ELSE players
-    END,
+    players = jsonb_insert(COALESCE(players, '[]'::jsonb), '{-1}', @player::jsonb),
     last_active_at = NOW(),
     updated_at = NOW()
-WHERE g.id = $1
-RETURNING (SELECT status FROM group_status) as result;
+WHERE g.id = @id;

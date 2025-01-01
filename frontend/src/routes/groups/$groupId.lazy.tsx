@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
 
 import {
@@ -8,8 +8,14 @@ import {
   AccessGroupDialog,
 } from "@/components";
 import { Button } from "@/components/ui";
-import { useGroup, useIsAuthed } from "@/hooks";
-import { getPlayerFromProfile, Group, Profile } from "@/types";
+import {
+  useGroup,
+  useIsAuthed,
+  useJoinGroup,
+  useProfile,
+  useToast,
+} from "@/hooks";
+import { getPlayerFromProfile, Group, Profile, StatusCodes } from "@/types";
 
 export const Route = createLazyFileRoute("/groups/$groupId")({
   component: GroupPage,
@@ -19,11 +25,23 @@ function GroupPage() {
   const { groupId } = Route.useParams();
   const isAuthed = useIsAuthed(groupId);
   const [g, isLoading, error] = useGroup(groupId);
+  const [profile] = useProfile();
+  const { toast } = useToast();
+
+  const joinGroup = useJoinGroup();
+
   const [group, setGroup] = useState<Group | undefined>(g);
   const [showAccessDialog, setShowAccessDialog] = useState(false);
   const [canUserAccessGroup, setCanUserAccessGroup] = useState<boolean | null>(
     null,
   );
+
+  const { isPlayerInGroup, isOwner } = useMemo(() => {
+    return {
+      isPlayerInGroup: group?.players.some((p) => p.name === profile.name),
+      isOwner: group?.owner === profile.name,
+    };
+  }, [group, profile]);
 
   useEffect(() => {
     if (g) {
@@ -34,12 +52,38 @@ function GroupPage() {
     }
   }, [g, isLoading, isAuthed]);
 
-  function onJoin(p: Profile) {
+  async function onJoin(p: Profile, passcode: string = "") {
     if (!group) return;
-    setGroup({
-      ...group,
-      players: [...group.players, getPlayerFromProfile(p)],
-    });
+    try {
+      const status = await joinGroup({
+        groupId,
+        player: p,
+        passcode,
+      });
+      if (status !== StatusCodes.OK) {
+        throw new Error(`${status}`);
+      }
+      if (!isPlayerInGroup) {
+        setGroup({
+          ...group,
+          players: [...group.players, getPlayerFromProfile(p)],
+        });
+      }
+
+      setShowAccessDialog(false);
+      setCanUserAccessGroup(true);
+
+      toast({
+        title: "Joined group",
+        variant: "success",
+      });
+    } catch {
+      toast({
+        title: "Access denied",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
   }
 
   function onLeave() {
@@ -51,35 +95,43 @@ function GroupPage() {
       <div className="min-h-[80vh] w-full flex flex-col items-center">
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-8">
-            <AccessGroupDialog
-              groupId={groupId}
-              open={showAccessDialog}
-              onJoin={onJoin}
-              onClose={() => {
-                setShowAccessDialog(false);
-                setCanUserAccessGroup(true);
-              }}
-            />
+            <AccessGroupDialog open={showAccessDialog} onJoin={onJoin} />
             {!isLoading && (
               <GroupDisplay
                 group={group}
                 canUserAccessGroup={canUserAccessGroup}
+                isOwner={isOwner}
               />
             )}
             <div className="flex flex-row justify-center mt-4">
               {canUserAccessGroup && (
-                <Button variant="destructive" onClick={onLeave}>
-                  Leave
-                </Button>
+                <div className="space-x-2">
+                  <Button variant="destructive" onClick={onLeave}>
+                    Leave
+                  </Button>
+                  {!isPlayerInGroup && (
+                    <Button
+                      variant="success"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onJoin(profile);
+                      }}
+                    >
+                      Join
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
           </div>
           {!isLoading && !error && (
             <div className="col-span-4 space-y-4">
-              <GroupControls
-                isGroupOpen={group?.open ?? false}
-                canUserAccessGroup={canUserAccessGroup}
-              />
+              {isOwner && (
+                <GroupControls
+                  isGroupOpen={group?.open ?? false}
+                  canUserAccessGroup={canUserAccessGroup}
+                />
+              )}
               <Chat canUserAccessGroup={canUserAccessGroup} />
             </div>
           )}
