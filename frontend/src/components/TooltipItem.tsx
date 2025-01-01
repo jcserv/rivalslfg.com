@@ -8,15 +8,19 @@ import {
 interface TooltipItemProps {
   children: React.ReactNode;
   content: React.ReactNode;
-  disabled?: boolean;
+  enabled?: boolean;
 }
 
-export function TooltipItem({ children, content, disabled }: TooltipItemProps) {
+export function TooltipItem({
+  children,
+  content,
+  enabled = true,
+}: TooltipItemProps) {
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger>{children}</TooltipTrigger>
-        {disabled && <TooltipContent>{content}</TooltipContent>}
+        {enabled && <TooltipContent>{content}</TooltipContent>}
       </Tooltip>
     </TooltipProvider>
   );

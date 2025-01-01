@@ -52,7 +52,7 @@ export const columns = (
           </TooltipItem>
           <TooltipItem
             content="Unable to join, requirements not met"
-            disabled={!canJoin}
+            enabled={!canJoin}
           >
             <span className="max-w-[500px] truncate font-medium cursor-">
               <Link
