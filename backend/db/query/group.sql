@@ -74,3 +74,38 @@ SET
     last_active_at = NOW(),
     updated_at = NOW()
 WHERE g.id = @id;
+
+-- name: RemovePlayerFromGroup :one
+WITH group_check AS (
+    SELECT 
+        CASE
+            WHEN NOT EXISTS (SELECT 1 FROM Groups WHERE g.id = @id) THEN 404
+            WHEN @requester_name != g.owner 
+                AND @requester_name != @player_name THEN 403
+            WHEN NOT EXISTS (
+                SELECT 1 FROM jsonb_array_elements(players) AS p
+                WHERE p->>'name' = @player_name::text
+            ) THEN 404
+            ELSE 200
+        END as status,
+        players
+    FROM Groups g
+    WHERE id = @id
+),
+player_update as (
+    UPDATE Groups g
+    SET 
+        players = COALESCE(
+            (
+                SELECT jsonb_agg(value)
+                FROM jsonb_array_elements(g.players) AS p
+                WHERE p->>'name' != @player_name::text
+            ),
+            '[]'::jsonb
+        ),
+        last_active_at = NOW(),
+        updated_at = NOW()
+    WHERE g.id = @id
+        AND (SELECT status FROM group_check) = 200
+)
+SELECT status FROM group_check;

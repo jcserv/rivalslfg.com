@@ -89,3 +89,31 @@ func (c *JoinGroup) Parse() (*services.JoinGroupArgs, error) {
 	}
 	return args, nil
 }
+
+type RemovePlayer struct {
+	GroupID       string `json:"groupId"`
+	PlayerName    string `json:"playerName"`
+	RequesterName string `json:"requesterName"` // Name of user making request
+}
+
+func (c *RemovePlayer) Parse() (*repository.RemovePlayerFromGroupParams, error) {
+	if c.GroupID == "" {
+		return nil, fmt.Errorf("groupId is required")
+	}
+	if c.PlayerName == "" {
+		return nil, fmt.Errorf("playerName is required")
+	}
+
+	// TODO[AUTH]: This should be provided via the cookie/session
+	if c.RequesterName == "" {
+		return nil, fmt.Errorf("requesterName is required")
+	}
+
+	params := &repository.RemovePlayerFromGroupParams{
+		ID:            c.GroupID,
+		PlayerName:    c.PlayerName,
+		RequesterName: c.RequesterName,
+	}
+
+	return params, nil
+}

@@ -189,7 +189,10 @@ export function ProfileForm({
         });
       }
 
-      setProfile(values as Profile);
+      setProfile({
+        id: 1, // TODO: This should be generated server-side
+        ...values,
+      } as Profile);
 
       if (!isGroup) {
         toast({

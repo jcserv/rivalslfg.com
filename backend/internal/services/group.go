@@ -76,3 +76,21 @@ func (s *GroupService) JoinGroup(ctx context.Context, arg JoinGroupArgs) error {
 	}
 
 }
+
+func (s *GroupService) RemovePlayerFromGroup(ctx context.Context, arg repository.RemovePlayerFromGroupParams) error {
+	result, err := s.repo.RemovePlayerFromGroup(ctx, arg)
+	if err != nil {
+		return err
+	}
+
+	switch result {
+	case 200:
+		return nil
+	case 403:
+		return NewError(http.StatusForbidden, "Only group owners can remove other players", nil)
+	case 404:
+		return NewError(http.StatusNotFound, "Group or player not found", nil)
+	default:
+		return NewError(http.StatusInternalServerError, "Unknown error", nil)
+	}
+}

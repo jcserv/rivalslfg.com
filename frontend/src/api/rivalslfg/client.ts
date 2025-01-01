@@ -66,7 +66,7 @@ export class RivalsLFGClient extends HTTPClient {
   ): Promise<StatusCode> {
     try {
       const response = await fetch(
-        `${this.baseURL}/api/v1/groups/${groupId}/join`,
+        `${this.baseURL}/api/v1/groups/${groupId}/players/${player.id}`,
         {
           method: "POST",
           headers: {

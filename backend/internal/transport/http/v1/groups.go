@@ -130,3 +130,47 @@ func (a *API) JoinGroup() http.HandlerFunc {
 		httputil.OK(w, nil)
 	}
 }
+
+func (a *API) RemovePlayer() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		vars := mux.Vars(r)
+		groupID := vars["id"]
+
+		var input RemovePlayer
+		err := json.NewDecoder(r.Body).Decode(&input)
+		if err != nil {
+			log.Debug(ctx, err.Error())
+			httputil.BadRequest(w)
+			return
+		}
+
+		input.GroupID = groupID
+		params, err := input.Parse()
+		if err != nil {
+			log.Debug(ctx, err.Error())
+			httputil.BadRequest(w)
+			return
+		}
+
+		err = a.groupService.RemovePlayerFromGroup(ctx, *params)
+		if err != nil {
+			if serviceErr, ok := err.(services.Error); ok {
+				switch serviceErr.Code() {
+				case http.StatusNotFound:
+					httputil.NotFound(w)
+					return
+				case http.StatusForbidden:
+					httputil.Forbidden(w)
+					return
+				}
+			}
+			httputil.InternalServerError(ctx, w, err)
+			log.Error(ctx, err.Error())
+			return
+		}
+
+		httputil.OK(w, nil)
+	}
+}

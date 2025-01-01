@@ -106,9 +106,11 @@ function GroupPage() {
             <div className="flex flex-row justify-center mt-4">
               {canUserAccessGroup && (
                 <div className="space-x-2">
-                  <Button variant="destructive" onClick={onLeave}>
-                    Leave
-                  </Button>
+                  {isPlayerInGroup && (
+                    <Button variant="destructive" onClick={onLeave}>
+                      Leave
+                    </Button>
+                  )}
                   {!isPlayerInGroup && (
                     <Button
                       variant="success"
@@ -122,6 +124,7 @@ function GroupPage() {
                   )}
                 </div>
               )}
+              i love you
             </div>
           </div>
           {!isLoading && !error && (

@@ -3,6 +3,7 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import { InfoBanner, ProfileForm } from "@/components";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui";
 import { useProfile } from "@/hooks";
+import { Profile } from "@/types";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,

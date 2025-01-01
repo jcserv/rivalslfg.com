@@ -10,14 +10,13 @@ import (
 const (
 	APIV1URLPath = "/api/v1/"
 	byId         = "/{id}"
-	join         = "/join"
+	byPlayerID   = "/{playerID}"
 
-	groups    = APIV1URLPath + "groups"
-	group     = groups + byId
-	joinGroup = group + join
+	groups = APIV1URLPath + "groups"
+	group  = groups + byId
 
-	players = APIV1URLPath + "players"
-	player  = players + byId
+	players = group + "/players"
+	player  = players + byPlayerID
 )
 
 type API struct {
@@ -35,5 +34,6 @@ func (a *API) RegisterRoutes(r *mux.Router) {
 	r.HandleFunc(group, a.GetGroupByID()).Methods(http.MethodGet)
 	r.HandleFunc(groups, a.GetGroups()).Methods(http.MethodGet)
 	r.HandleFunc(groups, a.DeleteGroup()).Methods(http.MethodDelete)
-	r.HandleFunc(joinGroup, a.JoinGroup()).Methods(http.MethodPost)
+	r.HandleFunc(player, a.JoinGroup()).Methods(http.MethodPost)
+	r.HandleFunc(player, a.RemovePlayer()).Methods((http.MethodDelete))
 }
