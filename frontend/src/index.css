@@ -87,6 +87,6 @@ body {
   height: 100vh;
 }
 
-section {
+.page {
   min-height: 85vh;
 }
