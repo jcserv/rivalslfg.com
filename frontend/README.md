@@ -28,7 +28,7 @@ _Generated from [react-vite-shadcn-template](https://github.com/jcserv/react-vit
 
 FE-Only:
 
-- [X] Better username validation (\*)
+- [x] Better username validation (\*)
   - 14 chars max
   - Must be at least 3 characters
   - Invalid characters: ! @ # $ % ^ & \* ( ) = +

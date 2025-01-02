@@ -4,7 +4,7 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import {
   GroupDisplay,
   GroupControls,
-  Chat,
+  ChatBox,
   AccessGroupDialog,
 } from "@/components";
 import { Button } from "@/components/ui";
@@ -130,7 +130,7 @@ function GroupPage() {
 
   return (
     <section className="p-2 md:p-4">
-      <div className="min-h-[80vh] w-full flex flex-col items-center">
+      <div className="h-full w-full flex flex-col items-center">
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-8">
             <AccessGroupDialog open={showAccessDialog} onJoin={onJoin} />
@@ -176,7 +176,7 @@ function GroupPage() {
                   canUserAccessGroup={canUserAccessGroup}
                 />
               )}
-              <Chat canUserAccessGroup={canUserAccessGroup} />
+              <ChatBox canUserAccessGroup={canUserAccessGroup} />
             </div>
           )}
         </div>
