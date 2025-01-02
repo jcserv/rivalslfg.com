@@ -332,72 +332,40 @@ export function RoleQueueEnabledField({
   );
 }
 
+interface RoleQueueFieldProps extends FormFieldProps {
+  role: "vanguards" | "duelists" | "strategists";
+  label: string;
+}
+
+export function RoleQueueField({ form, role, label }: RoleQueueFieldProps) {
+  return (
+    <FormField
+      control={form.control}
+      name={`roleQueue.${role}`}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>{label}</FormLabel>
+          <Input
+            type="number"
+            value={field.value}
+            onChange={(e) => field.onChange(+e.target.value)}
+            min={0}
+            max={6}
+            className="w-[75px]"
+          />
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+}
+
 export function RoleQueueFields({ form }: FormFieldProps) {
   return (
     <div className="flex flex-row gap-4">
-      <FormField
-        control={form.control}
-        name="roleQueue.vanguards"
-        render={({ field }) => (
-          <FormItem className="mx-2">
-            <FormLabel>Vanguards</FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                id="roleQueue.vanguards"
-                value={field.value}
-                onChange={(e) => field.onChange(+e.target.value)}
-                min={0}
-                max={6}
-                className="w-[75px]"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="roleQueue.duelists"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Duelists</FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                id="roleQueue.duelists"
-                value={field.value}
-                onChange={(e) => field.onChange(+e.target.value)}
-                min={0}
-                max={6}
-                className="w-[75px]"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="roleQueue.strategists"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Strategists</FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                id="roleQueue.strategists"
-                value={field.value}
-                onChange={(e) => field.onChange(+e.target.value)}
-                min={0}
-                max={6}
-                className="w-[75px]"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <RoleQueueField form={form} role="vanguards" label="Vanguards" />
+      <RoleQueueField form={form} role="duelists" label="Duelists" />
+      <RoleQueueField form={form} role="strategists" label="Strategists" />
     </div>
   );
 }
