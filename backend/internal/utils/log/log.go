@@ -2,6 +2,8 @@ package log
 
 import (
 	"context"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/getsentry/sentry-go"
@@ -13,28 +15,6 @@ import (
 var (
 	logger *zap.Logger
 )
-
-func initSentry() error {
-	return sentry.Init(sentry.ClientOptions{
-		Dsn:              env.GetString("SENTRY_DSN", ""),
-		AttachStacktrace: true,
-		EnableTracing:    true,
-		TracesSampleRate: 1.0,
-		Environment:      env.GetString("ENVIRONMENT", "dev"),
-	})
-}
-
-func sentryHook(entry zapcore.Entry) error {
-	if entry.Level >= zapcore.ErrorLevel {
-		hub := sentry.CurrentHub()
-		event := sentry.NewEvent()
-		event.Level = sentry.LevelError
-		event.Message = entry.Message
-		event.Timestamp = entry.Time
-		hub.CaptureEvent(event)
-	}
-	return nil
-}
 
 func Init(isProd bool) *zap.Logger {
 	if isProd {
@@ -59,13 +39,62 @@ func Init(isProd bool) *zap.Logger {
 	options := []zap.Option{zap.AddCallerSkip(1)}
 	if isProd {
 		sentryCore := zap.WrapCore(func(core zapcore.Core) zapcore.Core {
-			return zapcore.RegisterHooks(core, sentryHook)
+			return zapcore.RegisterHooks(core, func(entry zapcore.Entry) error {
+				fields := []zapcore.Field{}
+				return sentryHook(entry, fields)
+			})
 		})
 		options = append(options, sentryCore)
 	}
 
 	logger = l.WithOptions(options...)
 	return logger
+}
+
+func WithRequest(l *zap.Logger, r *http.Request) *zap.Logger {
+	userAgent := r.UserAgent()
+	os, device := parseUserAgent(userAgent)
+
+	return l.With(
+		zap.String("method", r.Method),
+		zap.String("path", r.URL.Path),
+		zap.String("remote_addr", r.RemoteAddr),
+		zap.String("user_agent", userAgent),
+		zap.String("request_id", r.Header.Get("X-Request-ID")),
+		zap.String("user", r.Header.Get("X-User-ID")),
+		zap.String("device", device),
+		zap.String("os", os),
+		zap.String("url", r.URL.String()),
+	)
+}
+
+func parseUserAgent(userAgent string) (os, device string) {
+	ua := strings.ToLower(userAgent)
+
+	switch {
+	case strings.Contains(ua, "windows"):
+		os = "windows"
+	case strings.Contains(ua, "mac os"):
+		os = "macos"
+	case strings.Contains(ua, "linux"):
+		os = "linux"
+	case strings.Contains(ua, "android"):
+		os = "android"
+	case strings.Contains(ua, "ios"):
+		os = "ios"
+	default:
+		os = "unknown"
+	}
+
+	switch {
+	case strings.Contains(ua, "mobile"):
+		device = "mobile"
+	case strings.Contains(ua, "tablet"):
+		device = "tablet"
+	default:
+		device = "desktop"
+	}
+	return
 }
 
 func GetLogger(ctx context.Context) *zap.Logger {

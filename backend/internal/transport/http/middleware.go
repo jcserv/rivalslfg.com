@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/jcserv/rivalslfg/internal/utils/log"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -52,10 +54,18 @@ func LogIncomingRequests() mux.MiddlewareFunc {
 			startTime := time.Now()
 			wrapped := wrapResponseWriter(w)
 
+			requestID := r.Header.Get("X-Request-ID")
+			if requestID == "" {
+				requestID = uuid.New().String()
+				r.Header.Set("X-Request-ID", requestID)
+			}
+			w.Header().Set("X-Request-ID", requestID)
+			reqLogger := log.WithRequest(logger, r)
+
 			defer func() {
 				if err := recover(); err != nil {
 					wrapped.WriteHeader(http.StatusInternalServerError)
-					logger.Error(fmt.Sprintf("panic: %v", err))
+					reqLogger.Error(fmt.Sprintf("panic: %v", err))
 					return
 				}
 			}()
@@ -76,11 +86,11 @@ func LogIncomingRequests() mux.MiddlewareFunc {
 			)
 
 			if status >= 500 {
-				logger.Error(logMsg)
+				reqLogger.Error(logMsg)
 			} else if status >= 400 {
-				logger.Warn(logMsg)
+				reqLogger.Warn(logMsg)
 			} else {
-				logger.Info(logMsg)
+				reqLogger.Info(logMsg)
 			}
 		})
 	}
