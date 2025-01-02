@@ -8,6 +8,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
 	github.com/derekparker/trie v0.0.0-20230829180723-39f4de51ef7d // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
+	github.com/getsentry/sentry-go v0.31.0 // indirect
 	github.com/go-delve/delve v1.24.0 // indirect
 	github.com/go-delve/liner v1.2.3-0.20231231155935-4726ab1d7f62 // indirect
 	github.com/google/go-dap v0.12.0 // indirect
