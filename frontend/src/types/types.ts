@@ -195,6 +195,7 @@ export function getGroupFromProfile(owner: Profile, id: string): Group {
     gamemode: owner.gamemode,
     players: [
       {
+        id: 1, // TODO: This should be generated server-side
         name: owner.name,
         leader: true,
         platform: owner.platform,
@@ -213,6 +214,7 @@ export function getGroupFromProfile(owner: Profile, id: string): Group {
 
 export function getPlayerFromProfile(profile: Profile): Player {
   return {
+    id: 1, // TODO: This should be generated server-side
     name: profile.name,
     leader: false,
     platform: profile.platform,
@@ -394,6 +396,7 @@ export function areRequirementsMet(
 }
 
 export type Player = {
+  id: number;
   name: string;
   leader?: boolean;
   rank: string;

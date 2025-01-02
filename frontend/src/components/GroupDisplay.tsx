@@ -21,14 +21,7 @@ import {
 import { TeamUpItem } from "@/components/TeamUp";
 import { useProfile, useToast } from "@/hooks";
 import { strArrayToTitleCase, toTitleCase } from "@/lib";
-import {
-  getGroupInfo,
-  getPlatform,
-  getRank,
-  getRegion,
-  Group,
-  Player,
-} from "@/types";
+import { getGroupInfo, getPlatform, getRank, getRegion, Group } from "@/types";
 
 import teamUps from "@/assets/teamups.json";
 
@@ -36,12 +29,14 @@ interface GroupDisplayProps {
   group: Group | undefined;
   canUserAccessGroup: boolean | null;
   isOwner: boolean;
+  onRemove: (id: number, playerToRemove: string) => void;
 }
 
 export function GroupDisplay({
   group,
   canUserAccessGroup,
   isOwner,
+  onRemove,
 }: GroupDisplayProps) {
   const [profile] = useProfile();
   const { toast } = useToast();
@@ -59,10 +54,6 @@ export function GroupDisplay({
           .intersection(currCharacters).size > 0,
     );
   }, [teamUps, currCharacters]);
-
-  function onKick(player: Player) {
-    console.log(player);
-  }
 
   if (!group) return null;
   return (
@@ -174,7 +165,7 @@ export function GroupDisplay({
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => onKick(player)}
+                        onClick={() => onRemove(player.id, player.name)}
                       >
                         <X className="w-4 h-4" />
                       </Button>

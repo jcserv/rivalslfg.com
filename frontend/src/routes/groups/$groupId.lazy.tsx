@@ -86,8 +86,43 @@ function GroupPage() {
     }
   }
 
-  function onLeave() {
-    console.log("i'm leavin here D:");
+  async function onRemove(id: number, playerToRemove: string) {
+    if (!group) return;
+    try {
+      // const status = await joinGroup({
+      //   groupId,
+      //   player: p,
+      //   passcode,
+      // });
+      // if (status !== StatusCodes.OK) {
+      //   throw new Error(`${status}`);
+      // }
+
+      // Handle case for when leader leaves; should set other player to be leader
+      if (isPlayerInGroup) {
+        setGroup({
+          ...group,
+          players: group.players.filter((p) => p.name !== playerToRemove),
+        });
+      }
+
+      toast({
+        title:
+          playerToRemove === profile.name
+            ? "Left group"
+            : "Removed player from group",
+        variant: "success",
+      });
+    } catch {
+      toast({
+        title:
+          playerToRemove === profile.name
+            ? "Unable to leave group"
+            : "Unable to remove player from group",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
   }
 
   return (
@@ -101,13 +136,17 @@ function GroupPage() {
                 group={group}
                 canUserAccessGroup={canUserAccessGroup}
                 isOwner={isOwner}
+                onRemove={onRemove}
               />
             )}
             <div className="flex flex-row justify-center mt-4">
               {canUserAccessGroup && (
                 <div className="space-x-2">
                   {isPlayerInGroup && (
-                    <Button variant="destructive" onClick={onLeave}>
+                    <Button
+                      variant="destructive"
+                      onClick={() => onRemove(profile.id, profile.name)}
+                    >
                       Leave
                     </Button>
                   )}
@@ -124,7 +163,6 @@ function GroupPage() {
                   )}
                 </div>
               )}
-              i love you
             </div>
           </div>
           {!isLoading && !error && (
