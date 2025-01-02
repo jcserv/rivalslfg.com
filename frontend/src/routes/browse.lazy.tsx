@@ -1,7 +1,7 @@
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
 
 import { ErrorBanner, GroupTable } from "@/components";
-import { useGroups, useProfile } from "@/hooks";
+import { useProfile } from "@/hooks";
 
 export const Route = createLazyFileRoute("/browse")({
   component: BrowsePage,
@@ -9,10 +9,7 @@ export const Route = createLazyFileRoute("/browse")({
 
 function BrowsePage() {
   const [profile] = useProfile();
-  const { data: groups, pagination, isLoading: isLoadingGroups } = useGroups();
-
   const isProfileEmpty = !profile || Object.keys(profile).length === 0;
-  const isLoading = isLoadingGroups;
 
   return (
     <section className="p-2 md:p-4">
@@ -30,12 +27,14 @@ function BrowsePage() {
           </ErrorBanner>
         )}
         <div className="w-3/4">
-          <GroupTable
-            groups={!isLoading && groups ? groups : []}
-            profile={profile}
-            isProfileEmpty={isProfileEmpty}
-            pagination={pagination}
-          />
+          <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
+            <div className="flex items-center justify-between space-y-2">
+              <h2 className="text-2xl font-bold tracking-tight text-left">
+                Groups
+              </h2>
+            </div>
+            <GroupTable profile={profile} isProfileEmpty={isProfileEmpty} />
+          </div>
         </div>
       </div>
     </section>

@@ -2,27 +2,18 @@ import { useMemo } from "react";
 
 import { columns } from "@/components/GroupTable.Columns";
 import { DataTable } from "@/components/ui";
-import {
-  areRequirementsMet,
-  getRequirements,
-  Group,
-  PaginationState,
-  Profile,
-} from "@/types";
+import { useGroups } from "@/hooks";
+import { areRequirementsMet, getRequirements, Group, Profile } from "@/types";
 
 interface GroupTableProps {
-  groups: Group[];
   profile: Profile | undefined;
   isProfileEmpty: boolean;
-  pagination?: PaginationState;
 }
 
-export function GroupTable({
-  groups,
-  profile,
-  isProfileEmpty,
-  pagination,
-}: GroupTableProps) {
+export function GroupTable({ profile, isProfileEmpty }: GroupTableProps) {
+  const { data, pagination, isLoading } = useGroups();
+  const groups: Group[] = !isLoading ? data : [];
+
   const groupTableData = useMemo(() => {
     return groups.map((group) => {
       const requirements = getRequirements(group);
@@ -36,19 +27,11 @@ export function GroupTable({
   }, [groups, profile]);
 
   return (
-    <>
-      <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
-        <div className="flex items-center justify-between space-y-2">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight">Groups</h2>
-          </div>
-        </div>
-        <DataTable
-          data={groupTableData}
-          columns={columns(isProfileEmpty)}
-          pagination={pagination}
-        />
-      </div>
-    </>
+    <DataTable
+      data={groupTableData}
+      columns={columns(isProfileEmpty)}
+      pagination={pagination}
+      isLoading={isLoading}
+    />
   );
 }

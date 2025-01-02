@@ -19,14 +19,16 @@ import { PaginationState } from "@/types";
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
   pagination?: PaginationState;
+  showCompactMode?: boolean;
 }
 
 export function DataTablePagination<TData>({
   table,
   pagination,
+  showCompactMode,
 }: DataTablePaginationProps<TData>) {
   const totalRows = pagination
-    ? (pagination.totalCount || 0)
+    ? pagination.totalCount || 0
     : table.getRowModel().rows.length;
   const pageSize = pagination
     ? pagination.pageSize
@@ -85,27 +87,33 @@ export function DataTablePagination<TData>({
 
   return (
     <div className="flex items-center justify-between px-2">
-      <div className="flex-1 text-sm text-muted-foreground">
-        {totalRows} row(s) total
-      </div>
-      <div className="flex items-center space-x-6 lg:space-x-8">
-        <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Rows per page</p>
-          <Select value={`${pageSize}`} onValueChange={onPageSizeChange}>
-            <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder={pageSize} />
-            </SelectTrigger>
-            <SelectContent side="top">
-              {[10, 20, 30, 40, 50].map((pageSize) => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
-                  {pageSize}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      {!showCompactMode && (
+        <div className="flex-1 text-sm text-muted-foreground">
+          {totalRows} row(s) total
         </div>
+      )}
+      <div className="flex items-center space-x-6 lg:space-x-8">
+        {!showCompactMode && (
+          <div className="flex items-center space-x-2">
+            <p className="text-sm font-medium">Rows per page</p>
+            <Select value={`${pageSize}`} onValueChange={onPageSizeChange}>
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue placeholder={pageSize} />
+              </SelectTrigger>
+              <SelectContent side="top">
+                {[10, 20, 30, 40, 50].map((pageSize) => (
+                  <SelectItem key={pageSize} value={`${pageSize}`}>
+                    {pageSize}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Page {pageIndex + 1} of {totalPages}
+          {!showCompactMode
+            ? `Page ${pageIndex + 1} of ${totalPages}`
+            : `Page ${pageIndex + 1}/${totalPages}`}
         </div>
         <div className="flex items-center space-x-2">
           <Button

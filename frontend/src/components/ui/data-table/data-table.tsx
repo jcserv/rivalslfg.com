@@ -31,12 +31,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   pagination?: PaginationState;
+  isLoading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   pagination,
+  isLoading,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -77,7 +79,17 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar table={table} />
+      <DataTableToolbar
+        table={table}
+        rightAdornment={
+          <DataTablePagination
+            table={table}
+            pagination={pagination}
+            showCompactMode
+          />
+        }
+      />
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -104,6 +116,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  isLoading={isLoading}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
