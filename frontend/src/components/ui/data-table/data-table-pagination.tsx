@@ -26,7 +26,7 @@ export function DataTablePagination<TData>({
   pagination,
 }: DataTablePaginationProps<TData>) {
   const totalRows = pagination
-    ? pagination.totalCount
+    ? (pagination.totalCount || 0)
     : table.getRowModel().rows.length;
   const pageSize = pagination
     ? pagination.pageSize

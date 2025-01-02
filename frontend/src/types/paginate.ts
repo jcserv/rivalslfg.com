@@ -13,7 +13,7 @@ export interface PaginationState {
   pageSize: number;
   pageIndex: number;
   pageCount: number;
-  totalCount: number;
+  totalCount: number | null;
   setPageSize: (size: number) => void;
   setPageIndex: (index: number) => void;
   canPreviousPage: boolean;
