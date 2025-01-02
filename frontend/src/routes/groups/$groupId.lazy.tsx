@@ -101,12 +101,30 @@ function GroupPage() {
         throw new Error(`${status}`);
       }
 
-      // Handle case for when leader leaves; should set other player to be leader
       if (isPlayerInGroup) {
-        setGroup({
+        const updatedPlayers = group.players.filter(
+          (p) => p.name !== playerToRemove,
+        );
+
+        let newGroup = {
           ...group,
-          players: group.players.filter((p) => p.name !== playerToRemove),
-        });
+          players: updatedPlayers,
+        };
+
+        if (group.owner === playerToRemove) {
+          const newOwner = updatedPlayers[0];
+
+          newGroup = {
+            ...newGroup,
+            owner: newOwner.name,
+            name: `${newOwner.name}'s group`,
+            players: updatedPlayers.map((p) =>
+              p.name === newOwner.name ? { ...p, leader: true } : p,
+            ),
+          };
+        }
+
+        setGroup(newGroup);
       }
 
       toast({

@@ -58,11 +58,70 @@ func (q *Queries) JoinGroup(ctx context.Context, arg JoinGroupParams) error {
 	return err
 }
 
+const promoteOwnerOrDeleteGroup = `-- name: PromoteOwnerOrDeleteGroup :one
+WITH group_check AS (
+    SELECT 
+        CASE
+            WHEN NOT EXISTS (SELECT 1 FROM Groups g WHERE g.id = $1) THEN 404
+            ELSE 200
+        END as status
+),
+owner_promotion AS (
+    UPDATE Groups g
+    SET 
+        owner = (
+            SELECT p->>'name'
+            FROM jsonb_array_elements(players) AS p
+            LIMIT 1
+        ),
+        players = (
+            SELECT jsonb_agg(
+                CASE 
+                    WHEN p->>'name' = (SELECT p->>'name' FROM jsonb_array_elements(players) AS p LIMIT 1) THEN
+                        jsonb_set(p, '{leader}', 'true'::jsonb)
+                    ELSE p
+                END
+            )
+            FROM jsonb_array_elements(players) AS p
+        ),
+        updated_at = NOW()
+    WHERE g.id = $1
+      AND $2 > 0
+    RETURNING g.id AS group_id, 'promoted' AS action
+),
+group_deletion AS (
+    DELETE FROM Groups g
+    WHERE g.id = $1
+      AND $2 = 0
+    RETURNING id AS group_id, 'deleted' AS action
+)
+SELECT 
+    CASE 
+        WHEN (SELECT status FROM group_check) = 404 THEN '404'
+        ELSE COALESCE(
+            (SELECT group_id FROM owner_promotion),
+            (SELECT group_id FROM group_deletion)
+        )
+    END AS group_id
+`
+
+type PromoteOwnerOrDeleteGroupParams struct {
+	ID               string      `json:"id"`
+	RemainingPlayers interface{} `json:"remaining_players"`
+}
+
+func (q *Queries) PromoteOwnerOrDeleteGroup(ctx context.Context, arg PromoteOwnerOrDeleteGroupParams) (interface{}, error) {
+	row := q.db.QueryRow(ctx, promoteOwnerOrDeleteGroup, arg.ID, arg.RemainingPlayers)
+	var group_id interface{}
+	err := row.Scan(&group_id)
+	return group_id, err
+}
+
 const removePlayerFromGroup = `-- name: RemovePlayerFromGroup :one
 WITH group_check AS (
     SELECT 
         CASE
-            WHEN NOT EXISTS (SELECT 1 FROM Groups WHERE g.id = $1) THEN 404
+            WHEN NOT EXISTS (SELECT 1 FROM Groups g WHERE g.id = $1) THEN 404
             WHEN $2 != g.owner 
                 AND $2 != $3 THEN 403
             WHEN NOT EXISTS (
@@ -71,11 +130,12 @@ WITH group_check AS (
             ) THEN 404
             ELSE 200
         END as status,
-        players
+        players,
+        owner
     FROM Groups g
-    WHERE id = $1
+    WHERE g.id = $1
 ),
-player_update as (
+player_update AS (
     UPDATE Groups g
     SET 
         players = COALESCE(
@@ -90,8 +150,12 @@ player_update as (
         updated_at = NOW()
     WHERE g.id = $1
         AND (SELECT status FROM group_check) = 200
+    RETURNING jsonb_array_length(players) AS remaining_players
 )
-SELECT status FROM group_check
+SELECT 
+    (SELECT status FROM group_check) AS status,
+    (SELECT remaining_players FROM player_update) AS remaining_players,
+    (SELECT owner FROM group_check) AS owner
 `
 
 type RemovePlayerFromGroupParams struct {
@@ -100,11 +164,17 @@ type RemovePlayerFromGroupParams struct {
 	PlayerName    interface{} `json:"player_name"`
 }
 
-func (q *Queries) RemovePlayerFromGroup(ctx context.Context, arg RemovePlayerFromGroupParams) (int32, error) {
+type RemovePlayerFromGroupRow struct {
+	Status           int32  `json:"status"`
+	RemainingPlayers int32  `json:"remaining_players"`
+	Owner            string `json:"owner"`
+}
+
+func (q *Queries) RemovePlayerFromGroup(ctx context.Context, arg RemovePlayerFromGroupParams) (RemovePlayerFromGroupRow, error) {
 	row := q.db.QueryRow(ctx, removePlayerFromGroup, arg.ID, arg.RequesterName, arg.PlayerName)
-	var status int32
-	err := row.Scan(&status)
-	return status, err
+	var i RemovePlayerFromGroupRow
+	err := row.Scan(&i.Status, &i.RemainingPlayers, &i.Owner)
+	return i, err
 }
 
 const upsertGroup = `-- name: UpsertGroup :one

@@ -56,8 +56,6 @@ func (s *GroupService) JoinGroup(ctx context.Context, arg JoinGroupArgs) error {
 		return err
 	}
 
-	log.Debug(ctx, fmt.Sprintf("status %d", status))
-
 	switch status {
 	case http.StatusOK: // User already in group
 		return nil
@@ -78,19 +76,46 @@ func (s *GroupService) JoinGroup(ctx context.Context, arg JoinGroupArgs) error {
 }
 
 func (s *GroupService) RemovePlayerFromGroup(ctx context.Context, arg repository.RemovePlayerFromGroupParams) error {
-	result, err := s.repo.RemovePlayerFromGroup(ctx, arg)
+	out, err := s.repo.RemovePlayerFromGroup(ctx, arg)
 	if err != nil {
 		return err
 	}
 
-	switch result {
+	switch out.Status {
 	case 200:
-		return nil
+		if !(arg.PlayerName == out.Owner) {
+			return nil
+		}
+		return s.PromoteOwnerOrDeleteGroup(ctx, repository.PromoteOwnerOrDeleteGroupParams{
+			ID:               arg.ID,
+			RemainingPlayers: out.RemainingPlayers,
+		})
 	case 403:
 		return NewError(http.StatusForbidden, "Only group owners can remove other players", nil)
 	case 404:
 		return NewError(http.StatusNotFound, "Group or player not found", nil)
 	default:
+		log.Debug(ctx, fmt.Sprintf("Unknown error: %v", out.Status))
+		return NewError(http.StatusInternalServerError, "Unknown error", nil)
+	}
+}
+
+func (s *GroupService) PromoteOwnerOrDeleteGroup(ctx context.Context, arg repository.PromoteOwnerOrDeleteGroupParams) error {
+	out, err := s.repo.PromoteOwnerOrDeleteGroup(ctx, arg)
+	if err != nil {
+		return err
+	}
+
+	switch out.(type) {
+	case string:
+		switch out.(string) {
+		case "404":
+			return NewError(http.StatusNotFound, "Group not found", nil)
+		default:
+			return nil
+		}
+	default:
+		log.Debug(ctx, fmt.Sprintf("Unknown error: %v", out))
 		return NewError(http.StatusInternalServerError, "Unknown error", nil)
 	}
 }
