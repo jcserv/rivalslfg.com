@@ -2,6 +2,7 @@ package v1
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -30,7 +31,6 @@ func (a *API) UpsertGroup() http.HandlerFunc {
 
 		groupID, err := a.groupService.UpsertGroup(ctx, *params)
 		if err != nil {
-			log.Error(ctx, err.Error())
 			httputil.InternalServerError(ctx, w, err)
 			return
 		}
@@ -53,7 +53,6 @@ func (a *API) GetGroupByID() http.HandlerFunc {
 
 		group, err := a.groupService.GetGroupByID(ctx, groupID)
 		if err != nil {
-			log.Error(ctx, err.Error())
 			httputil.InternalServerError(ctx, w, err)
 			return
 		}
@@ -74,7 +73,6 @@ func (a *API) GetGroups() http.HandlerFunc {
 
 		groups, err := a.groupService.GetGroups(ctx)
 		if err != nil {
-			log.Error(ctx, err.Error())
 			httputil.InternalServerError(ctx, w, err)
 			return
 		}
@@ -85,6 +83,10 @@ func (a *API) GetGroups() http.HandlerFunc {
 
 func (a *API) DeleteGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		err := errors.New("test error")
+		httputil.InternalServerError(ctx, w, err)
+		return
 	}
 }
 
@@ -124,7 +126,6 @@ func (a *API) JoinGroup() http.HandlerFunc {
 				}
 			}
 			httputil.InternalServerError(ctx, w, err)
-			log.Error(ctx, err.Error())
 			return
 		}
 		httputil.OK(w, nil)
@@ -166,8 +167,8 @@ func (a *API) RemovePlayer() http.HandlerFunc {
 					return
 				}
 			}
-			httputil.InternalServerError(ctx, w, err)
 			log.Error(ctx, err.Error())
+			httputil.InternalServerError(ctx, w, err)
 			return
 		}
 
