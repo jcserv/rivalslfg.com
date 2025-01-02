@@ -29,9 +29,9 @@ this folder contains the backend for [rivalslfg](https://rivalslfg.vercel.app/),
 
 1. [X] List Groups
    - [ ] Filter by: (*)
-     -  Region
-     -  Gamemode
-     -  Requirements Met (provided player info)
+     -  Region `/v1/groups?filter=region eq "na"`
+     -  Gamemode `/v1/groups?filter=gamemode eq "competitive"`
+     -  Requirements Met (provided player info) `/v1/groups?filter=requirementsMet eq true`
 
      -  Visibility
      -  Platform

@@ -9,6 +9,9 @@ codegen:
 dev:
 	go build ./cmd/rivalslfg/main.go && ./main
 
+test:
+	go test ./...
+
 clean:
 	rm main
 
