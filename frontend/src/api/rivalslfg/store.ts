@@ -31,16 +31,12 @@ export const rivalsStoreActions = {
   setGroups(groups: Group[]) {
     rivalslfgStore.setState((prev) => ({ ...prev, groups }));
   },
-  setGroup(group: Group) {
+  upsertGroup(group: Group) {
     rivalslfgStore.setState((prev) => ({
       ...prev,
-      groups: [group, ...prev.groups],
-    }));
-  },
-  replaceGroup(group: Group) {
-    rivalslfgStore.setState((prev) => ({
-      ...prev,
-      groups: prev.groups.map((g) => (g.id === group.id ? group : g)),
+      groups: prev.groups.some((g) => g.id === group.id)
+        ? prev.groups.map((g) => (g.id === group.id ? group : g))
+        : [group, ...prev.groups],
     }));
   },
   clearStore() {

@@ -7,7 +7,6 @@ interface TeamUpProps {
 
 export function TeamUpItem({ teamup }: TeamUpProps) {
   // TODO: Display the current & required characters for the teamup, red border if missing. green border if present.
-
   return (
     <li>
       <HoverCard>

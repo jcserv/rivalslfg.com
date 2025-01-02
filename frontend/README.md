@@ -43,6 +43,8 @@ FE-Only:
 - [ ] Filter or sort characters based on selected roles
 - [ ] vice versa, derive roles from characters?
 - [x] Remove player from group
+- [ ] Display the current & required characters for the teamup, red border if missing. green border if present.
+- [ ] Replace hard-coded player IDs
 
 API Integration:
 
