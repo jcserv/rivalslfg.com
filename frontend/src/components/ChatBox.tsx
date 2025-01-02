@@ -1,13 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+
 import { Send } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  ChatBubble,
-  ChatBubbleMessage,
-  ChatInput,
-  ChatMessageList,
-} from "@/components/ui/chat";
 import {
   Card,
   CardContent,
@@ -16,6 +10,13 @@ import {
   CardTitle,
   Skeleton,
 } from "@/components/ui";
+import { Button } from "@/components/ui/button";
+import {
+  ChatBubble,
+  ChatBubbleMessage,
+  ChatInput,
+  ChatMessageList,
+} from "@/components/ui/chat";
 import { useProfile } from "@/hooks";
 
 interface Message {

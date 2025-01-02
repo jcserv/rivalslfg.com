@@ -1,7 +1,7 @@
 import { Store } from "@tanstack/react-store";
 
-import { Group } from "@/types";
 import { queryClient } from "@/routes/__root";
+import { Group } from "@/types";
 
 interface RivalsLFGStore {
   authedGroups: Map<string, boolean>;

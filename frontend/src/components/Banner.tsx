@@ -1,12 +1,12 @@
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@/components/ui";
 import { Info } from "lucide-react";
 
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 export const InfoBanner = ({ children }: { children: JSX.Element }) => (

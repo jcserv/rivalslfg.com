@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
+import { useForm, UseFormReturn } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "@tanstack/react-router";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { useForm, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 
 import {
@@ -22,15 +23,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Command,
@@ -40,6 +32,23 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorInput,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from "@/components/ui/multi-select";
 import {
   Popover,
   PopoverContent,
@@ -52,14 +61,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  MultiSelector,
-  MultiSelectorContent,
-  MultiSelectorInput,
-  MultiSelectorItem,
-  MultiSelectorList,
-  MultiSelectorTrigger,
-} from "@/components/ui/multi-select";
 import { useToast, useUpsertGroup } from "@/hooks";
 import { cn } from "@/lib/utils";
 import {

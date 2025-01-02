@@ -1,10 +1,10 @@
-import { ColumnDef, Row } from "@tanstack/react-table";
 import { Link } from "@tanstack/react-router";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { Eye, EyeOff } from "lucide-react";
 
-import { HoverCardContent, HoverCard, HoverCardTrigger } from "@/components/ui";
-import { DataTableColumnHeader } from "@/components/ui/data-table";
 import { TooltipItem } from "@/components/TooltipItem";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui";
+import { DataTableColumnHeader } from "@/components/ui/data-table";
 import { toTitleCase } from "@/lib/utils";
 import {
   Gamemode,

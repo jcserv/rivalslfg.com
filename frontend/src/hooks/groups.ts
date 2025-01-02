@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { rivalsStoreKeys, fetchGroups, fetchGroup, upsertGroup } from "@/api";
+import { fetchGroup, fetchGroups, rivalsStoreKeys, upsertGroup } from "@/api";
 import { Group, Profile } from "@/types";
 
 export function useGroups(): [Group[] | undefined, boolean, Error | null] {

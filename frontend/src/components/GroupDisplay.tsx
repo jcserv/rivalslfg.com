@@ -1,6 +1,8 @@
 import { useMemo } from "react";
+
 import { Copy, X } from "lucide-react";
 
+import { TeamUpItem } from "@/components/TeamUp";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,14 +13,13 @@ import {
 } from "@/components/ui/card";
 import {
   Table,
+  TableBody,
   TableCaption,
+  TableCell,
+  TableHead,
   TableHeader,
   TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
 } from "@/components/ui/table";
-import { TeamUpItem } from "@/components/TeamUp";
 import { useProfile, useToast } from "@/hooks";
 import { strArrayToTitleCase, toTitleCase } from "@/lib";
 import { getGroupInfo, getPlatform, getRank, getRegion, Group } from "@/types";

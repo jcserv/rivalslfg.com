@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
+
 import { createLazyFileRoute } from "@tanstack/react-router";
 
 import {
-  GroupDisplay,
-  GroupControls,
-  ChatBox,
   AccessGroupDialog,
+  ChatBox,
+  GroupControls,
+  GroupDisplay,
 } from "@/components";
 import { Button } from "@/components/ui";
 import {
