@@ -194,7 +194,10 @@ function GroupPage() {
                   canUserAccessGroup={canUserAccessGroup}
                 />
               )}
-              <ChatBox canUserAccessGroup={canUserAccessGroup} />
+              <ChatBox
+                canUserAccessGroup={canUserAccessGroup}
+                isPlayerInGroup={isPlayerInGroup}
+              />
             </div>
           )}
         </div>

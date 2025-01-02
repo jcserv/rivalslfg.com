@@ -56,9 +56,10 @@ function getUserColor(username: string): string {
 
 interface ChatBoxProps {
   canUserAccessGroup: boolean | null;
+  isPlayerInGroup: boolean;
 }
 
-export function ChatBox({ canUserAccessGroup }: ChatBoxProps) {
+export function ChatBox({ canUserAccessGroup, isPlayerInGroup }: ChatBoxProps) {
   const [profile] = useProfile();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -137,6 +138,7 @@ export function ChatBox({ canUserAccessGroup }: ChatBoxProps) {
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Send message"
             className="flex-1 w-full"
+            disabled={!isPlayerInGroup}
           />
           <Button type="submit" size="icon">
             <Send className="h-4 w-4" />
