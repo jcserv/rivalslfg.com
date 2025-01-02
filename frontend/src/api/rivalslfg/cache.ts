@@ -52,3 +52,21 @@ export const joinGroup = async (
   }
   return result;
 };
+
+export const removePlayer = async (
+  groupId: string,
+  playerId: number,
+  requesterName: string,
+  playerName: string,
+): Promise<StatusCode> => {
+  const result = await rivalslfgAPIClient.removePlayer(
+    groupId,
+    playerId,
+    requesterName,
+    playerName,
+  );
+  // if (result === StatusCodes.OK) {
+  //   rivalsStoreActions.removePlayerFromGroup(playerId);
+  // }
+  return result;
+};

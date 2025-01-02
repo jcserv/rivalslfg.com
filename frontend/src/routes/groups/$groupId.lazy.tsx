@@ -13,6 +13,7 @@ import {
   useIsAuthed,
   useJoinGroup,
   useProfile,
+  useRemovePlayer,
   useToast,
 } from "@/hooks";
 import { getPlayerFromProfile, Group, Profile, StatusCodes } from "@/types";
@@ -29,6 +30,7 @@ function GroupPage() {
   const { toast } = useToast();
 
   const joinGroup = useJoinGroup();
+  const removePlayer = useRemovePlayer();
 
   const [group, setGroup] = useState<Group | undefined>(g);
   const [showAccessDialog, setShowAccessDialog] = useState(false);
@@ -89,14 +91,15 @@ function GroupPage() {
   async function onRemove(id: number, playerToRemove: string) {
     if (!group) return;
     try {
-      // const status = await joinGroup({
-      //   groupId,
-      //   player: p,
-      //   passcode,
-      // });
-      // if (status !== StatusCodes.OK) {
-      //   throw new Error(`${status}`);
-      // }
+      const status = await removePlayer({
+        groupId,
+        playerId: 1, // TODO: This should be generated server-side
+        requesterName: profile.name,
+        playerName: playerToRemove,
+      });
+      if (status !== StatusCodes.OK) {
+        throw new Error(`${status}`);
+      }
 
       // Handle case for when leader leaves; should set other player to be leader
       if (isPlayerInGroup) {

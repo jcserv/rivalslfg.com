@@ -84,4 +84,31 @@ export class RivalsLFGClient extends HTTPClient {
       return StatusCodes.InternalServerError as StatusCode;
     }
   }
+
+  async removePlayer(
+    groupId: string,
+    playerId: number,
+    requesterName: string,
+    playerName: string,
+  ): Promise<StatusCode> {
+    try {
+      const response = await fetch(
+        `${this.baseURL}/api/v1/groups/${groupId}/players/${playerId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            requesterName,
+            playerName,
+          }),
+        },
+      );
+      return response.status as StatusCode;
+    } catch (error) {
+      console.error("Error removing player from group", error);
+      return StatusCodes.InternalServerError as StatusCode;
+    }
+  }
 }
