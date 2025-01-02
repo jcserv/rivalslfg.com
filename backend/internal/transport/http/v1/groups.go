@@ -3,7 +3,6 @@ package v1
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -67,7 +66,6 @@ func (a *API) GetGroupByID() http.HandlerFunc {
 	}
 }
 
-// TODO: Add pagination, filter, sorting
 func (a *API) GetGroups() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -78,9 +76,13 @@ func (a *API) GetGroups() http.HandlerFunc {
 			return
 		}
 
-		log.Info(ctx, fmt.Sprintf("query params: %+v", queryParams))
+		args, err := Parse(queryParams)
+		if err != nil {
+			httputil.BadRequest(w)
+			return
+		}
 
-		groups, err := a.groupService.GetGroups(ctx)
+		groups, err := a.groupService.GetGroups(ctx, *args)
 		if err != nil {
 			httputil.InternalServerError(ctx, w, err)
 			return

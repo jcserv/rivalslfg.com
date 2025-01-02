@@ -27,8 +27,8 @@ func (s *GroupService) UpsertGroup(ctx context.Context, arg repository.UpsertGro
 	return groupID, nil
 }
 
-func (s *GroupService) GetGroups(ctx context.Context) ([]repository.GroupWithPlayers, error) {
-	groups, err := s.repo.GetGroups(ctx)
+func (s *GroupService) GetGroups(ctx context.Context, arg repository.GetGroupsParams) ([]repository.GroupWithPlayers, error) {
+	groups, err := s.repo.GetGroups(ctx, arg)
 	if err != nil {
 		return nil, err
 	}

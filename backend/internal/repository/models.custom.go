@@ -17,7 +17,10 @@ type GroupDTO struct {
 
 type GroupWithPlayers struct {
 	GroupDTO
+
+	// Computed fields
 	Name    string          `json:"name"`
+	Size    int             `json:"size"`
 	Players []PlayerInGroup `json:"players"`
 }
 
