@@ -56,7 +56,7 @@ function getUserColor(username: string): string {
 
 interface ChatBoxProps {
   canUserAccessGroup: boolean | null;
-  isPlayerInGroup: boolean;
+  isPlayerInGroup: boolean | undefined;
 }
 
 export function ChatBox({ canUserAccessGroup, isPlayerInGroup }: ChatBoxProps) {
