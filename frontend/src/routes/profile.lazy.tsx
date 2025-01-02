@@ -15,7 +15,11 @@ function ProfilePage() {
     <section className="p-2 md:p-4">
       <div className="w-full flex flex-col items-center">
         <div className="w-1/2">
-          <ProfileForm profile={profile as Profile} setProfile={setProfile} />
+          <ProfileForm
+            profileFormType="profile"
+            profile={profile as Profile}
+            setProfile={setProfile}
+          />
         </div>
       </div>
     </section>

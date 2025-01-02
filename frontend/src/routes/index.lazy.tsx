@@ -28,11 +28,15 @@ function Index() {
             <TabsTrigger value="create">Create Group</TabsTrigger>
           </TabsList>
           <TabsContent value="find">
-            <ProfileForm profile={profile as Profile} setProfile={setProfile} />
+            <ProfileForm
+              profileFormType="find"
+              profile={profile as Profile}
+              setProfile={setProfile}
+            />
           </TabsContent>
           <TabsContent value="create">
             <ProfileForm
-              isGroup
+              profileFormType="create"
               profile={profile as Profile}
               setProfile={setProfile}
             />

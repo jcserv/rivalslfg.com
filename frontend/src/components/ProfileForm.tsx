@@ -65,8 +65,10 @@ import { useToast, useUpsertGroup } from "@/hooks";
 import { cn } from "@/lib/utils";
 import {
   Gamemode,
+  getSubmitButtonLabel,
   Platform,
   Profile,
+  ProfileFormType,
   Rank,
   Region,
   Roles,
@@ -132,14 +134,36 @@ const formSchema = z.object({
     .optional(),
 });
 
+const emptyState = {
+  name: "",
+  region: "",
+  platform: "",
+  gamemode: "",
+  roles: [] as string[],
+  rank: "",
+  characters: [] as string[],
+  voiceChat: false,
+  mic: false,
+  roleQueue: {
+    vanguards: 2,
+    duelists: 2,
+    strategists: 2,
+  },
+  groupSettings: {
+    platforms: [],
+    voiceChat: false,
+    mic: false,
+  },
+};
+
 interface ProfileFormProps {
-  isGroup?: boolean;
+  profileFormType: ProfileFormType;
   profile?: Profile;
   setProfile: (profile: Profile) => void;
 }
 
 export function ProfileForm({
-  isGroup = false,
+  profileFormType,
   profile,
   setProfile,
 }: ProfileFormProps) {
@@ -152,24 +176,7 @@ export function ProfileForm({
 
   const defaultValues = useMemo(
     () => ({
-      region: "",
-      platform: "",
-      gamemode: "",
-      roles: [] as string[],
-      rank: "",
-      characters: [] as string[],
-      voiceChat: false,
-      mic: false,
-      roleQueue: {
-        vanguards: 2,
-        duelists: 2,
-        strategists: 2,
-      },
-      groupSettings: {
-        platforms: [],
-        voiceChat: false,
-        mic: false,
-      },
+      ...emptyState,
       ...profile,
     }),
     [profile],
@@ -180,9 +187,15 @@ export function ProfileForm({
     defaultValues,
   });
 
+  function onClear() {
+    form.reset(emptyState);
+  }
+
   function onReset() {
     form.reset(defaultValues);
   }
+
+  const isGroup = profileFormType === "create";
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -721,11 +734,16 @@ export function ProfileForm({
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-            <div className="flex space-x-2">
-              <Button type="button" variant="destructive" onClick={onReset}>
+            <div className="flex justify-end space-x-2">
+              <Button type="button" variant="destructive" onClick={onClear}>
                 Clear
               </Button>
-              <Button type="submit">Submit</Button>
+              <Button type="button" variant="secondary" onClick={onReset}>
+                Reset
+              </Button>
+              <Button type="submit" variant="success">
+                {getSubmitButtonLabel(profileFormType)}
+              </Button>
             </div>
           </form>
         </Form>
