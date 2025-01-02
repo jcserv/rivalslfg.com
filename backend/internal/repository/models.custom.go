@@ -19,8 +19,10 @@ type GroupWithPlayers struct {
 	GroupDTO
 
 	// Computed fields
-	Name    string          `json:"name"`
-	Size    int             `json:"size"`
+	Name         string    `json:"name"`
+	Size         int       `json:"size"`
+	LastActiveAt time.Time `json:"lastActiveAt"`
+
 	Players []PlayerInGroup `json:"players"`
 }
 

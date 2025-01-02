@@ -94,6 +94,7 @@ func parseSorting(args *repository.GetGroupsParams, sorters []httputil.Sort) err
 func parsePagination(args *repository.GetGroupsParams, paginateBy *httputil.OffsetPagination) error {
 	args.Limit = paginateBy.Limit
 	args.Offset = paginateBy.Offset
+	args.Count = paginateBy.Count
 	return nil
 }
 

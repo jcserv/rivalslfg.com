@@ -3,14 +3,14 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchGroup, fetchGroups, rivalsStoreKeys, upsertGroup } from "@/api";
 import { Group, Profile } from "@/types";
 
-export function useGroups(): [Group[] | undefined, boolean, Error | null] {
-  const query = useQuery({
-    queryKey: rivalsStoreKeys.groups,
-    queryFn: () => fetchGroups(),
-    staleTime: 0,
-  });
+import { usePagination } from "./paginate";
 
-  return [query.data, query.isLoading, query.error];
+export function useGroups() {
+  return usePagination({
+    queryKey: rivalsStoreKeys.groups,
+    queryFn: ({ limit, offset }) => fetchGroups({ limit, offset }),
+    initialState: { pageSize: 10 },
+  });
 }
 
 export function useGroup(

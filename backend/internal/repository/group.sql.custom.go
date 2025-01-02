@@ -28,6 +28,19 @@ SELECT
     ) AS group_settings,
     players,
     jsonb_array_length(players) AS size,
+	CASE WHEN $7 = true THEN (
+        SELECT COUNT(*)
+        FROM Groups g2
+        WHERE ($1 = '' OR g2.region = $1)
+          AND ($2 = '' OR g2.gamemode = $2)
+          AND ($3 = '' OR
+            CASE 
+                WHEN LOWER($3) = 'true' THEN g2.open = true
+                WHEN LOWER($3) = 'false' THEN g2.open = false
+                ELSE TRUE
+            END
+          )
+    ) ELSE 0 END as total_count,
 	last_active_at
 FROM Groups g
 WHERE ($1 = '' OR g.region = $1)
@@ -52,18 +65,55 @@ type GetGroupsParams struct {
 	SizeSort       string `json:"sizeSort"`
 	Limit          int    `json:"limit"`
 	Offset         int    `json:"offset"`
+	Count          bool   `json:"count"`
 }
 
-func (q *Queries) GetGroups(ctx context.Context, arg GetGroupsParams) ([]GroupWithPlayers, error) {
-	rows, err := q.db.Query(ctx, getGroups, arg.RegionFilter, arg.GamemodeFilter, arg.OpenFilter, arg.SizeSort, arg.Limit, arg.Offset)
+type GetGroupsRow struct {
+	GroupWithPlayers
+	TotalCount int32 `json:"totalCount"`
+}
+
+func (g *GetGroupsRow) ToGroupWithPlayers() GroupWithPlayers {
+	return GroupWithPlayers{
+		GroupDTO: GroupDTO{
+			ID:            g.ID,
+			CommunityID:   g.CommunityID,
+			Owner:         g.Owner,
+			Region:        g.Region,
+			Gamemode:      g.Gamemode,
+			Open:          g.Open,
+			Passcode:      g.Passcode,
+			RoleQueue:     g.RoleQueue,
+			GroupSettings: g.GroupSettings,
+			LastActiveAt:  g.LastActiveAt,
+		},
+		Name:         g.Name,
+		Size:         g.Size,
+		Players:      g.Players,
+		LastActiveAt: g.LastActiveAt,
+	}
+}
+
+type GetGroupsResult struct {
+	Groups     []GroupWithPlayers `json:"groups"`
+	TotalCount int32              `json:"totalCount"`
+}
+
+func (q *Queries) GetGroups(ctx context.Context, arg GetGroupsParams) (*GetGroupsResult, error) {
+	rows, err := q.db.Query(ctx, getGroups, arg.RegionFilter, arg.GamemodeFilter, arg.OpenFilter,
+		arg.SizeSort, arg.Limit, arg.Offset, arg.Count)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	result := make([]GroupWithPlayers, 0)
+	result := &GetGroupsResult{
+		Groups:     make([]GroupWithPlayers, 0),
+		TotalCount: 0,
+	}
+
 	for rows.Next() {
-		var g GroupWithPlayers
+		var g GetGroupsRow
 		if err := rows.Scan(
 			&g.ID,
 			&g.CommunityID,
@@ -75,12 +125,14 @@ func (q *Queries) GetGroups(ctx context.Context, arg GetGroupsParams) ([]GroupWi
 			&g.GroupSettings,
 			&g.Players,
 			&g.Size,
+			&g.TotalCount,
 			&g.LastActiveAt,
 		); err != nil {
 			return nil, err
 		}
 		g.Name = fmt.Sprintf("%s's Group", g.Owner)
-		result = append(result, g)
+		result.TotalCount = g.TotalCount
+		result.Groups = append(result.Groups, g.ToGroupWithPlayers())
 	}
 	return result, nil
 }
@@ -104,7 +156,7 @@ SELECT
 		'mic', g.mic
 	) AS group_settings,
 	players,
-	jsonb_array_length(players, 1) AS size,
+	jsonb_array_length(players) AS size,
 	last_active_at
 FROM Groups g
 WHERE g.id = $1`

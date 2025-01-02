@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/jcserv/rivalslfg/internal/services"
@@ -82,10 +83,14 @@ func (a *API) GetGroups() http.HandlerFunc {
 			return
 		}
 
-		groups, err := a.groupService.GetGroups(ctx, *args)
+		groups, totalCount, err := a.groupService.GetGroups(ctx, *args)
 		if err != nil {
 			httputil.InternalServerError(ctx, w, err)
 			return
+		}
+
+		if queryParams.PaginateBy.Count {
+			w.Header().Set("X-Total-Count", strconv.FormatInt(int64(totalCount), 10))
 		}
 
 		httputil.OK(w, groups)

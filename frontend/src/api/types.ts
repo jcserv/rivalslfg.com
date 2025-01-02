@@ -11,3 +11,8 @@ export const StatusCodes: Record<string, StatusCode> = {
   NotFound: 404,
   InternalServerError: 500,
 };
+
+export type PaginationParams = {
+  limit: number;
+  offset: number;
+};

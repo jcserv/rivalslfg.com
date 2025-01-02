@@ -1,7 +1,17 @@
-import { rivalslfgStore, rivalsStoreActions } from "@/api/rivalslfg/store";
+import {
+  PaginationParams,
+  rivalslfgStore,
+  rivalsStoreActions,
+  StatusCode,
+  StatusCodes,
+} from "@/api";
 import { rivalslfgAPIClient } from "@/routes/__root";
-import { getGroupFromProfile, Group, Profile } from "@/types";
-import { StatusCode, StatusCodes } from "@/types/http";
+import {
+  getGroupFromProfile,
+  Group,
+  PaginatedQueryFnResponse,
+  Profile,
+} from "@/types";
 
 export const upsertGroup = async (
   profile: Profile,
@@ -16,10 +26,12 @@ export const upsertGroup = async (
   return groupId;
 };
 
-export const fetchGroups = async (): Promise<Group[]> => {
-  const groups = await rivalslfgAPIClient.getGroups();
+export const fetchGroups = async (
+  pagination?: PaginationParams,
+): PaginatedQueryFnResponse<Group> => {
+  const { groups, totalCount } = await rivalslfgAPIClient.getGroups(pagination);
   rivalsStoreActions.setGroups(groups);
-  return groups;
+  return { data: groups, totalCount };
 };
 
 export const fetchGroup = async (id: string): Promise<Group | undefined> => {

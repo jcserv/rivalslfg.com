@@ -83,6 +83,8 @@ func (s *Service) StartHTTP(ctx context.Context) error {
 	origins := handlers.AllowedOrigins([]string{os.Getenv("ORIGIN_ALLOWED")})
 	methods := handlers.AllowedMethods([]string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions})
 
-	http.ListenAndServe(fmt.Sprintf(":%s", s.cfg.HTTPPort), handlers.CORS(origins, headers, methods)(r))
+	exposedHeaders := handlers.ExposedHeaders([]string{"X-Requested-With", "Content-Type", "X-Total-Count"})
+
+	http.ListenAndServe(fmt.Sprintf(":%s", s.cfg.HTTPPort), handlers.CORS(origins, headers, methods, exposedHeaders)(r))
 	return nil
 }

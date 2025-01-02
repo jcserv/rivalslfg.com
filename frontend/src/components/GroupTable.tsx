@@ -2,18 +2,26 @@ import { useMemo } from "react";
 
 import { columns } from "@/components/GroupTable.Columns";
 import { DataTable } from "@/components/ui";
-import { areRequirementsMet, getRequirements, Group, Profile } from "@/types";
+import {
+  areRequirementsMet,
+  getRequirements,
+  Group,
+  PaginationState,
+  Profile,
+} from "@/types";
 
 interface GroupTableProps {
   groups: Group[];
   profile: Profile | undefined;
   isProfileEmpty: boolean;
+  pagination?: PaginationState;
 }
 
 export function GroupTable({
   groups,
   profile,
   isProfileEmpty,
+  pagination,
 }: GroupTableProps) {
   const groupTableData = useMemo(() => {
     return groups.map((group) => {
@@ -35,7 +43,11 @@ export function GroupTable({
             <h2 className="text-2xl font-bold tracking-tight">Groups</h2>
           </div>
         </div>
-        <DataTable data={groupTableData} columns={columns(isProfileEmpty)} />
+        <DataTable
+          data={groupTableData}
+          columns={columns(isProfileEmpty)}
+          pagination={pagination}
+        />
       </div>
     </>
   );

@@ -9,7 +9,7 @@ export const Route = createLazyFileRoute("/browse")({
 
 function BrowsePage() {
   const [profile] = useProfile();
-  const [groups, isLoadingGroups] = useGroups();
+  const { data: groups, pagination, isLoading: isLoadingGroups } = useGroups();
 
   const isProfileEmpty = !profile || Object.keys(profile).length === 0;
   const isLoading = isLoadingGroups;
@@ -34,6 +34,7 @@ function BrowsePage() {
             groups={!isLoading && groups ? groups : []}
             profile={profile}
             isProfileEmpty={isProfileEmpty}
+            pagination={pagination}
           />
         </div>
       </div>

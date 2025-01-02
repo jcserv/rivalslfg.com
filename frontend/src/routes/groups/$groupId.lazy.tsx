@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { createLazyFileRoute } from "@tanstack/react-router";
 
+import { StatusCodes } from "@/api";
 import {
   AccessGroupDialog,
   ChatBox,
@@ -17,7 +18,7 @@ import {
   useRemovePlayer,
   useToast,
 } from "@/hooks";
-import { getPlayerFromProfile, Group, Profile, StatusCodes } from "@/types";
+import { getPlayerFromProfile, Group, Profile } from "@/types";
 
 export const Route = createLazyFileRoute("/groups/$groupId")({
   component: GroupPage,

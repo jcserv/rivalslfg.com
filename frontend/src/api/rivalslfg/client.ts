@@ -1,6 +1,10 @@
-import { HTTPClient } from "@/api/base/client";
-import { getGroupFromProfile, Group, Profile } from "@/types";
-import { StatusCode, StatusCodes } from "@/types/http";
+import { HTTPClient, PaginationParams, StatusCode, StatusCodes } from "@/api";
+import {
+  getGroupFromProfile,
+  Group,
+  PaginatedGroupsResponse,
+  Profile,
+} from "@/types";
 
 export class RivalsLFGClient extends HTTPClient {
   private readonly baseURL: string;
@@ -33,16 +37,35 @@ export class RivalsLFGClient extends HTTPClient {
     }
   }
 
-  async getGroups(): Promise<Group[]> {
+  async getGroups(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedGroupsResponse> {
     try {
+      const params = new URLSearchParams();
+      if (pagination) {
+        params.set("limit", pagination.limit.toString());
+        params.set("offset", pagination.offset.toString());
+        params.set("count", "true");
+      }
+
       const response = await this.fetchWithRetry(
-        `${this.baseURL}/api/v1/groups`,
+        `${this.baseURL}/api/v1/groups?${params.toString()}`,
       );
+      const totalCount = parseInt(response.headers.get("X-Total-Count") ?? "0");
       const data = await response.json();
-      return data;
+
+      return {
+        groups: data ?? [],
+        pageCount: Math.ceil(data.totalCount / (pagination?.limit || 10)),
+        totalCount,
+      };
     } catch (error) {
       console.error("Error fetching groups", error);
-      return [];
+      return {
+        groups: [],
+        pageCount: 0,
+        totalCount: 0,
+      };
     }
   }
 
