@@ -28,12 +28,12 @@ this folder contains the backend for [rivalslfg](https://rivalslfg.vercel.app/),
 ## todo
 
 1. [X] List Groups
-   - [ ] Filter by: (*)
+   - [X] Filter by: (*)
      -  Region `/v1/groups?filter=region eq "na"`
      -  Gamemode `/v1/groups?filter=gamemode eq "competitive"`
      -  Requirements Met (provided player info) `/v1/groups?filter=requirementsMet eq true`
 
-     -  Visibility
+     -  [X] Visibility
      -  Platform
      -  Gamemode
      -  Size
@@ -43,9 +43,9 @@ this folder contains the backend for [rivalslfg](https://rivalslfg.vercel.app/),
        - Mic
 2. [X] Upsert Group
 3. [ ] Delete Group
-4. [ ] Join Group (if private, authenticate provided passcode)
-5. [ ] Remove Player from Group
-6. [ ] Leave Group
+4. [X] Join Group (if private, authenticate provided passcode)
+5. [X] Remove Player from Group
+6. [X] Leave Group
 
 7. Chat
 
@@ -59,6 +59,8 @@ this folder contains the backend for [rivalslfg](https://rivalslfg.vercel.app/),
 
 Bugs:
 - No auth right now, so users can modify other users' info if they know their id
+- prevent group creation if user already has group
+- supported filters/sorters for ParseQueryParams
 
 Before release:
 - [ ] Squash migrations into one, remove seed data
@@ -66,4 +68,4 @@ Before release:
 * indicates these are good first issues
 
 tweaks:
-- add group count field to group table? (can be derived from players json but not sure if that's a performance issue)
+- [X] add group count field to group table? (can be derived from players json but not sure if that's a performance issue)

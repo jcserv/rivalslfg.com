@@ -1,9 +1,11 @@
-import { HTTPClient, PaginationParams, StatusCode, StatusCodes } from "@/api";
+import { HTTPClient, StatusCode, StatusCodes } from "@/api";
 import {
   getGroupFromProfile,
   Group,
   PaginatedGroupsResponse,
   Profile,
+  QueryParams,
+  toURLSearchParams,
 } from "@/types";
 
 export class RivalsLFGClient extends HTTPClient {
@@ -37,17 +39,9 @@ export class RivalsLFGClient extends HTTPClient {
     }
   }
 
-  async getGroups(
-    pagination?: PaginationParams,
-  ): Promise<PaginatedGroupsResponse> {
+  async getGroups(query?: QueryParams): Promise<PaginatedGroupsResponse> {
     try {
-      const params = new URLSearchParams();
-      if (pagination) {
-        params.set("limit", pagination.limit.toString());
-        params.set("offset", pagination.offset.toString());
-        params.set("count", "true");
-      }
-
+      const params = query ? toURLSearchParams(query) : new URLSearchParams();
       const response = await this.fetchWithRetry(
         `${this.baseURL}/api/v1/groups?${params.toString()}`,
       );
@@ -56,7 +50,7 @@ export class RivalsLFGClient extends HTTPClient {
 
       return {
         groups: data ?? [],
-        pageCount: Math.ceil(data.totalCount / (pagination?.limit || 10)),
+        pageCount: Math.ceil(totalCount / (query?.paginateBy?.limit || 10)),
         totalCount,
       };
     } catch (error) {

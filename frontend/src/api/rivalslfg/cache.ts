@@ -1,5 +1,4 @@
 import {
-  PaginationParams,
   rivalslfgStore,
   rivalsStoreActions,
   StatusCode,
@@ -11,6 +10,7 @@ import {
   Group,
   PaginatedQueryFnResponse,
   Profile,
+  QueryParams,
 } from "@/types";
 
 export const upsertGroup = async (
@@ -27,9 +27,9 @@ export const upsertGroup = async (
 };
 
 export const fetchGroups = async (
-  pagination?: PaginationParams,
+  query?: QueryParams,
 ): PaginatedQueryFnResponse<Group> => {
-  const { groups, totalCount } = await rivalslfgAPIClient.getGroups(pagination);
+  const { groups, totalCount } = await rivalslfgAPIClient.getGroups(query);
   rivalsStoreActions.setGroups(groups);
   return { data: groups, totalCount };
 };

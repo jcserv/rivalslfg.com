@@ -37,7 +37,7 @@ FE-Only:
   - / ?
   - Allowed: . - \_ ' < >
 - [x] Group should be private by default
-- [ ] Chat
+- [x] Chat
 - [ ] Matchmaking
 - [ ] Set default filters based on user profile (region=, gamemode=, canjoin=) (\*)
 - [ ] Filter or sort characters based on selected roles
@@ -52,7 +52,7 @@ API Integration:
 - [x] Integrate Create Group Form
 - [x] Integrate Profile Form
 - [x] Integrate Browse Page
-- [ ] Browse Page Pagination & Filtering (\*)
+- [x] Browse Page Pagination & Filtering (\*)
 - [x] Integrate Group Page
 - [x] Integrate Join Group
 - [x] Integrate remove player from group

@@ -35,9 +35,11 @@ export function usePagination<TData>({
     queryKey: getQueryKey(baseQueryKey, { pageSize, pageIndex }),
     queryFn: async () => {
       const response = await queryFn({
-        limit: pageSize,
-        offset: pageIndex * pageSize,
-        count: totalCount === null, // Only request total count on first load
+        paginateBy: {
+          limit: pageSize,
+          offset: pageIndex * pageSize,
+          count: totalCount === null, // Only request total count on first load
+        },
       });
 
       if (totalCount === null && response.totalCount) {
@@ -61,9 +63,11 @@ export function usePagination<TData>({
         queryKey: nextPageKey,
         queryFn: async () =>
           queryFn({
-            limit: pageSize,
-            offset: targetPageIndex * pageSize,
-            count: false,
+            paginateBy: {
+              limit: pageSize,
+              offset: targetPageIndex * pageSize,
+              count: false,
+            },
           }),
         staleTime: 60000,
       });

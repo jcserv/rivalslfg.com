@@ -128,7 +128,7 @@ export function DataTable<TData, TValue>({
               Array.from({ length: pagination?.pageSize || 10 }, (_, index) => (
                 <TableRow key={`loading-${index}`} isLoading>
                   {columns.map((column) => (
-                    <TableCell key={column.id}></TableCell>
+                    <TableCell key={`col-${column.id}`}></TableCell>
                   ))}
                 </TableRow>
               ))

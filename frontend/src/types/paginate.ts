@@ -1,8 +1,14 @@
-export type PaginatedQueryFn<TData> = (params: {
+import { QueryParams } from "./query";
+
+export type OffsetPagination = {
   limit: number;
   offset: number;
-  count: boolean;
-}) => PaginatedQueryFnResponse<TData>;
+  count?: boolean;
+};
+
+export type PaginatedQueryFn<TData> = (
+  params: QueryParams,
+) => PaginatedQueryFnResponse<TData>;
 
 export type PaginatedQueryFnResponse<TData> = Promise<{
   data: TData[];
