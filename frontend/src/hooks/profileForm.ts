@@ -67,8 +67,7 @@ export function useProfileForm({
         variant: "success",
       });
       router.navigate({ to: `/groups/${groupId}` });
-    } catch (error) {
-      console.error("Form submission error", error);
+    } catch {
       toast({
         title: "Failed to save preferences",
         description: "Please try again.",

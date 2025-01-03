@@ -1,3 +1,5 @@
+import { ColumnFilter } from "@tanstack/react-table";
+
 import { QueryParams } from "./query";
 
 export type OffsetPagination = {
@@ -22,10 +24,12 @@ export interface PaginationState {
   totalCount: number | null;
   setPageSize: (size: number) => void;
   setPageIndex: (index: number) => void;
+  setFilters: (filters: ColumnFilter[]) => void;
   canPreviousPage: boolean;
   canNextPage: boolean;
   previousPage: () => void;
   nextPage: () => void;
   firstPage: () => void;
   lastPage: () => void;
+  refetch: () => void;
 }

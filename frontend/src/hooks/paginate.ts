@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
+import { ColumnFiltersState } from "@tanstack/react-table";
 
 import { queryClient } from "@/routes/__root";
+import { getFilterBy } from "@/types";
 import { PaginatedQueryFn } from "@/types/paginate";
 
 interface PaginationState {
   pageSize: number;
   pageIndex: number;
+  filters?: ColumnFiltersState;
 }
 
 interface PaginationOptions<TData> {
@@ -18,8 +21,13 @@ interface PaginationOptions<TData> {
 
 const getQueryKey = (
   base: readonly string[],
-  { pageSize, pageIndex }: PaginationState,
-) => [...base, pageSize, pageIndex];
+  { pageSize, pageIndex, filters }: PaginationState,
+) => [
+  ...base,
+  pageSize,
+  pageIndex,
+  ...(filters?.map((f) => [f.id, f.value]) ?? []),
+];
 
 export function usePagination<TData>({
   queryKey: baseQueryKey,
@@ -28,11 +36,12 @@ export function usePagination<TData>({
 }: PaginationOptions<TData>) {
   const [pageSize, setPageSize] = useState(initialState?.pageSize || 10);
   const [pageIndex, setPageIndex] = useState(initialState?.pageIndex || 0);
+  const [filters, setFilters] = useState<ColumnFiltersState>([]);
   const [totalCount, setTotalCount] = useState<number | null>(null);
 
   // Current page query
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: getQueryKey(baseQueryKey, { pageSize, pageIndex }),
+    queryKey: getQueryKey(baseQueryKey, { pageSize, pageIndex, filters }),
     queryFn: async () => {
       const response = await queryFn({
         paginateBy: {
@@ -40,6 +49,7 @@ export function usePagination<TData>({
           offset: pageIndex * pageSize,
           count: totalCount === null, // Only request total count on first load
         },
+        filterBy: getFilterBy(filters),
       });
 
       if (totalCount === null && response.totalCount) {
@@ -108,6 +118,7 @@ export function usePagination<TData>({
         setPageIndex(0);
       },
       setPageIndex,
+      setFilters,
       canPreviousPage: pageIndex > 0,
       canNextPage: pageIndex < pageCount - 1,
       previousPage: () => setPageIndex((old) => Math.max(0, old - 1)),
@@ -115,6 +126,7 @@ export function usePagination<TData>({
       firstPage: () => setPageIndex(0),
       lastPage: () => setPageIndex(Math.max(0, pageCount - 1)),
       prefetchPage,
+      refetch,
     },
     isLoading,
     error,

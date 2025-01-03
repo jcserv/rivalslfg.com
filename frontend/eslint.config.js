@@ -19,12 +19,12 @@ export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
-  { rules: { "react/react-in-jsx-scope": "off" } },
   {
     plugins: {
       "simple-import-sort": simpleImportSort,
     },
     rules: {
+      "no-console": "error",
       "simple-import-sort/imports": [
         "error",
         {

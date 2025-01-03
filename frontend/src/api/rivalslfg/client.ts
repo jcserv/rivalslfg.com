@@ -33,8 +33,7 @@ export class RivalsLFGClient extends HTTPClient {
 
       const data = await response.json();
       return data.id || "";
-    } catch (error) {
-      console.error("Error creating/updating group:", error);
+    } catch {
       return "";
     }
   }
@@ -53,8 +52,7 @@ export class RivalsLFGClient extends HTTPClient {
         pageCount: Math.ceil(totalCount / (query?.paginateBy?.limit || 10)),
         totalCount,
       };
-    } catch (error) {
-      console.error("Error fetching groups", error);
+    } catch {
       return {
         groups: [],
         pageCount: 0,
@@ -70,8 +68,7 @@ export class RivalsLFGClient extends HTTPClient {
       );
       const data = await response.json();
       return data;
-    } catch (error) {
-      console.error("Error fetching group with id", error);
+    } catch {
       return undefined;
     }
   }
@@ -96,8 +93,7 @@ export class RivalsLFGClient extends HTTPClient {
         },
       );
       return response.status as StatusCode;
-    } catch (error) {
-      console.error("Error joining group", error);
+    } catch {
       return StatusCodes.InternalServerError as StatusCode;
     }
   }
@@ -123,8 +119,7 @@ export class RivalsLFGClient extends HTTPClient {
         },
       );
       return response.status as StatusCode;
-    } catch (error) {
-      console.error("Error removing player from group", error);
+    } catch {
       return StatusCodes.InternalServerError as StatusCode;
     }
   }

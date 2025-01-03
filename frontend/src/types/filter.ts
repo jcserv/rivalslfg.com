@@ -1,3 +1,5 @@
+import { ColumnFiltersState } from "@tanstack/react-table";
+
 type FilterOp = "eq";
 
 export interface Filter {
@@ -21,4 +23,12 @@ export function buildFilterQuery(filters: Filter[]): string {
     .join(" and ");
 
   return filterString;
+}
+
+export function getFilterBy(filters: ColumnFiltersState): Filter[] {
+  return filters.map((f) => ({
+    field: f.id,
+    op: "eq",
+    value: f.value,
+  }));
 }

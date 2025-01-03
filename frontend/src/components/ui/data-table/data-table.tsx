@@ -46,6 +46,13 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
+
+  React.useEffect(() => {
+    if (pagination?.setFilters) {
+      pagination.setFilters(columnFilters);
+    }
+  }, [columnFilters]);
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const table = useReactTable({
     data,
@@ -69,13 +76,29 @@ export function DataTable<TData, TValue>({
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    ...(!pagination ? { getPaginationRowModel: getPaginationRowModel() } : {}),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    manualPagination: pagination ? true : false,
-    ...(pagination ? { rowCount: pagination.totalCount ?? 0 } : {}),
+    ...(pagination
+      ? {
+          rowCount: pagination.totalCount ?? 0,
+          getPaginationRowModel: getPaginationRowModel(),
+          manualPagination: true,
+          manualFiltering: true,
+        }
+      : {
+          getPaginationRowModel: getPaginationRowModel(),
+          manualPagination: false,
+          manualFiltering: false,
+        }),
   });
+
+  // Trigger refetch when filters change
+  React.useEffect(() => {
+    if (pagination?.refetch) {
+      pagination.refetch();
+    }
+  }, [columnFilters]);
 
   return (
     <div className="space-y-4">
