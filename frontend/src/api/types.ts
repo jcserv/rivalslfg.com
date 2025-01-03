@@ -16,3 +16,7 @@ export type PaginationParams = {
   limit: number;
   offset: number;
 };
+
+export function toString(p: PaginationParams): string {
+  return `${p.limit}-${p.offset}`;
+}

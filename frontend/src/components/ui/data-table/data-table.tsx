@@ -47,7 +47,6 @@ export function DataTable<TData, TValue>({
     [],
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
-
   const table = useReactTable({
     data,
     columns,
@@ -70,11 +69,12 @@ export function DataTable<TData, TValue>({
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    ...(!pagination ? { getPaginationRowModel: getPaginationRowModel() } : {}),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     manualPagination: pagination ? true : false,
+    ...(pagination ? { rowCount: pagination.totalCount ?? 0 } : {}),
   });
 
   return (
@@ -89,7 +89,6 @@ export function DataTable<TData, TValue>({
           />
         }
       />
-
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -113,11 +112,7 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  isLoading={isLoading}
-                >
+                <TableRow key={row.id} isLoading={isLoading}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
@@ -125,6 +120,15 @@ export function DataTable<TData, TValue>({
                         cell.getContext(),
                       )}
                     </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : isLoading ? (
+              // Render dummy rows when data is loading
+              Array.from({ length: pagination?.pageSize || 10 }, (_, index) => (
+                <TableRow key={`loading-${index}`} isLoading>
+                  {columns.map((column) => (
+                    <TableCell key={column.id}></TableCell>
                   ))}
                 </TableRow>
               ))

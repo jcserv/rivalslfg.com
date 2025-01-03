@@ -8,7 +8,9 @@ import { usePagination } from "./paginate";
 export function useGroups() {
   return usePagination({
     queryKey: rivalsStoreKeys.groups,
-    queryFn: ({ limit, offset }) => fetchGroups({ limit, offset }),
+    queryFn: async ({ limit, offset }) => {
+      return await fetchGroups({ limit, offset });
+    },
     initialState: { pageSize: 10 },
   });
 }

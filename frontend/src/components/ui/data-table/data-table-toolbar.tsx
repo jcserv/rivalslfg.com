@@ -26,7 +26,7 @@ export function DataTableToolbar<TData>({
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
-          className="h-8 w-[150px] lg:w-[250px]"
+          className="h-8 w-[150px] lg:w-[175px]"
         />
         {table.getColumn("region") && (
           <DataTableFacetedFilter
@@ -59,8 +59,8 @@ export function DataTableToolbar<TData>({
             <X />
           </Button>
         )}
-        {rightAdornment}
       </div>
+      {rightAdornment}
     </div>
   );
 }
