@@ -39,6 +39,9 @@ export function usePagination<TData>({
   const [filters, setFilters] = useState<ColumnFiltersState>([]);
   const [totalCount, setTotalCount] = useState<number | null>(null);
 
+  // Only request total count on first load, or if filters change
+  const [shouldFetchCount, setShouldFetchCount] = useState(true);
+
   // Current page query
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: getQueryKey(baseQueryKey, { pageSize, pageIndex, filters }),
@@ -47,13 +50,14 @@ export function usePagination<TData>({
         paginateBy: {
           limit: pageSize,
           offset: pageIndex * pageSize,
-          count: totalCount === null, // Only request total count on first load
+          count: shouldFetchCount, 
         },
         filterBy: getFilterBy(filters),
       });
 
-      if (totalCount === null && response.totalCount) {
+      if (shouldFetchCount && response.totalCount !== undefined) {
         setTotalCount(response.totalCount);
+        setShouldFetchCount(false);
       }
 
       return response;
@@ -67,6 +71,7 @@ export function usePagination<TData>({
       const nextPageKey = getQueryKey(baseQueryKey, {
         pageSize,
         pageIndex: targetPageIndex,
+        filters,
       });
 
       await queryClient.prefetchQuery({
@@ -78,6 +83,7 @@ export function usePagination<TData>({
               offset: targetPageIndex * pageSize,
               count: false,
             },
+            filterBy: getFilterBy(filters),
           }),
         staleTime: 60000,
       });
@@ -116,9 +122,13 @@ export function usePagination<TData>({
       setPageSize: (size: number) => {
         setPageSize(size);
         setPageIndex(0);
+        setShouldFetchCount(true);
       },
       setPageIndex,
-      setFilters,
+      setFilters: (filters: ColumnFiltersState) => {
+        setFilters(filters);
+        setShouldFetchCount(true);
+      },
       canPreviousPage: pageIndex > 0,
       canNextPage: pageIndex < pageCount - 1,
       previousPage: () => setPageIndex((old) => Math.max(0, old - 1)),
