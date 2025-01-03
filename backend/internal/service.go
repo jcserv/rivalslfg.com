@@ -6,9 +6,10 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/gorilla/handlers"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jcserv/rivalslfg/internal/repository"
 	"github.com/jcserv/rivalslfg/internal/services"
 	_http "github.com/jcserv/rivalslfg/internal/transport/http"
@@ -60,20 +61,39 @@ func (s *Service) Run() error {
 	return nil
 }
 
-func (s *Service) ConnectDB(ctx context.Context) (*pgx.Conn, error) {
-	conn, err := pgx.Connect(context.Background(), s.cfg.DatabaseURL)
+func (s *Service) ConnectDB(ctx context.Context) (*pgxpool.Pool, error) {
+	config, err := pgxpool.ParseConfig(s.cfg.DatabaseURL)
 	if err != nil {
+		return nil, err
+	}
+
+	config.MaxConns = 25
+	config.MinConns = 5
+	config.MaxConnLifetime = time.Hour
+	config.MaxConnIdleTime = 30 * time.Minute
+
+	pool, err := pgxpool.NewWithConfig(ctx, config)
+	if err != nil {
+		return nil, err
+	}
+	if err := pool.Ping(ctx); err != nil {
 		return nil, err
 	}
 	log.Info(ctx, "Connection established to database")
 
+	conn, err := pool.Acquire(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Release()
+
 	customDataTypes := []string{"RankName", "RankID", "Rank"}
 	for _, typeName := range customDataTypes {
-		dataType, _ := conn.LoadType(ctx, typeName)
-		conn.TypeMap().RegisterType(dataType)
+		dataType, _ := conn.Conn().LoadType(ctx, typeName)
+		conn.Conn().TypeMap().RegisterType(dataType)
 	}
 
-	return conn, nil
+	return pool, nil
 }
 
 func (s *Service) StartHTTP(ctx context.Context) error {
