@@ -8,43 +8,42 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTokenService(t *testing.T) {
-	service := NewTokenService("test-secret")
+var mockSecretKey = []byte("test-secret")
 
+func TestTokenService(t *testing.T) {
 	t.Run("GenerateToken", func(t *testing.T) {
-		// Test valid token generation
 		t.Run("ValidInput", func(t *testing.T) {
-			token, err := service.GenerateToken("user123", true)
+			token, err := GenerateToken("1", map[string]string{
+				"playerId": "1",
+				"groupId":  "AAAA",
+			})
 			assert.NoError(t, err)
 			assert.NotEmpty(t, token)
 		})
 	})
 
 	t.Run("ValidateToken", func(t *testing.T) {
-		// Test valid token validation
 		t.Run("ValidToken", func(t *testing.T) {
-			token, _ := service.GenerateToken("user123", true)
-			claims, err := service.ValidateToken(token)
+			token, _ := GenerateToken("1", map[string]string{
+				"playerId": "1",
+				"groupId":  "AAAA",
+			})
+			claims, err := ValidateToken(token)
 			assert.NoError(t, err)
 
 			subject, err := claims.GetSubject()
 			assert.NoError(t, err)
-			assert.Equal(t, "user123", subject)
-
-			// assert.NoError(t, err)
-			// assert.NotNil(t, claims["rights"])
+			assert.Equal(t, "1", subject)
 		})
 
-		// Test expired token
 		t.Run("ExpiredToken", func(t *testing.T) {
-			expiredToken := createExpiredToken(service.secretKey)
-			_, err := service.ValidateToken(expiredToken)
+			expiredToken := createExpiredToken(mockSecretKey)
+			_, err := ValidateToken(expiredToken)
 			assert.Error(t, err)
 		})
 
-		// Test invalid token
 		t.Run("InvalidToken", func(t *testing.T) {
-			_, err := service.ValidateToken("invalid-token")
+			_, err := ValidateToken("invalid-token")
 			assert.Error(t, err)
 		})
 	})
@@ -52,7 +51,7 @@ func TestTokenService(t *testing.T) {
 
 func createExpiredToken(secretKey []byte) string {
 	claims := jwt.MapClaims{
-		"sub": "user123",
+		"sub": "1",
 		"exp": time.Now().Add(-24 * time.Hour).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

@@ -32,6 +32,10 @@ func Forbidden(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusForbidden)
 }
 
+func Unauthorized(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusUnauthorized)
+}
+
 func InternalServerError(ctx context.Context, w http.ResponseWriter, err error) {
 	log.Error(ctx, err.Error())
 	w.WriteHeader(http.StatusInternalServerError)

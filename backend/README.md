@@ -18,6 +18,7 @@ this folder contains the backend for [rivalslfg](https://rivalslfg.vercel.app/),
   - [postgres](https://www.postgresql.org/)
   - [flyctl](https://fly.io/docs/flyctl/installing/)
   - [postico](https://eggerapps.at/postico2/)
+  - [godepgraph](https://github.com/kisielk/godepgraph)
 
 ### running locally
 

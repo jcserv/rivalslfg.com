@@ -37,12 +37,24 @@ func NewAPI(authService services.IAuth, groupService services.IGroup) *API {
 }
 
 func (a *API) RegisterRoutes(r *mux.Router) {
+	r.HandleFunc(groups,
+		middleware.RequireOwnership("group", "", &UpsertGroup{})(
+			a.UpsertGroup(),
+		),
+	)
+
 	r.HandleFunc(groups, a.UpsertGroup()).Methods(http.MethodPost)
 	r.HandleFunc(group, a.GetGroupByID()).Methods(http.MethodGet)
 	r.HandleFunc(groups, a.GetGroups()).Methods(http.MethodGet)
-	r.HandleFunc(groups, middleware.RequireRight(auth.RightDeleteGroup)(a.DeleteGroup())).Methods(http.MethodDelete)
+	r.HandleFunc(groups, a.DeleteGroup()).Methods(http.MethodDelete)
 
 	r.HandleFunc(playaz, a.CreatePlayer()).Methods(http.MethodPost)
 	r.HandleFunc(player, a.JoinGroup()).Methods(http.MethodPost)
-	r.HandleFunc(player, a.RemovePlayer()).Methods((http.MethodDelete))
+	r.HandleFunc(player,
+		middleware.RequireRight(auth.RightUpdateGroup)(
+			middleware.RequireOwnership("group", "id", nil)(
+				a.RemovePlayer(),
+			),
+		),
+	).Methods((http.MethodDelete))
 }

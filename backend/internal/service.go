@@ -11,7 +11,6 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/handlers"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/jcserv/rivalslfg/internal/repository"
 	"github.com/jcserv/rivalslfg/internal/services"
 	"github.com/jcserv/rivalslfg/internal/store"
@@ -52,7 +51,7 @@ func NewService() (*Service, error) {
 	store := store.New(client)
 
 	s.api = _http.NewAPI(
-		services.NewAuth(store, auth.NewTokenService(cfg.JWTSecretKey)),
+		services.NewAuth(store),
 		services.NewGroup(repo),
 	)
 	return s, nil

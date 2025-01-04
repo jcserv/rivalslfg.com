@@ -13,14 +13,12 @@ import (
 type Token string
 
 type Auth struct {
-	store        store.Store
-	tokenService *auth.TokenService
+	store store.Store
 }
 
-func NewAuth(store store.Store, tokenService *auth.TokenService) *Auth {
+func NewAuth(store store.Store) *Auth {
 	return &Auth{
-		store:        store,
-		tokenService: tokenService,
+		store: store,
 	}
 }
 
@@ -39,7 +37,9 @@ func (p *PlayerAuth) ToMap() map[string]interface{} {
 }
 
 func (s *Auth) CreateAuth(ctx context.Context, playerID string) (Token, error) {
-	token, err := s.tokenService.GenerateToken(playerID, true)
+	token, err := auth.GenerateToken(playerID, map[string]string{
+		"playerId": playerID,
+	})
 	if err != nil {
 		return "", err
 	}

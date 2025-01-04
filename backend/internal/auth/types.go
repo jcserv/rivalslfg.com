@@ -1,5 +1,7 @@
 package auth
 
+import "github.com/golang-jwt/jwt/v5"
+
 type Right string
 
 const (
@@ -16,4 +18,14 @@ const (
 
 func IsEqual(s string, r Right) bool {
 	return string(r) == s
+}
+
+func HasOwnership(claims jwt.MapClaims, resourceType string, resourceID string) bool {
+	switch resourceType {
+	case "player":
+		return claims["playerId"] == resourceID
+	case "group":
+		return claims["groupId"] == resourceID
+	}
+	return false
 }

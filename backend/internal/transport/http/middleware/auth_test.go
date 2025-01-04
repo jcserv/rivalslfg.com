@@ -13,7 +13,7 @@ import (
 func TestRequireRight(t *testing.T) {
 	t.Run("HasRight", func(t *testing.T) {
 		claims := jwt.MapClaims{
-			"sub":    "user123",
+			"sub":    "1",
 			"rights": []string{"user:read"},
 		}
 		req := httptest.NewRequest("GET", "/", nil)
@@ -30,7 +30,7 @@ func TestRequireRight(t *testing.T) {
 
 	t.Run("NoRight", func(t *testing.T) {
 		claims := jwt.MapClaims{
-			"sub":    "user123",
+			"sub":    "1",
 			"rights": []string{"user:write"},
 		}
 		req := httptest.NewRequest("GET", "/", nil)
