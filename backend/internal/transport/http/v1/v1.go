@@ -46,22 +46,18 @@ func (a *API) RegisterRoutes(r *mux.Router) {
 			AllowCreate:    true,
 		})(a.UpsertGroup()),
 	)
-
-	r.HandleFunc(groups, a.UpsertGroup()).Methods(http.MethodPost)
 	r.HandleFunc(group, a.GetGroupByID()).Methods(http.MethodGet)
 	r.HandleFunc(groups, a.GetGroups()).Methods(http.MethodGet)
-	r.HandleFunc(groups, a.DeleteGroup()).Methods(http.MethodDelete)
-
+	r.HandleFunc(groups,
+		middleware.RequireRight(auth.RightDeleteGroup)(
+			a.DeleteGroup(),
+		),
+	).Methods(http.MethodDelete)
 	r.HandleFunc(playaz, a.CreatePlayer()).Methods(http.MethodPost)
 	r.HandleFunc(player, a.JoinGroup()).Methods(http.MethodPost)
-
 	r.HandleFunc(player,
-		middleware.RequireAuth(middleware.AuthConfig{
-			ResourceType:   "group",
-			ResourceIDFrom: middleware.FromParam,
-			ParamName:      "id",
-			RequiredRight:  auth.RightUpdateGroup,
-			AllowCreate:    true,
-		})(a.RemovePlayer()),
+		middleware.RequireRight(
+			auth.RightLeaveGroup,
+		)(a.RemovePlayer()),
 	).Methods(http.MethodDelete)
 }

@@ -18,13 +18,6 @@ func GenerateToken(subject string, additionalClaims map[string]string, additiona
 		return "", err
 	}
 
-	baseRights := []Right{
-		RightReadUser,
-		RightUpdateUser,
-		RightDeleteUser,
-		RightCreateGroup,
-	}
-
 	rights := append(baseRights, additionalRights...)
 	claims := jwt.MapClaims{
 		"sub":    subject,

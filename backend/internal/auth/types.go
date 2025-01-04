@@ -1,6 +1,8 @@
 package auth
 
-import "github.com/golang-jwt/jwt/v5"
+import (
+	"github.com/golang-jwt/jwt/v5"
+)
 
 type Right string
 
@@ -13,8 +15,32 @@ const (
 	RightReadGroup   Right = "group:read"
 	RightUpdateGroup Right = "group:update"
 	RightDeleteGroup Right = "group:delete"
-	RightLeaveGroup  Right = "group:leave"
+
+	RightJoinGroup  Right = "group:join"
+	RightLeaveGroup Right = "group:leave"
 )
+
+// This is granted when a user joins a group, creates a group, or begins queuing up.
+var baseRights = []Right{
+	RightReadUser,
+	RightUpdateUser,
+	RightDeleteUser,
+	RightCreateGroup,
+	RightReadGroup,
+	RightJoinGroup,
+}
+
+var groupMemberRights = []Right{
+	RightLeaveGroup,
+}
+
+var groupOwnerRights = []Right{
+	RightUpdateGroup,
+	RightDeleteGroup,
+	RightLeaveGroup,
+}
+
+// TODO: How do we return the updated token after promoting a player?
 
 func IsEqual(s string, r Right) bool {
 	return string(r) == s
