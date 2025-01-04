@@ -26,14 +26,14 @@ const formSchema = z.object({
 interface GroupControlsProps {
   isGroupOpen: boolean;
   canUserAccessGroup: boolean | null;
+  passcode: string;
 }
 
 export function GroupControls({
   isGroupOpen,
   canUserAccessGroup,
+  passcode,
 }: GroupControlsProps) {
-  const passcode = "abcd";
-
   const defaultValues = {
     open: isGroupOpen,
   };

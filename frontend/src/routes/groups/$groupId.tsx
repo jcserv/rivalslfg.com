@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createFileRoute, SearchSchemaInput } from "@tanstack/react-router";
 
-import { StatusCodes } from "@/api";
+import { StatusCodes } from "@/api/types";
 import {
   AccessGroupDialog,
   ChatBox,
@@ -20,12 +20,29 @@ import {
 } from "@/hooks";
 import { getPlayerFromProfile, Group, Profile } from "@/types";
 
-export const Route = createLazyFileRoute("/groups/$groupId")({
+type GroupPageSearchParams = {
+  join?: boolean;
+  passcode?: string;
+};
+
+export const Route = createFileRoute("/groups/$groupId")({
   component: GroupPage,
+  validateSearch: (
+    search: { join?: boolean; passcode?: string } & SearchSchemaInput,
+  ): GroupPageSearchParams => {
+    return {
+      ...(search.join !== undefined && { join: search.join }),
+      ...(search.passcode !== undefined && { passcode: search.passcode }),
+    };
+  },
 });
 
 function GroupPage() {
+  const passcode = "abcd";
+
   const { groupId } = Route.useParams();
+  const searchParams = Route.useSearch();
+
   const isAuthed = useIsAuthed(groupId);
   const [g, isLoading, error] = useGroup(groupId);
   const [profile] = useProfile();
@@ -56,39 +73,58 @@ function GroupPage() {
     }
   }, [g, isLoading, isAuthed]);
 
-  async function onJoin(p: Profile, passcode: string = "") {
-    if (!group) return;
-    try {
-      const status = await joinGroup({
-        groupId,
-        player: p,
-        passcode,
-      });
-      if (status !== StatusCodes.OK) {
-        throw new Error(`${status}`);
-      }
-      if (!isPlayerInGroup) {
-        setGroup({
-          ...group,
-          players: [...group.players, getPlayerFromProfile(p)],
+  const onJoin = useCallback(
+    async (p: Profile, passcode: string = "") => {
+      if (!group) return;
+      try {
+        const status = await joinGroup({
+          groupId,
+          player: p,
+          passcode,
+        });
+        if (status !== StatusCodes.OK) {
+          throw new Error(`${status}`);
+        }
+        if (!isPlayerInGroup) {
+          setGroup({
+            ...group,
+            players: [...group.players, getPlayerFromProfile(p)],
+          });
+        }
+
+        setShowAccessDialog(false);
+        setCanUserAccessGroup(true);
+
+        toast({
+          title: "Joined group",
+          variant: "success",
+        });
+      } catch {
+        toast({
+          title: "Access denied",
+          description: "Please try again.",
+          variant: "destructive",
         });
       }
+    },
+    [
+      group,
+      groupId,
+      isPlayerInGroup,
+      setGroup,
+      setShowAccessDialog,
+      setCanUserAccessGroup,
+    ],
+  );
 
-      setShowAccessDialog(false);
-      setCanUserAccessGroup(true);
-
-      toast({
-        title: "Joined group",
-        variant: "success",
-      });
-    } catch {
-      toast({
-        title: "Access denied",
-        description: "Please try again.",
-        variant: "destructive",
-      });
+  useEffect(() => {
+    if (searchParams.join) {
+      const joinGroupAsync = async () => {
+        await onJoin(profile, searchParams.passcode ?? "");
+      };
+      joinGroupAsync();
     }
-  }
+  }, [searchParams.join, profile, searchParams.passcode, onJoin]);
 
   async function onRemove(id: number, playerToRemove: string) {
     if (!group) return;
@@ -159,6 +195,7 @@ function GroupPage() {
                 group={group}
                 canUserAccessGroup={canUserAccessGroup}
                 isOwner={isOwner}
+                passcode={passcode}
                 onRemove={onRemove}
               />
             )}
@@ -194,6 +231,7 @@ function GroupPage() {
                 <GroupControls
                   isGroupOpen={group?.open ?? false}
                   canUserAccessGroup={canUserAccessGroup}
+                  passcode={passcode}
                 />
               )}
               <ChatBox

@@ -30,6 +30,7 @@ interface GroupDisplayProps {
   group: Group | undefined;
   canUserAccessGroup: boolean | null;
   isOwner: boolean;
+  passcode: string;
   onRemove: (id: number, playerToRemove: string) => void;
 }
 
@@ -68,7 +69,7 @@ export function GroupDisplay({
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href);
                 toast({
-                  title: "Copied current URL to clipboard!",
+                  title: "Copied invitation URL to clipboard",
                   variant: "success",
                 });
               }}

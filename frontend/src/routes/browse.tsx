@@ -19,18 +19,15 @@ export const Route = createFileRoute("/browse")({
   validateSearch: (
     search: { queue?: boolean } & SearchSchemaInput,
   ): BrowsePageSearchParams => {
-    if (search.queue === undefined) {
-      return {};
-    }
     return {
-      queue: search.queue,
+      ...(search.queue !== undefined && { queue: search.queue }),
     };
   },
 });
 
 function BrowsePage() {
-  const params = Route.useSearch();
-  const [show, setShow] = useState(params.queue ?? false);
+  const searchParams = Route.useSearch();
+  const [show, setShow] = useState(searchParams.queue ?? false);
 
   const [profile] = useProfile();
   const isProfileEmpty = !profile || Object.keys(profile).length === 0;

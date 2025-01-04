@@ -16,6 +16,7 @@ export * from "./input";
 export * from "./label";
 export * from "./multi-select";
 export * from "./popover";
+export * from "./progress";
 export * from "./scroll-area";
 export * from "./select";
 export * from "./separator";

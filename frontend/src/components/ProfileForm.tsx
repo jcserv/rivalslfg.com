@@ -57,7 +57,7 @@ export function ProfileForm({
   const isGroup = profileFormType === "create";
 
   const { form, onSubmit, onClear, onReset } = useProfileForm({
-    isGroup,
+    profileFormType,
     profile,
     setProfile,
   });

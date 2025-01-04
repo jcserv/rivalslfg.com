@@ -6,16 +6,16 @@ import { useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { useToast, useUpsertGroup } from "@/hooks";
-import { emptyState, formSchema, Profile } from "@/types";
+import { emptyState, formSchema, Profile, ProfileFormType } from "@/types";
 
 interface UseProfileFormProps {
-  isGroup?: boolean;
+  profileFormType: ProfileFormType;
   profile?: Profile;
   setProfile: (profile: Profile) => void;
 }
 
 export function useProfileForm({
-  isGroup = false,
+  profileFormType,
   profile,
   setProfile,
 }: UseProfileFormProps) {
@@ -39,6 +39,8 @@ export function useProfileForm({
     },
   });
 
+  const isGroup = profileFormType === "create";
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       let groupId = "";
@@ -59,6 +61,9 @@ export function useProfileForm({
           title: "Preferences saved",
           variant: "success",
         });
+        if (profileFormType === "find") {
+          router.navigate({ to: "/browse", search: { queue: true } });
+        }
         return;
       }
 
