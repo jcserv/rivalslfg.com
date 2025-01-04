@@ -96,7 +96,7 @@ func TestIntegration_RemovePlayer(t *testing.T) {
 		token, _ := auth.GenerateToken("1", map[string]string{
 			"playerId": "1",
 			"groupId":  "AAAA",
-		}, auth.RightUpdateGroup)
+		}, auth.RightLeaveGroup)
 		req := httptest.NewRequest(http.MethodDelete, "/api/v1/groups/AAAA/players/1", test.GetBody(
 			map[string]interface{}{
 				"groupId":       "AAAA",
@@ -112,6 +112,22 @@ func TestIntegration_RemovePlayer(t *testing.T) {
 	})
 
 	t.Run("Should allow group member leaving", func(t *testing.T) {
+		mockGroupService.EXPECT().RemovePlayerFromGroup(gomock.Any(), gomock.Any()).Return(nil)
+		token, _ := auth.GenerateToken("1", map[string]string{
+			"playerId": "1",
+		}, auth.RightLeaveGroup)
+		req := httptest.NewRequest(http.MethodDelete, "/api/v1/groups/AAAA/players/1", test.GetBody(
+			map[string]interface{}{
+				"groupId":       "AAAA",
+				"playerName":    "xZestence",
+				"requesterName": "xZestence",
+			},
+		))
+		req.Header.Set("Authorization", token)
+		rec := httptest.NewRecorder()
+
+		r.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusOK, rec.Code)
 	})
 }
 

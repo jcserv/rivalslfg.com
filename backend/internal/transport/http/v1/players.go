@@ -2,6 +2,7 @@ package v1
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -13,26 +14,31 @@ import (
 func (a *API) CreatePlayer() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		token, err := a.authService.CreateAuth(ctx, "1")
-		if err != nil {
-			httputil.InternalServerError(ctx, w, err)
-			return
-		}
+		err := errors.New("test error")
+		httputil.InternalServerError(ctx, w, err)
+		return
 
-		playerAuth, err := a.authService.ValidateToken(ctx, token)
-		if err != nil {
-			httputil.InternalServerError(ctx, w, err)
-			return
-		}
+		// ctx := r.Context()
+		// token, err := a.authService.CreateAuth(ctx, "1")
+		// if err != nil {
+		// 	httputil.InternalServerError(ctx, w, err)
+		// 	return
+		// }
 
-		httputil.OK(w, map[string]any{
-			"token": string(token),
-			"playerAuth": map[string]string{
-				"playerId": playerAuth.PlayerID,
-				"token":    playerAuth.Token,
-				"lastSeen": playerAuth.LastSeen.String(),
-			},
-		})
+		// playerAuth, err := a.authService.ValidateToken(ctx, token)
+		// if err != nil {
+		// 	httputil.InternalServerError(ctx, w, err)
+		// 	return
+		// }
+
+		// httputil.OK(w, map[string]any{
+		// 	"token": string(token),
+		// 	"playerAuth": map[string]string{
+		// 		"playerId": playerAuth.PlayerID,
+		// 		"token":    playerAuth.Token,
+		// 		"lastSeen": playerAuth.LastSeen.String(),
+		// 	},
+		// })
 	}
 }
 

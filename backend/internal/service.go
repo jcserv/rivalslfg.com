@@ -13,7 +13,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jcserv/rivalslfg/internal/repository"
 	"github.com/jcserv/rivalslfg/internal/services"
-	"github.com/jcserv/rivalslfg/internal/store"
 	_http "github.com/jcserv/rivalslfg/internal/transport/http"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
@@ -42,16 +41,16 @@ func NewService() (*Service, error) {
 		return nil, err
 	}
 
-	client, err := s.ConnectCache(context.Background())
-	if err != nil {
-		return nil, err
-	}
+	// client, err := s.ConnectCache(context.Background())
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	repo := repository.New(conn)
-	store := store.New(client)
+	// store := store.New(client)
 
 	s.api = _http.NewAPI(
-		services.NewAuth(store),
+		services.NewAuth(),
 		services.NewGroup(repo),
 	)
 	return s, nil
