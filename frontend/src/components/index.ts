@@ -1,6 +1,7 @@
 export * from "./AccessGroupDialog";
 export * from "./Banner";
 export * from "./ChatBox";
+export * from "./FindGroupDialog";
 export * from "./Footer";
 export * from "./GroupControls";
 export * from "./GroupDisplay";

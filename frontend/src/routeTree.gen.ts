@@ -13,12 +13,12 @@ import { createFileRoute } from "@tanstack/react-router";
 // Import Routes
 
 import { Route as rootRoute } from "./routes/__root";
+import { Route as BrowseImport } from "./routes/browse";
 
 // Create Virtual Routes
 
 const ProfileLazyImport = createFileRoute("/profile")();
 const DiscordLazyImport = createFileRoute("/discord")();
-const BrowseLazyImport = createFileRoute("/browse")();
 const IndexLazyImport = createFileRoute("/")();
 const GroupsGroupIdLazyImport = createFileRoute("/groups/$groupId")();
 
@@ -34,10 +34,10 @@ const DiscordLazyRoute = DiscordLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import("./routes/discord.lazy").then((d) => d.Route));
 
-const BrowseLazyRoute = BrowseLazyImport.update({
+const BrowseRoute = BrowseImport.update({
   path: "/browse",
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import("./routes/browse.lazy").then((d) => d.Route));
+} as any);
 
 const IndexLazyRoute = IndexLazyImport.update({
   path: "/",
@@ -66,7 +66,7 @@ declare module "@tanstack/react-router" {
       id: "/browse";
       path: "/browse";
       fullPath: "/browse";
-      preLoaderRoute: typeof BrowseLazyImport;
+      preLoaderRoute: typeof BrowseImport;
       parentRoute: typeof rootRoute;
     };
     "/discord": {
@@ -97,7 +97,7 @@ declare module "@tanstack/react-router" {
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexLazyRoute;
-  "/browse": typeof BrowseLazyRoute;
+  "/browse": typeof BrowseRoute;
   "/discord": typeof DiscordLazyRoute;
   "/profile": typeof ProfileLazyRoute;
   "/groups/$groupId": typeof GroupsGroupIdLazyRoute;
@@ -105,7 +105,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   "/": typeof IndexLazyRoute;
-  "/browse": typeof BrowseLazyRoute;
+  "/browse": typeof BrowseRoute;
   "/discord": typeof DiscordLazyRoute;
   "/profile": typeof ProfileLazyRoute;
   "/groups/$groupId": typeof GroupsGroupIdLazyRoute;
@@ -114,7 +114,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute;
   "/": typeof IndexLazyRoute;
-  "/browse": typeof BrowseLazyRoute;
+  "/browse": typeof BrowseRoute;
   "/discord": typeof DiscordLazyRoute;
   "/profile": typeof ProfileLazyRoute;
   "/groups/$groupId": typeof GroupsGroupIdLazyRoute;
@@ -137,7 +137,7 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute;
-  BrowseLazyRoute: typeof BrowseLazyRoute;
+  BrowseRoute: typeof BrowseRoute;
   DiscordLazyRoute: typeof DiscordLazyRoute;
   ProfileLazyRoute: typeof ProfileLazyRoute;
   GroupsGroupIdLazyRoute: typeof GroupsGroupIdLazyRoute;
@@ -145,7 +145,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
-  BrowseLazyRoute: BrowseLazyRoute,
+  BrowseRoute: BrowseRoute,
   DiscordLazyRoute: DiscordLazyRoute,
   ProfileLazyRoute: ProfileLazyRoute,
   GroupsGroupIdLazyRoute: GroupsGroupIdLazyRoute,
@@ -174,7 +174,7 @@ export const routeTree = rootRoute
       "filePath": "index.lazy.tsx"
     },
     "/browse": {
-      "filePath": "browse.lazy.tsx"
+      "filePath": "browse.tsx"
     },
     "/discord": {
       "filePath": "discord.lazy.tsx"
