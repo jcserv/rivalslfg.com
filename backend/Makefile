@@ -1,7 +1,7 @@
 include .env
 export 
 
-.PHONY: codegen dev clean dev-db dev-db-down dev-db-migrate reset test-db test-db-down test-db-migrate reset-test 
+.PHONY: codegen dev mocks clean dev-db dev-db-down dev-db-migrate reset test-db test-db-down test-db-migrate reset-test depgraph
 
 codegen:
 	sqlc generate
@@ -9,8 +9,11 @@ codegen:
 dev:
 	go build ./cmd/rivalslfg/main.go && ./main
 
+mocks:
+	mockgen -package=mocks -source=internal/services/interfaces.go -destination=internal/test/mocks/interfaces.go
+
 test:
-	go test ./...
+	go test ./... 
 
 clean:
 	rm main
@@ -42,3 +45,6 @@ migrate-test:
 
 reset-test:
 	make test-db-down && make test-db && make migrate-test
+
+depgraph:
+	godepgraph github.com/jcserv/rivalslfg/internal | dot -Tpng -o godepgraph.png

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/jcserv/rivalslfg/internal/transport/http/httputil"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -105,8 +106,19 @@ type UpsertGroup struct {
 	Gamemode      string                     `json:"gamemode"`
 	Players       []repository.PlayerInGroup `json:"players"`
 	Open          bool                       `json:"open"`
-	RoleQueue     *repository.RoleQueue
-	GroupSettings *repository.GroupSettings
+	RoleQueue     *repository.RoleQueue      `json:"roleQueue"`
+	GroupSettings *repository.GroupSettings  `json:"groupSettings"`
+}
+
+// GetID returns the ID of the group, and also allows this to implement the RequestWithID interface
+func (c *UpsertGroup) GetID() string {
+	return c.ID
+}
+
+func (c *UpsertGroup) ToMap() map[string]any {
+	out := map[string]any{}
+	_ = mapstructure.Decode(c, &out)
+	return out
 }
 
 func (c *UpsertGroup) Parse() (*repository.UpsertGroupParams, error) {
@@ -180,7 +192,9 @@ func (c *JoinGroup) Parse() (*services.JoinGroupArgs, error) {
 }
 
 type RemovePlayer struct {
-	GroupID       string `json:"groupId"`
+	GroupID string `json:"groupId"`
+
+	// TODO: This should use IDs
 	PlayerName    string `json:"playerName"`
 	RequesterName string `json:"requesterName"` // Name of user making request
 }
