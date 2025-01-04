@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/handlers"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jcserv/rivalslfg/internal/repository"
@@ -37,6 +38,11 @@ func NewService() (*Service, error) {
 	}
 
 	conn, err := s.ConnectDB(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = s.ConnectCache(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -90,10 +96,28 @@ func (s *Service) ConnectDB(ctx context.Context) (*pgxpool.Pool, error) {
 	customDataTypes := []string{"RankName", "RankID", "Rank"}
 	for _, typeName := range customDataTypes {
 		dataType, _ := conn.Conn().LoadType(ctx, typeName)
+		if dataType == nil {
+			log.Error(ctx, fmt.Sprintf("Failed to load data type %s", typeName))
+			continue
+		}
 		conn.Conn().TypeMap().RegisterType(dataType)
 	}
 
 	return pool, nil
+}
+
+func (s *Service) ConnectCache(ctx context.Context) (*redis.Client, error) {
+	config, err := redis.ParseURL(s.cfg.CacheURL)
+	if err != nil {
+		return nil, err
+	}
+
+	client := redis.NewClient(config)
+	if err := client.Ping(ctx).Err(); err != nil {
+		return nil, err
+	}
+	log.Info(ctx, "Connection established to cache")
+	return client, nil
 }
 
 func (s *Service) StartHTTP(ctx context.Context) error {

@@ -11,6 +11,7 @@ type Configuration struct {
 	Environment string
 	HTTPPort    string
 	DatabaseURL string
+	CacheURL    string
 }
 
 func NewConfiguration() (*Configuration, error) {
@@ -19,12 +20,16 @@ func NewConfiguration() (*Configuration, error) {
 	cfg.Environment = env.GetString("ENVIRONMENT", "dev")
 	cfg.HTTPPort = env.GetString("HTTP_PORT", "8080")
 	cfg.DatabaseURL = env.GetString("DATABASE_URL", "")
+	cfg.CacheURL = env.GetString("CACHE_URL", "")
 	return cfg, nil
 }
 
 func (c *Configuration) Validate() error {
 	if c.DatabaseURL == "" {
 		return errors.New("DATABASE_URL is required")
+	}
+	if c.CacheURL == "" {
+		return errors.New("CACHE_URL is required")
 	}
 	return nil
 }
