@@ -57,3 +57,17 @@ func ValidateToken(tokenString string) (jwt.MapClaims, error) {
 
 	return nil, jwt.ErrTokenInvalidClaims
 }
+
+func HasRight(claims map[string]interface{}, requiredRight Right) bool {
+	rights, ok := claims["rights"].([]interface{})
+	if !ok {
+		return false
+	}
+
+	for _, right := range rights {
+		if IsEqual(right.(string), requiredRight) {
+			return true
+		}
+	}
+	return false
+}

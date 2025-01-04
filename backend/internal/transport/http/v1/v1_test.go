@@ -26,6 +26,7 @@ func TestIntegration_UpsertGroup(t *testing.T) {
 		mockGroupService,
 	)
 	a.RegisterRoutes(r)
+	t.Parallel()
 	t.Run("Should allow unauthenticated users to create a group", func(t *testing.T) {
 		mockGroupService.EXPECT().UpsertGroup(gomock.Any(), gomock.Any()).Return("AAAA", nil)
 		req := httptest.NewRequest(http.MethodPost, "/api/v1/groups", test.GetBody(
@@ -89,7 +90,8 @@ func TestIntegration_RemovePlayer(t *testing.T) {
 	)
 	a.RegisterRoutes(r)
 
-	t.Run("When group owner removes player, should return 200 OK", func(t *testing.T) {
+	t.Parallel()
+	t.Run("Should allow group owners to kick other players", func(t *testing.T) {
 		mockGroupService.EXPECT().RemovePlayerFromGroup(gomock.Any(), gomock.Any()).Return(nil)
 		token, _ := auth.GenerateToken("1", map[string]string{
 			"playerId": "1",
@@ -107,6 +109,9 @@ func TestIntegration_RemovePlayer(t *testing.T) {
 
 		r.ServeHTTP(rec, req)
 		assert.Equal(t, http.StatusOK, rec.Code)
+	})
+
+	t.Run("Should allow group member leaving", func(t *testing.T) {
 	})
 }
 

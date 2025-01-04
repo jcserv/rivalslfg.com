@@ -1,43 +1,51 @@
 package middleware
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRequireRight(t *testing.T) {
-	t.Run("HasRight", func(t *testing.T) {
-		claims := jwt.MapClaims{
-			"sub":    "1",
-			"rights": []string{"user:read"},
-		}
+	t.Run("Should allow if requested right is provided", func(t *testing.T) {
+		token, _ := auth.GenerateToken("1", map[string]string{
+			"playerId": "1",
+			"groupId":  "AAAA",
+		}, auth.RightReadUser)
 		req := httptest.NewRequest("GET", "/", nil)
-		req = req.WithContext(context.WithValue(req.Context(), "claims", claims))
+		req.Header.Set("Authorization", token)
 		rec := httptest.NewRecorder()
 
-		handler := RequireRight("user:read")(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		handler := RequireRight(auth.RightReadUser)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 		}))
 
 		handler.ServeHTTP(rec, req)
 		assert.Equal(t, http.StatusOK, rec.Code)
 	})
-
-	t.Run("NoRight", func(t *testing.T) {
-		claims := jwt.MapClaims{
-			"sub":    "1",
-			"rights": []string{"user:write"},
-		}
+	t.Run("Should not allow if requested right is not provided", func(t *testing.T) {
+		token, _ := auth.GenerateToken("1", map[string]string{
+			"playerId": "1",
+		})
 		req := httptest.NewRequest("GET", "/", nil)
-		req = req.WithContext(context.WithValue(req.Context(), "claims", claims))
+		req.Header.Set("Authorization", token)
 		rec := httptest.NewRecorder()
 
-		handler := RequireRight("user:read")(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		handler := RequireRight(auth.RightDeleteGroup)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}))
+
+		handler.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusForbidden, rec.Code)
+	})
+	t.Run("Should not allow if user does not have token", func(t *testing.T) {
+		req := httptest.NewRequest("GET", "/", nil)
+		rec := httptest.NewRecorder()
+
+		handler := RequireRight(auth.RightReadUser)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 		}))
 

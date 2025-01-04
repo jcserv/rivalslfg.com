@@ -22,13 +22,13 @@ func RequireRight(right auth.Right) func(http.HandlerFunc) http.HandlerFunc {
 
 			claims, err := auth.ValidateToken(authToken)
 			if err != nil {
-				httputil.Unauthorized(w)
+				httputil.Forbidden(w)
 				return
 			}
 
 			rights, ok := claims["rights"].([]interface{}) // JWT claims are usually unmarshaled as []interface{}
 			if !ok {
-				httputil.Unauthorized(w)
+				httputil.Forbidden(w)
 				return
 			}
 
@@ -38,7 +38,7 @@ func RequireRight(right auth.Right) func(http.HandlerFunc) http.HandlerFunc {
 					return
 				}
 			}
-			httputil.Unauthorized(w)
+			httputil.Forbidden(w)
 			return
 		}
 	}
@@ -48,32 +48,62 @@ type RequestWithID interface {
 	GetID() string
 }
 
-func RequireOwnership(resourceType string, paramName string, body any) func(http.HandlerFunc) http.HandlerFunc {
+type ResourceIDSource int
+
+const (
+	FromBody ResourceIDSource = iota
+	FromParam
+)
+
+type AuthConfig struct {
+	ResourceType   string
+	ResourceIDFrom ResourceIDSource
+	RequiredRight  auth.Right
+
+	// Used when ResourceIDFrom is FromParam
+	ParamName string
+	// Used when ResourceIDFrom is FromBody
+	Body any
+	// Whether to allow unauthenticated creation
+	AllowCreate bool
+}
+
+func RequireAuth(config AuthConfig) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			var resourceID string
+			var isCreate bool
 
-			if body != nil && r.Body != nil {
-				bodyData := body.(RequestWithID)
-				if err := json.NewDecoder(r.Body).Decode(&bodyData); err != nil {
-					httputil.BadRequest(w)
-					return
-				}
+			switch config.ResourceIDFrom {
+			case FromBody:
+				if config.Body != nil && r.Body != nil {
+					bodyData := config.Body.(RequestWithID)
+					if err := json.NewDecoder(r.Body).Decode(&bodyData); err != nil {
+						httputil.BadRequest(w)
+						return
+					}
 
-				// Only authenticate ownership if an ID is provided, otherwise this request is for creating a new resource
-				if bodyData.GetID() != "" {
 					resourceID = bodyData.GetID()
-				}
+					isCreate = resourceID == ""
 
-				// IMPORTANT: restore body for later use
-				bodyBytes, _ := json.Marshal(bodyData)
-				r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+					bodyBytes, _ := json.Marshal(bodyData)
+					r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+				}
+			case FromParam:
+				if config.ParamName != "" {
+					vars := mux.Vars(r)
+					resourceID = vars[config.ParamName]
+				}
 			}
 
+			// Only authenticate ownership if an ID is provided, otherwise this request is for creating a new resource
 			authToken := r.Header.Get("Authorization")
-			// Allow unauthenticated users to create a group
-			if authToken == "" && resourceID == "" {
-				next(w, r)
+			if authToken == "" {
+				if isCreate && config.AllowCreate {
+					next(w, r)
+					return
+				}
+				httputil.Unauthorized(w)
 				return
 			}
 
@@ -83,14 +113,16 @@ func RequireOwnership(resourceType string, paramName string, body any) func(http
 				return
 			}
 
-			if paramName != "" {
-				vars := mux.Vars(r)
-				resourceID = vars[paramName]
-			}
-
-			if !auth.HasOwnership(claims, resourceType, resourceID) {
+			if !auth.HasOwnership(claims, config.ResourceType, resourceID) {
 				httputil.Forbidden(w)
 				return
+			}
+
+			if config.RequiredRight != "" {
+				if !auth.HasRight(claims, config.RequiredRight) {
+					httputil.Forbidden(w)
+					return
+				}
 			}
 
 			next(w, r)
