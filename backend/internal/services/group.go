@@ -9,17 +9,17 @@ import (
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
-type GroupService struct {
+type Group struct {
 	repo *repository.Queries
 }
 
-func NewGroupService(repo *repository.Queries) *GroupService {
-	return &GroupService{
+func NewGroup(repo *repository.Queries) *Group {
+	return &Group{
 		repo: repo,
 	}
 }
 
-func (s *GroupService) UpsertGroup(ctx context.Context, arg repository.UpsertGroupParams) (string, error) {
+func (s *Group) UpsertGroup(ctx context.Context, arg repository.UpsertGroupParams) (string, error) {
 	groupID, err := s.repo.UpsertGroup(ctx, arg)
 	if err != nil {
 		return "", err
@@ -27,7 +27,7 @@ func (s *GroupService) UpsertGroup(ctx context.Context, arg repository.UpsertGro
 	return groupID, nil
 }
 
-func (s *GroupService) GetGroups(ctx context.Context, arg repository.GetGroupsParams) ([]repository.GroupWithPlayers, int32, error) {
+func (s *Group) GetGroups(ctx context.Context, arg repository.GetGroupsParams) ([]repository.GroupWithPlayers, int32, error) {
 	result, err := s.repo.GetGroups(ctx, arg)
 	if err != nil {
 		return nil, 0, err
@@ -35,7 +35,7 @@ func (s *GroupService) GetGroups(ctx context.Context, arg repository.GetGroupsPa
 	return result.Groups, result.TotalCount, nil
 }
 
-func (s *GroupService) GetGroupByID(ctx context.Context, id string) (*repository.GroupWithPlayers, error) {
+func (s *Group) GetGroupByID(ctx context.Context, id string) (*repository.GroupWithPlayers, error) {
 	group, err := s.repo.GetGroupByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ type JoinGroupArgs struct {
 	JoinGroup         repository.JoinGroupParams
 }
 
-func (s *GroupService) JoinGroup(ctx context.Context, arg JoinGroupArgs) error {
+func (s *Group) JoinGroup(ctx context.Context, arg JoinGroupArgs) error {
 	// TODO: Acquire lock on group
 	// TODO: Check against requirements of group
 	status, err := s.repo.CheckCanJoinGroup(ctx, arg.CheckCanJoinGroup)
@@ -75,7 +75,7 @@ func (s *GroupService) JoinGroup(ctx context.Context, arg JoinGroupArgs) error {
 
 }
 
-func (s *GroupService) RemovePlayerFromGroup(ctx context.Context, arg repository.RemovePlayerFromGroupParams) error {
+func (s *Group) RemovePlayerFromGroup(ctx context.Context, arg repository.RemovePlayerFromGroupParams) error {
 	out, err := s.repo.RemovePlayerFromGroup(ctx, arg)
 	if err != nil {
 		return err
@@ -100,7 +100,7 @@ func (s *GroupService) RemovePlayerFromGroup(ctx context.Context, arg repository
 	}
 }
 
-func (s *GroupService) PromoteOwnerOrDeleteGroup(ctx context.Context, arg repository.PromoteOwnerOrDeleteGroupParams) error {
+func (s *Group) PromoteOwnerOrDeleteGroup(ctx context.Context, arg repository.PromoteOwnerOrDeleteGroupParams) error {
 	out, err := s.repo.PromoteOwnerOrDeleteGroup(ctx, arg)
 	if err != nil {
 		return err

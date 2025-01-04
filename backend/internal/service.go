@@ -11,16 +11,17 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/handlers"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/jcserv/rivalslfg/internal/repository"
 	"github.com/jcserv/rivalslfg/internal/services"
+	"github.com/jcserv/rivalslfg/internal/store"
 	_http "github.com/jcserv/rivalslfg/internal/transport/http"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
 type Service struct {
-	api          *_http.API
-	cfg          *Configuration
-	groupService *services.GroupService
+	api *_http.API
+	cfg *Configuration
 }
 
 func NewService() (*Service, error) {
@@ -42,13 +43,18 @@ func NewService() (*Service, error) {
 		return nil, err
 	}
 
-	_, err = s.ConnectCache(context.Background())
+	client, err := s.ConnectCache(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
 	repo := repository.New(conn)
-	s.api = _http.NewAPI(services.NewGroupService(repo))
+	store := store.New(client)
+
+	s.api = _http.NewAPI(
+		services.NewAuth(store, auth.NewTokenService(cfg.JWTSecretKey)),
+		services.NewGroup(repo),
+	)
 	return s, nil
 }
 

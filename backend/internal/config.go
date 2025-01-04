@@ -7,11 +7,12 @@ import (
 )
 
 type Configuration struct {
-	Region      string
-	Environment string
-	HTTPPort    string
-	DatabaseURL string
-	CacheURL    string
+	Region       string
+	Environment  string
+	HTTPPort     string
+	DatabaseURL  string
+	CacheURL     string
+	JWTSecretKey string
 }
 
 func NewConfiguration() (*Configuration, error) {
@@ -21,6 +22,7 @@ func NewConfiguration() (*Configuration, error) {
 	cfg.HTTPPort = env.GetString("HTTP_PORT", "8080")
 	cfg.DatabaseURL = env.GetString("DATABASE_URL", "")
 	cfg.CacheURL = env.GetString("CACHE_URL", "")
+	cfg.JWTSecretKey = env.GetString("JWT_SECRET_KEY", "")
 	return cfg, nil
 }
 
@@ -30,6 +32,9 @@ func (c *Configuration) Validate() error {
 	}
 	if c.CacheURL == "" {
 		return errors.New("CACHE_URL is required")
+	}
+	if c.JWTSecretKey == "" {
+		return errors.New("JWT_SECRET_KEY is required")
 	}
 	return nil
 }

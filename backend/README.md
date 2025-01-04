@@ -13,9 +13,11 @@ this folder contains the backend for [rivalslfg](https://rivalslfg.vercel.app/),
 - [docker](https://docs.docker.com/get-started/get-docker/)
 - [sqlc](https://docs.sqlc.dev/en/stable/overview/install.html)
 - [golang-migrate CLI](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate)
+- [gomock](https://github.com/uber-go/mock)
 - OPTIONAL:
   - [postgres](https://www.postgresql.org/)
   - [flyctl](https://fly.io/docs/flyctl/installing/)
+  - [postico](https://eggerapps.at/postico2/)
 
 ### running locally
 

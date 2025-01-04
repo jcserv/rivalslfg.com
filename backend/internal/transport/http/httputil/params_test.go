@@ -9,6 +9,8 @@ import (
 )
 
 func TestParseQueryParams(t *testing.T) {
+	defaultPagination := &OffsetPagination{Limit: 250, Offset: 0, Count: false}
+
 	tests := []struct {
 		name          string
 		query         string
@@ -37,6 +39,7 @@ func TestParseQueryParams(t *testing.T) {
 					{Field: "region", Op: Eq, Value: "na"},
 					{Field: "active", Op: Eq, Value: true},
 				},
+				PaginateBy: defaultPagination,
 			},
 			expectedError: false,
 		},
@@ -48,6 +51,7 @@ func TestParseQueryParams(t *testing.T) {
 					{Field: "region", Ascending: false},
 					{Field: "gamemode", Ascending: true},
 				},
+				PaginateBy: defaultPagination,
 			},
 			expectedError: false,
 		},
@@ -104,22 +108,21 @@ func TestParseQueryParams(t *testing.T) {
 				FilterBy: []Filter{
 					{Field: "name", Op: Eq, Value: "John Doe @work"},
 				},
+				PaginateBy: defaultPagination,
 			},
 			expectedError: false,
 		},
 		{
 			name:          "Empty Sort Field",
 			query:         `sort=,-field`,
-			expected:      &QueryParams{SortBy: []Sort{{Field: "field", Ascending: false}}},
+			expected:      &QueryParams{SortBy: []Sort{{Field: "field", Ascending: false}}, PaginateBy: defaultPagination},
 			expectedError: false,
 		},
 		{
-			name:  "Negative Limit",
-			query: "limit=-10&offset=-5",
-			expected: &QueryParams{
-				PaginateBy: &OffsetPagination{Limit: -10, Offset: -5, Count: false},
-			},
-			expectedError: false,
+			name:          "Negative Limit",
+			query:         "limit=-10&offset=-5",
+			expected:      nil,
+			expectedError: true,
 		},
 		{
 			name:          "Non-Numeric Pagination Values",
@@ -130,14 +133,15 @@ func TestParseQueryParams(t *testing.T) {
 		{
 			name:          "Case Insensitivity",
 			query:         `filter=Region EQ "na"`,
-			expected:      &QueryParams{FilterBy: []Filter{{Field: "Region", Op: Eq, Value: "na"}}},
+			expected:      &QueryParams{FilterBy: []Filter{{Field: "Region", Op: Eq, Value: "na"}}, PaginateBy: defaultPagination},
 			expectedError: false,
 		},
 		{
 			name:  "Whitespace Handling",
 			query: `filter=  field   eq   "value"  `,
 			expected: &QueryParams{
-				FilterBy: []Filter{{Field: "field", Op: Eq, Value: "value"}},
+				FilterBy:   []Filter{{Field: "field", Op: Eq, Value: "value"}},
+				PaginateBy: defaultPagination,
 			},
 			expectedError: false,
 		},
