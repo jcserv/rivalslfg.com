@@ -38,6 +38,7 @@ export function GroupDisplay({
   group,
   canUserAccessGroup,
   isOwner,
+  passcode,
   onRemove,
 }: GroupDisplayProps) {
   const [profile] = useProfile();
@@ -57,23 +58,49 @@ export function GroupDisplay({
     );
   }, [teamUps, currCharacters]);
 
+  const isGroupMember = useMemo(() => {
+    if (!group || !profile) return false;
+    return group.players.some((player) => player.name === profile.name);
+  }, [group, profile]);
+
+  const buildInviteUrl = () => {
+    const url = new URL(window.location.href);
+    const searchParams = new URLSearchParams(url.search);
+
+    searchParams.set("join", "true");
+
+    if (!group?.open && (isOwner || isGroupMember)) {
+      searchParams.set("passcode", passcode);
+    }
+
+    url.search = searchParams.toString();
+    return url.toString();
+  };
+
+  const handleCopyUrl = () => {
+    const inviteUrl = buildInviteUrl();
+    navigator.clipboard.writeText(inviteUrl);
+
+    toast({
+      title: "Copied invite URL to clipboard",
+      variant: "success",
+    });
+  };
+
   if (!group) return null;
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>
           {group?.name}
-          <Button variant="outline" size="icon" className="ml-2">
-            <Copy
-              className="w-4 h-4"
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                toast({
-                  title: "Copied invitation URL to clipboard",
-                  variant: "success",
-                });
-              }}
-            />
+          <Button
+            variant="outline"
+            size="icon"
+            className="ml-2"
+            onClick={handleCopyUrl}
+          >
+            <Copy className="w-4 h-4" />
           </Button>
         </CardTitle>
         <CardDescription>
