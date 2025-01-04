@@ -24,7 +24,7 @@ export function useGroup(
   const query = useQuery({
     queryKey: rivalsStoreKeys.group(id),
     queryFn: () => fetchGroup(id),
-    staleTime: 0,
+    staleTime: 10000,
   });
 
   return [query.data, query.isLoading, query.error];

@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -24,6 +23,8 @@ import { Input } from "@/components/ui/input";
 import { useProfile } from "@/hooks";
 import { Profile } from "@/types";
 
+import { BackButton } from "./BackButton";
+
 const formSchema = z.object({
   passcode: z
     .string()
@@ -38,7 +39,6 @@ interface AccessGroupDialogProps {
 
 export function AccessGroupDialog({ open, onJoin }: AccessGroupDialogProps) {
   const [profile] = useProfile();
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,11 +50,6 @@ export function AccessGroupDialog({ open, onJoin }: AccessGroupDialogProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     onJoin(profile, values.passcode);
   }
-
-  const handleBack = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent form submission
-    router.history.back();
-  };
 
   return (
     <Dialog open={open}>
@@ -85,9 +80,7 @@ export function AccessGroupDialog({ open, onJoin }: AccessGroupDialogProps) {
               </div>
             </div>
             <DialogFooter className="flex flex-row justify-between sm:justify-between">
-              <Button variant="outline" onClick={handleBack}>
-                Back
-              </Button>
+              <BackButton text="Back" />
               <Button type="submit">Submit</Button>
             </DialogFooter>
           </form>

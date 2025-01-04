@@ -1,10 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { createFileRoute, SearchSchemaInput } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  notFound,
+  SearchSchemaInput,
+} from "@tanstack/react-router";
 
+import { fetchGroup } from "@/api";
 import { StatusCodes } from "@/api/types";
 import {
   AccessGroupDialog,
+  BackButton,
   ChatBox,
   GroupControls,
   GroupDisplay,
@@ -35,6 +41,20 @@ export const Route = createFileRoute("/groups/$groupId")({
       ...(search.passcode !== undefined && { passcode: search.passcode }),
     };
   },
+  loader: async ({ params }) => {
+    const { groupId } = params;
+    const group = await fetchGroup(groupId);
+    if (!group) throw notFound();
+    return group;
+  },
+  notFoundComponent: () => (
+    <section className="p-2 md:p-4 h-[80vh]">
+      <div className="h-full w-full flex flex-col items-center justify-center space-y-2">
+        <p>This group doesn&apos;t exist!</p>
+        <BackButton />
+      </div>
+    </section>
+  ),
 });
 
 function GroupPage() {
@@ -42,11 +62,11 @@ function GroupPage() {
 
   const { groupId } = Route.useParams();
   const searchParams = Route.useSearch();
+  const { toast } = useToast();
 
   const isAuthed = useIsAuthed(groupId);
   const [g, isLoading, error] = useGroup(groupId);
   const [profile] = useProfile();
-  const { toast } = useToast();
 
   const joinGroup = useJoinGroup();
   const removePlayer = useRemovePlayer();
