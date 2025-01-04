@@ -50,7 +50,7 @@ export function usePagination<TData>({
         paginateBy: {
           limit: pageSize,
           offset: pageIndex * pageSize,
-          count: shouldFetchCount, 
+          count: shouldFetchCount,
         },
         filterBy: getFilterBy(filters),
       });

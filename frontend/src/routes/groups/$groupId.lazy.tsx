@@ -151,8 +151,8 @@ function GroupPage() {
   return (
     <section className="p-2 md:p-4">
       <div className="h-full w-full flex flex-col items-center">
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-8">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 w-full max-w-[1200px]">
+          <div className="col-span-1 md:col-span-8">
             <AccessGroupDialog open={showAccessDialog} onJoin={onJoin} />
             {!isLoading && (
               <GroupDisplay
@@ -189,7 +189,7 @@ function GroupPage() {
             </div>
           </div>
           {!isLoading && !error && (
-            <div className="col-span-4 space-y-4">
+            <div className="col-span-1 md:col-span-4 space-y-4 sm:w-1/2  md:w-full mx-auto">
               {isOwner && (
                 <GroupControls
                   isGroupOpen={group?.open ?? false}
