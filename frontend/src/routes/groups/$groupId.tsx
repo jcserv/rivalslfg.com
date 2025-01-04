@@ -6,7 +6,7 @@ import {
   SearchSchemaInput,
 } from "@tanstack/react-router";
 
-import { fetchGroup } from "@/api";
+import { fetchGroup, joinGroup } from "@/api";
 import { StatusCodes } from "@/api/types";
 import {
   AccessGroupDialog,
@@ -17,6 +17,7 @@ import {
 } from "@/components";
 import { Button } from "@/components/ui";
 import {
+  getStorageValue,
   useGroup,
   useIsAuthed,
   useJoinGroup,
@@ -41,11 +42,17 @@ export const Route = createFileRoute("/groups/$groupId")({
       ...(search.passcode !== undefined && { passcode: search.passcode }),
     };
   },
-  loader: async ({ params }) => {
+  beforeLoad: async ({ params, search }) => {
     const { groupId } = params;
-    const group = await fetchGroup(groupId);
+    const { join, passcode } = search;
+    const group = await fetchGroup(groupId.toUpperCase());
     if (!group) throw notFound();
-    return group;
+    if (!join) return;
+    if (join && !group.open) {
+      return;
+    }
+    const profile: Profile = getStorageValue("profile", {});
+    await joinGroup(groupId.toUpperCase(), profile, passcode ?? "");
   },
   notFoundComponent: () => (
     <section className="p-2 md:p-4 h-[80vh]">
@@ -61,7 +68,6 @@ function GroupPage() {
   const passcode = "abcd";
 
   const { groupId } = Route.useParams();
-  const searchParams = Route.useSearch();
   const { toast } = useToast();
 
   const isAuthed = useIsAuthed(groupId);
@@ -73,6 +79,7 @@ function GroupPage() {
 
   const [group, setGroup] = useState<Group | undefined>(g);
   const [showAccessDialog, setShowAccessDialog] = useState(false);
+
   const [canUserAccessGroup, setCanUserAccessGroup] = useState<boolean | null>(
     null,
   );
@@ -136,15 +143,6 @@ function GroupPage() {
       setCanUserAccessGroup,
     ],
   );
-
-  useEffect(() => {
-    if (searchParams.join) {
-      const joinGroupAsync = async () => {
-        await onJoin(profile, searchParams.passcode ?? "");
-      };
-      joinGroupAsync();
-    }
-  }, [searchParams.join, profile, searchParams.passcode, onJoin]);
 
   async function onRemove(id: number, playerToRemove: string) {
     if (!group) return;

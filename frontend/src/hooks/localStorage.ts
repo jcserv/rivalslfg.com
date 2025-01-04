@@ -11,7 +11,7 @@ function isEntryExpired(s: StorageValue | null): boolean {
   return s.expiration && new Date(s.expiration) < new Date();
 }
 
-function getStorageValue(key: string, initialValue: any) {
+export function getStorageValue(key: string, initialValue: any) {
   const savedValue = localStorage.getItem(key);
   if (!savedValue) return initialValue;
 
