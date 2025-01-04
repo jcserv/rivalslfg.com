@@ -34,6 +34,13 @@ export const columns = (
   isProfileEmpty: boolean,
 ): ColumnDef<GroupTableData>[] => [
   {
+    accessorKey: "open",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Visibility" />
+    ),
+    filterFn: defaultFilterFn,
+  },
+  {
     accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />

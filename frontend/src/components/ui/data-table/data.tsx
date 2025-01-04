@@ -5,6 +5,19 @@ export const regions = Object.entries(Region).map(([key, value]) => ({
   label: value,
 }));
 
+export const open = [
+  {
+    value: "true",
+    label: "Public",
+    icon: "👀",
+  },
+  {
+    value: "false",
+    label: "Private",
+    icon: "🔒",
+  },
+];
+
 export const gamemodes = [
   {
     value: "competitive",

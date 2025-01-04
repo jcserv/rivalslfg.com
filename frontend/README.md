@@ -23,46 +23,5 @@ _Generated from [react-vite-shadcn-template](https://github.com/jcserv/react-vit
 ## references
 
 - [favicon.io/](https://favicon.io/)
-
-### TODO
-
-FE-Only:
-
-- [x] Better username validation (\*)
-  - 14 chars max
-  - Must be at least 3 characters
-  - Invalid characters: ! @ # $ % ^ & \* ( ) = +
-  - [ { ] } \ |
-  - ; :
-  - / ?
-  - Allowed: . - \_ ' < >
-- [x] Group should be private by default
-- [x] Chat
-- [ ] Matchmaking
-- [ ] Set default filters based on user profile (region=, gamemode=, canjoin=) (\*)
-- [ ] Filter or sort characters based on selected roles
-- [ ] vice versa, derive roles from characters?
-- [x] Remove player from group
-- [ ] Display the current & required characters for the teamup, red border if missing. green border if present.
-- [ ] Replace hard-coded player IDs
-
-API Integration:
-
-- [x] Integrate Find Group Form
-- [x] Integrate Create Group Form
-- [x] Integrate Profile Form
-- [x] Integrate Browse Page
-- [x] Browse Page Pagination & Filtering (\*)
-- [x] Integrate Group Page
-- [x] Integrate Join Group
-- [x] Integrate remove player from group
-- [ ] Chat
-- [ ] Matchmaking
-
-Bugs:
-
-- [x] Fix flicker on group page?
-  - [x] repro'd when joining a public group
-- [x] Group table does not show until groups are loaded, should load in but with empty data.
-- [ ] After creating a group, the owner should not have to authenticate (sessions integration will probs solve this)
-  - repro: create a group, click away, then come back to the group page. this works, but then if you refresh the dialog will open again
+- [https://www.shadcn-form.com/](https://www.shadcn-form.com/)
+- [https://shadcn-chat.vercel.app/](https://shadcn-chat.vercel.app/)
