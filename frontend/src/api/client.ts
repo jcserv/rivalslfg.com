@@ -1,3 +1,5 @@
+import { HTTPError } from "./types";
+
 export class HTTPClient {
   private lastRequestTime: number = 0;
   private readonly minRequestInterval: number = 75; // 75ms between requests
@@ -54,7 +56,8 @@ export class HTTPClient {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const respBody = await response.json();
+      throw new HTTPError(response.status, response.statusText, respBody);
     }
 
     this.handleNewToken(response);

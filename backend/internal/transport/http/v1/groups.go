@@ -14,37 +14,47 @@ import (
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
-func (a *API) UpsertGroup() http.HandlerFunc {
+// httputil.BadRequest(w, fmt.Errorf("Player is already in group: %s", group.ID),
+//
+//	map[string]any{
+//		"groupId": group.ID,
+//	},
+//
+// )
+func (a *API) CreateGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		var input UpsertGroup
+
+		var input CreateGroup
 		err := json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
 			log.Debug(ctx, err.Error())
-			httputil.BadRequest(w)
+			httputil.BadRequest(w, err)
 			return
 		}
 
+		input.PlayerID, input.GroupID = reqCtx.GetPlayerID(ctx), reqCtx.GetGroupID(ctx)
 		params, err := input.Parse()
 		if err != nil {
 			log.Debug(ctx, err.Error())
-			httputil.BadRequest(w)
+			httputil.BadRequest(w, err)
 			return
 		}
 
-		groupID, err := a.groupService.UpsertGroup(ctx, *params)
+		result, err := a.groupService.CreateGroup(ctx, *params)
 		if err != nil {
 			httputil.InternalServerError(ctx, w, err)
 			return
 		}
 
-		authInfo := reqCtx.GetAuthInfoOrDefault(ctx, &reqCtx.AuthInfo{
-			PlayerID: "1", // TODO: This should be generated server-side
-			GroupID:  groupID,
-		})
-		httputil.EmbedTokenInResponse(ctx, w, authInfo, auth.GroupOwnerRights)
-		httputil.OK(w, map[string]string{
-			"id": groupID,
+		httputil.EmbedTokenInResponse(ctx, w, &reqCtx.AuthInfo{
+			PlayerID: int(result.PlayerID),
+			GroupID:  result.GroupID,
+		}, auth.GroupOwnerRights)
+
+		httputil.OK(w, map[string]any{
+			"groupId":  result.GroupID,
+			"playerId": result.PlayerID,
 		})
 	}
 }
@@ -55,7 +65,7 @@ func (a *API) GetGroupByID() http.HandlerFunc {
 		vars := mux.Vars(r)
 		groupID := vars["id"]
 		if groupID == "" {
-			httputil.BadRequest(w)
+			httputil.BadRequest(w, fmt.Errorf("groupId is required"))
 			return
 		}
 
@@ -81,14 +91,14 @@ func (a *API) GetGroups() http.HandlerFunc {
 		queryParams, err := httputil.ParseQueryParams(r)
 		if err != nil {
 			log.Debug(ctx, fmt.Sprintf("error parsing query params: %v", err))
-			httputil.BadRequest(w)
+			httputil.BadRequest(w, err)
 			return
 		}
 
 		args, err := Parse(queryParams)
 		if err != nil {
 			log.Debug(ctx, fmt.Sprintf("error parsing query params: %v", err))
-			httputil.BadRequest(w)
+			httputil.BadRequest(w, err)
 			return
 		}
 

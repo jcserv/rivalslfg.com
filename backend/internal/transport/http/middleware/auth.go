@@ -12,10 +12,30 @@ import (
 	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 )
 
+func InitRequestContext() mux.MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			authToken := r.Header.Get("Authorization")
+			if authToken == "" {
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			claims, err := auth.ValidateToken(authToken)
+			if err != nil {
+				httputil.Forbidden(w)
+				return
+			}
+			next.ServeHTTP(w, reqCtx.WithAuthInfo(r, claims))
+		})
+	}
+}
+
 func RequireRight(right auth.Right) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			authToken := r.Header.Get("Authorization")
+			ctx := r.Context()
+			authToken := reqCtx.GetToken(ctx)
 			if authToken == "" {
 				httputil.Unauthorized(w)
 				return
@@ -27,7 +47,7 @@ func RequireRight(right auth.Right) func(http.HandlerFunc) http.HandlerFunc {
 				return
 			}
 
-			rights, ok := claims["rights"].([]interface{}) // JWT claims are usually unmarshaled as []interface{}
+			rights, ok := claims["rights"].([]interface{})
 			if !ok {
 				httputil.Forbidden(w)
 				return
@@ -35,7 +55,7 @@ func RequireRight(right auth.Right) func(http.HandlerFunc) http.HandlerFunc {
 
 			for _, userRight := range rights {
 				if auth.IsEqual(userRight.(string), right) {
-					next(w, reqCtx.WithAuthInfo(r, claims))
+					next(w, r)
 					return
 				}
 			}
@@ -80,7 +100,7 @@ func RequireAuth(config AuthConfig) func(http.HandlerFunc) http.HandlerFunc {
 				if config.Body != nil && r.Body != nil {
 					bodyData := config.Body.(RequestWithID)
 					if err := json.NewDecoder(r.Body).Decode(&bodyData); err != nil {
-						httputil.BadRequest(w)
+						httputil.BadRequest(w, err)
 						return
 					}
 
@@ -98,7 +118,8 @@ func RequireAuth(config AuthConfig) func(http.HandlerFunc) http.HandlerFunc {
 			}
 
 			// Only authenticate ownership if an ID is provided, otherwise this request is for creating a new resource
-			authToken := r.Header.Get("Authorization")
+			ctx := r.Context()
+			authToken := reqCtx.GetToken(ctx)
 			if authToken == "" {
 				if isCreate && config.AllowCreate {
 					next(w, r)
@@ -131,7 +152,7 @@ func RequireAuth(config AuthConfig) func(http.HandlerFunc) http.HandlerFunc {
 				}
 			}
 
-			next(w, reqCtx.WithAuthInfo(r, claims))
+			next(w, r)
 		}
 	}
 }

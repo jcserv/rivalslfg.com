@@ -5,10 +5,11 @@ import (
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jcserv/rivalslfg/internal/utils"
 )
 
 type AuthInfo struct {
-	PlayerID string
+	PlayerID int
 	GroupID  string
 	Token    string
 }
@@ -35,10 +36,10 @@ func GetAuthInfoOrDefault(ctx context.Context, fallback *AuthInfo) *AuthInfo {
 	return info
 }
 
-func GetPlayerID(ctx context.Context) string {
+func GetPlayerID(ctx context.Context) int {
 	info, ok := GetAuthInfo(ctx)
 	if !ok {
-		return ""
+		return 0
 	}
 	return info.PlayerID
 }
@@ -71,9 +72,9 @@ func ctxWithAuthInfo(ctx context.Context, info *AuthInfo) context.Context {
 func WithAuthInfo(r *http.Request, claims jwt.MapClaims) *http.Request {
 	ctx := r.Context()
 
-	playerID, groupID, token := "", "", ""
+	playerID, groupID, token := 0, "", ""
 	if playerIDVal, ok := claims["playerId"]; ok {
-		playerID = playerIDVal.(string)
+		playerID = utils.StringToInt(playerIDVal.(string))
 	}
 	if groupIDVal, ok := claims["groupId"]; ok {
 		groupID = groupIDVal.(string)

@@ -97,16 +97,6 @@ func (s *Service) ConnectDB(ctx context.Context) (*pgxpool.Pool, error) {
 	}
 	defer conn.Release()
 
-	customDataTypes := []string{"RankName", "RankID", "Rank"}
-	for _, typeName := range customDataTypes {
-		dataType, _ := conn.Conn().LoadType(ctx, typeName)
-		if dataType == nil {
-			log.Error(ctx, fmt.Sprintf("Failed to load data type %s", typeName))
-			continue
-		}
-		conn.Conn().TypeMap().RegisterType(dataType)
-	}
-
 	return pool, nil
 }
 

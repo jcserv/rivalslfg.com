@@ -26,9 +26,10 @@ func NewAPI(authService services.IAuth, groupService services.IGroup) *API {
 
 func (a *API) RegisterRoutes() *mux.Router {
 	r := mux.NewRouter()
-	r.Use(middleware.LogIncomingRequests())
+	r.Use(middleware.InitRequestContext())
 	a.V1API.RegisterRoutes(r)
 	r.HandleFunc(HealthCheck, a.HealthCheck()).Methods(http.MethodGet)
+	r.Use(middleware.LogIncomingRequests())
 	return r
 }
 

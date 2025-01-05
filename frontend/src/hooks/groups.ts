@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { fetchGroup, fetchGroups, rivalsStoreKeys, upsertGroup } from "@/api";
+import { createGroup, fetchGroup, fetchGroups, rivalsStoreKeys } from "@/api";
 import { Group, Profile } from "@/types";
 
 import { usePagination } from "./paginate";
@@ -30,15 +30,14 @@ export function useGroup(
   return [query.data, query.isLoading, query.error];
 }
 
-type UpsertGroupArgs = {
+type createGroupArgs = {
   profile: Profile;
-  id: string;
 };
 
-export function useUpsertGroup() {
+export function useCreateGroup() {
   const { mutateAsync } = useMutation({
-    mutationFn: (input: UpsertGroupArgs) => {
-      return upsertGroup(input.profile, input.id);
+    mutationFn: (input: createGroupArgs) => {
+      return createGroup(input.profile);
     },
   });
   return mutateAsync;

@@ -37,20 +37,6 @@ type GroupSettings struct {
 	Mic       bool     `json:"mic"`
 }
 
-type Profile struct {
-	Name          string         `json:"name"`
-	Region        string         `json:"region"`
-	Platform      string         `json:"platform"`
-	Gamemode      string         `json:"gamemode"`
-	Roles         []string       `json:"roles"`
-	Rank          Rankid         `json:"rank"`
-	Characters    []string       `json:"characters"`
-	VoiceChat     bool           `json:"voiceChat"`
-	Mic           bool           `json:"mic"`
-	RoleQueue     *RoleQueue     `json:"roleQueue"`
-	GroupSettings *GroupSettings `json:"groupSettings"`
-}
-
 type PlayerInGroup struct {
 	Name       string   `json:"name"`
 	Leader     bool     `json:"leader"`

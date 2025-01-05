@@ -96,6 +96,21 @@ func (m *MockIGroup) EXPECT() *MockIGroupMockRecorder {
 	return m.recorder
 }
 
+// CreateGroup mocks base method.
+func (m *MockIGroup) CreateGroup(ctx context.Context, arg repository.CreateGroupParams) (repository.CreateGroupRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateGroup", ctx, arg)
+	ret0, _ := ret[0].(repository.CreateGroupRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateGroup indicates an expected call of CreateGroup.
+func (mr *MockIGroupMockRecorder) CreateGroup(ctx, arg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateGroup", reflect.TypeOf((*MockIGroup)(nil).CreateGroup), ctx, arg)
+}
+
 // GetGroupByID mocks base method.
 func (m *MockIGroup) GetGroupByID(ctx context.Context, id string) (*repository.GroupWithPlayers, error) {
 	m.ctrl.T.Helper()
@@ -125,61 +140,4 @@ func (m *MockIGroup) GetGroups(ctx context.Context, arg repository.GetGroupsPara
 func (mr *MockIGroupMockRecorder) GetGroups(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroups", reflect.TypeOf((*MockIGroup)(nil).GetGroups), ctx, arg)
-}
-
-// JoinGroup mocks base method.
-func (m *MockIGroup) JoinGroup(ctx context.Context, arg services.JoinGroupArgs) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "JoinGroup", ctx, arg)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// JoinGroup indicates an expected call of JoinGroup.
-func (mr *MockIGroupMockRecorder) JoinGroup(ctx, arg any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JoinGroup", reflect.TypeOf((*MockIGroup)(nil).JoinGroup), ctx, arg)
-}
-
-// PromoteOwnerOrDeleteGroup mocks base method.
-func (m *MockIGroup) PromoteOwnerOrDeleteGroup(ctx context.Context, arg repository.PromoteOwnerOrDeleteGroupParams) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PromoteOwnerOrDeleteGroup", ctx, arg)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// PromoteOwnerOrDeleteGroup indicates an expected call of PromoteOwnerOrDeleteGroup.
-func (mr *MockIGroupMockRecorder) PromoteOwnerOrDeleteGroup(ctx, arg any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PromoteOwnerOrDeleteGroup", reflect.TypeOf((*MockIGroup)(nil).PromoteOwnerOrDeleteGroup), ctx, arg)
-}
-
-// RemovePlayerFromGroup mocks base method.
-func (m *MockIGroup) RemovePlayerFromGroup(ctx context.Context, arg repository.RemovePlayerFromGroupParams) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RemovePlayerFromGroup", ctx, arg)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// RemovePlayerFromGroup indicates an expected call of RemovePlayerFromGroup.
-func (mr *MockIGroupMockRecorder) RemovePlayerFromGroup(ctx, arg any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemovePlayerFromGroup", reflect.TypeOf((*MockIGroup)(nil).RemovePlayerFromGroup), ctx, arg)
-}
-
-// UpsertGroup mocks base method.
-func (m *MockIGroup) UpsertGroup(ctx context.Context, arg repository.UpsertGroupParams) (string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpsertGroup", ctx, arg)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpsertGroup indicates an expected call of UpsertGroup.
-func (mr *MockIGroupMockRecorder) UpsertGroup(ctx, arg any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertGroup", reflect.TypeOf((*MockIGroup)(nil).UpsertGroup), ctx, arg)
 }

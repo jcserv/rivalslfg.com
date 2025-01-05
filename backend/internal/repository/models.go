@@ -5,132 +5,10 @@
 package repository
 
 import (
-	"database/sql/driver"
-	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
-
-type Rankid string
-
-const (
-	RankidB3  Rankid = "b3"
-	RankidB2  Rankid = "b2"
-	RankidB1  Rankid = "b1"
-	RankidS3  Rankid = "s3"
-	RankidS2  Rankid = "s2"
-	RankidS1  Rankid = "s1"
-	RankidG3  Rankid = "g3"
-	RankidG2  Rankid = "g2"
-	RankidG1  Rankid = "g1"
-	RankidP3  Rankid = "p3"
-	RankidP2  Rankid = "p2"
-	RankidP1  Rankid = "p1"
-	RankidD3  Rankid = "d3"
-	RankidD2  Rankid = "d2"
-	RankidD1  Rankid = "d1"
-	RankidGm3 Rankid = "gm3"
-	RankidGm2 Rankid = "gm2"
-	RankidGm1 Rankid = "gm1"
-	RankidE   Rankid = "e"
-	RankidOa  Rankid = "oa"
-)
-
-func (e *Rankid) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = Rankid(s)
-	case string:
-		*e = Rankid(s)
-	default:
-		return fmt.Errorf("unsupported scan type for Rankid: %T", src)
-	}
-	return nil
-}
-
-type NullRankid struct {
-	Rankid Rankid `json:"rankid"`
-	Valid  bool   `json:"valid"` // Valid is true if Rankid is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullRankid) Scan(value interface{}) error {
-	if value == nil {
-		ns.Rankid, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.Rankid.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullRankid) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.Rankid), nil
-}
-
-type Rankname string
-
-const (
-	RanknameBronzeIII      Rankname = "Bronze III"
-	RanknameBronzeII       Rankname = "Bronze II"
-	RanknameBronzeI        Rankname = "Bronze I"
-	RanknameSilverIII      Rankname = "Silver III"
-	RanknameSilverII       Rankname = "Silver II"
-	RanknameSilverI        Rankname = "Silver I"
-	RanknameGoldIII        Rankname = "Gold III"
-	RanknameGoldII         Rankname = "Gold II"
-	RanknameGoldI          Rankname = "Gold I"
-	RanknamePlatinumIII    Rankname = "Platinum III"
-	RanknamePlatinumII     Rankname = "Platinum II"
-	RanknamePlatinumI      Rankname = "Platinum I"
-	RanknameDiamondIII     Rankname = "Diamond III"
-	RanknameDiamondII      Rankname = "Diamond II"
-	RanknameDiamondI       Rankname = "Diamond I"
-	RanknameGrandmasterIII Rankname = "Grandmaster III"
-	RanknameGrandmasterII  Rankname = "Grandmaster II"
-	RanknameGrandmasterI   Rankname = "Grandmaster I"
-	RanknameEternity       Rankname = "Eternity"
-	RanknameOneAboveAll    Rankname = "One Above All"
-)
-
-func (e *Rankname) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = Rankname(s)
-	case string:
-		*e = Rankname(s)
-	default:
-		return fmt.Errorf("unsupported scan type for Rankname: %T", src)
-	}
-	return nil
-}
-
-type NullRankname struct {
-	Rankname Rankname `json:"rankname"`
-	Valid    bool     `json:"valid"` // Valid is true if Rankname is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullRankname) Scan(value interface{}) error {
-	if value == nil {
-		ns.Rankname, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.Rankname.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullRankname) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.Rankname), nil
-}
 
 type Community struct {
 	ID          int32  `json:"id"`
@@ -142,19 +20,44 @@ type Community struct {
 type Group struct {
 	ID           string      `json:"id"`
 	CommunityID  int32       `json:"community_id"`
-	Owner        string      `json:"owner"`
+	Owner        pgtype.Text `json:"owner"`
 	Region       string      `json:"region"`
 	Gamemode     string      `json:"gamemode"`
-	Players      []byte      `json:"players"`
 	Open         bool        `json:"open"`
 	Passcode     string      `json:"passcode"`
-	Vanguards    pgtype.Int4 `json:"vanguards"`
-	Duelists     pgtype.Int4 `json:"duelists"`
-	Strategists  pgtype.Int4 `json:"strategists"`
+	Vanguards    int32       `json:"vanguards"`
+	Duelists     int32       `json:"duelists"`
+	Strategists  int32       `json:"strategists"`
 	Platforms    []string    `json:"platforms"`
 	VoiceChat    pgtype.Bool `json:"voice_chat"`
 	Mic          pgtype.Bool `json:"mic"`
 	CreatedAt    time.Time   `json:"created_at"`
 	UpdatedAt    time.Time   `json:"updated_at"`
 	LastActiveAt time.Time   `json:"last_active_at"`
+}
+
+type Groupmember struct {
+	GroupID  string `json:"group_id"`
+	PlayerID int32  `json:"player_id"`
+	Leader   bool   `json:"leader"`
+}
+
+type Player struct {
+	ID          int32    `json:"id"`
+	Name        string   `json:"name"`
+	Platform    string   `json:"platform"`
+	Roles       []string `json:"roles"`
+	Rank        int32    `json:"rank"`
+	Characters  []string `json:"characters"`
+	VoiceChat   bool     `json:"voice_chat"`
+	Mic         bool     `json:"mic"`
+	Vanguards   int32    `json:"vanguards"`
+	Duelists    int32    `json:"duelists"`
+	Strategists int32    `json:"strategists"`
+}
+
+type Rank struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Value int32  `json:"value"`
 }

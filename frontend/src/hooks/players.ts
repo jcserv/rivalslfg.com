@@ -26,10 +26,7 @@ type RemovePlayerArgs = {
 export function useRemovePlayer() {
   const { mutateAsync } = useMutation({
     mutationFn: (input: RemovePlayerArgs) => {
-      return removePlayer(
-        input.groupId,
-        input.playerId,
-      );
+      return removePlayer(input.groupId, input.playerId);
     },
   });
   return mutateAsync;
