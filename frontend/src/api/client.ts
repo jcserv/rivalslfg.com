@@ -55,8 +55,8 @@ export class HTTPClient {
       headers,
     });
 
-    const respBody = await response.json();
     if (!response.ok) {
+      const respBody = await response.json();
       throw new HTTPError(response.status, response.statusText, respBody);
     }
 

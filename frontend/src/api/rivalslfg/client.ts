@@ -23,9 +23,6 @@ export class RivalsLFGClient extends HTTPClient {
       method: "POST",
       body: JSON.stringify(body),
     });
-    if (!response.ok) {
-      throw new Error(`HTTP error, status: ${response.status}`);
-    }
 
     const data = await response.json();
     return data ?? { groupId: "", playerId: 0 };
