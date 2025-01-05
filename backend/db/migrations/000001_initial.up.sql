@@ -62,7 +62,6 @@ CREATE TABLE Groups (
     owner VARCHAR(14), -- this is the player's name
     region CHAR(2) NOT NULL,
     gamemode TEXT NOT NULL,
-    players JSONB NOT NULL DEFAULT '[]'::JSONB,
     
     open BOOLEAN NOT NULL,
     passcode VARCHAR(4) NOT NULL DEFAULT generate_passcode(),
@@ -81,6 +80,45 @@ CREATE TABLE Groups (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     last_active_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE Ranks (
+    id VARCHAR(4) PRIMARY KEY,  
+    name VARCHAR(20) NOT NULL, 
+    value INTEGER NOT NULL UNIQUE,
+    CONSTRAINT valid_rank_id CHECK (id ~ '^(b[1-3]|s[1-3]|g[1-3]|p[1-3]|d[1-3]|gm[1-3]|e|oa)$')
+);
+
+INSERT INTO Ranks (id, name, value) VALUES
+    ('b3', 'Bronze III', 0),
+    ('b2', 'Bronze II', 1),
+    ('b1', 'Bronze I', 2),
+    ('s3', 'Silver III', 10),
+    ('s2', 'Silver II', 11),
+    ('s1', 'Silver I', 12),
+    ('g3', 'Gold III', 20),
+    ('g2', 'Gold II', 21),
+    ('g1', 'Gold I', 22),
+    ('p3', 'Platinum III', 30),
+    ('p2', 'Platinum II', 31),
+    ('p1', 'Platinum I', 32),
+    ('d3', 'Diamond III', 40),
+    ('d2', 'Diamond II', 41),
+    ('d1', 'Diamond I', 42),
+    ('gm3', 'Grandmaster III', 50),
+    ('gm2', 'Grandmaster II', 51),
+    ('gm1', 'Grandmaster I', 52),
+    ('e', 'Eternity', 60),
+    ('oa', 'One Above All', 70);
+
+CREATE OR REPLACE FUNCTION rank_id_to_value(rank_id VARCHAR) 
+RETURNS INTEGER AS $$
+    SELECT value FROM Ranks WHERE id = $1;
+$$ LANGUAGE SQL IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION rank_value_to_id(rank_value INTEGER) 
+RETURNS VARCHAR AS $$
+    SELECT id FROM Ranks WHERE value = $1;
+$$ LANGUAGE SQL IMMUTABLE;
 
 CREATE TABLE Players (
     id SERIAL PRIMARY KEY NOT NULL,

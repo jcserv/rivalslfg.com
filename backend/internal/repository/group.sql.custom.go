@@ -7,8 +7,15 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-// TODO: Compute requirementsMet, add total count
 const getGroups = `
+WITH group_sizes AS (
+    SELECT 
+        group_id,
+        COUNT(*) as member_count
+    FROM GroupMembers
+    GROUP BY group_id
+)
+
 SELECT 
     g.id,
     community_id,
@@ -26,8 +33,28 @@ SELECT
         'voiceChat', g.voice_chat,
         'mic', g.mic
     ) AS group_settings,
-    players,
-    jsonb_array_length(players) AS size,
+    COALESCE(
+        (
+            SELECT jsonb_agg(
+                jsonb_build_object(
+                    'id', p.id,
+                    'name', p.name,
+                    'leader', gm.leader,
+                    'platform', p.platform,
+                    'roles', p.roles,
+                    'rank', rank_value_to_id(p.rank),
+                    'characters', p.characters,
+                    'voiceChat', p.voice_chat,
+                    'mic', p.mic
+                )
+            )
+            FROM GroupMembers gm
+            JOIN Players p ON p.id = gm.player_id
+            WHERE gm.group_id = g.id
+        ),
+        '[]'::jsonb
+    ) as players,
+    COALESCE(gs.member_count, 0) as size,
 	CASE WHEN $7 = true THEN (
         SELECT COUNT(*)
         FROM Groups g2
@@ -41,8 +68,9 @@ SELECT
             END
           )
     ) ELSE 0 END as total_count,
-	last_active_at
+	g.last_active_at
 FROM Groups g
+LEFT JOIN group_sizes gs ON g.id = gs.group_id
 WHERE ($1 = '' OR g.region = $1)
   AND ($2 = '' OR g.gamemode = $2)
   AND ($3 = '' OR
@@ -53,8 +81,8 @@ WHERE ($1 = '' OR g.region = $1)
     END
   )
 ORDER BY 
-    CASE WHEN $4 = 'asc' THEN jsonb_array_length(players) END ASC,
-    CASE WHEN $4 = 'desc' THEN jsonb_array_length(players) END DESC
+    CASE WHEN $4 = 'asc' THEN gs.member_count END ASC,
+    CASE WHEN $4 = 'desc' THEN gs.member_count END DESC
 LIMIT $5 OFFSET $6;
 `
 
