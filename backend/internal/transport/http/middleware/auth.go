@@ -26,7 +26,7 @@ func InitRequestContext() mux.MiddlewareFunc {
 				httputil.Forbidden(w)
 				return
 			}
-			next.ServeHTTP(w, reqCtx.WithAuthInfo(r, claims))
+			next.ServeHTTP(w, reqCtx.WithClaims(r, claims))
 		})
 	}
 }
@@ -136,7 +136,7 @@ func RequireAuth(config AuthConfig) func(http.HandlerFunc) http.HandlerFunc {
 			}
 
 			if isCreate && config.AllowCreate && auth.HasNotCreatedGroup(claims) {
-				next(w, reqCtx.WithAuthInfo(r, claims))
+				next(w, reqCtx.WithClaims(r, claims))
 				return
 			}
 

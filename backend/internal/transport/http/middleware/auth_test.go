@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/jcserv/rivalslfg/internal/auth"
+	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,8 +18,13 @@ func TestRequireRight(t *testing.T) {
 		}, auth.RightReadUser)
 		req := httptest.NewRequest("GET", "/", nil)
 		req.Header.Set("Authorization", token)
-		rec := httptest.NewRecorder()
+		req = reqCtx.WithAuthInfo(req, &reqCtx.AuthInfo{
+			PlayerID: 1,
+			GroupID:  "AAAA",
+			Token:    token,
+		})
 
+		rec := httptest.NewRecorder()
 		handler := RequireRight(auth.RightReadUser)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 		}))
@@ -32,8 +38,13 @@ func TestRequireRight(t *testing.T) {
 		})
 		req := httptest.NewRequest("GET", "/", nil)
 		req.Header.Set("Authorization", token)
-		rec := httptest.NewRecorder()
+		req = reqCtx.WithAuthInfo(req, &reqCtx.AuthInfo{
+			PlayerID: 1,
+			GroupID:  "AAAA",
+			Token:    token,
+		})
 
+		rec := httptest.NewRecorder()
 		handler := RequireRight(auth.RightDeleteGroup)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 		}))

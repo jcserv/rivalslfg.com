@@ -69,7 +69,7 @@ func ctxWithAuthInfo(ctx context.Context, info *AuthInfo) context.Context {
 	return context.WithValue(ctx, authInfoKey, info)
 }
 
-func WithAuthInfo(r *http.Request, claims jwt.MapClaims) *http.Request {
+func WithClaims(r *http.Request, claims jwt.MapClaims) *http.Request {
 	ctx := r.Context()
 
 	playerID, groupID, token := 0, "", ""
@@ -88,5 +88,10 @@ func WithAuthInfo(r *http.Request, claims jwt.MapClaims) *http.Request {
 		GroupID:  groupID,
 		Token:    token,
 	}
+	return r.WithContext(ctxWithAuthInfo(ctx, info))
+}
+
+func WithAuthInfo(r *http.Request, info *AuthInfo) *http.Request {
+	ctx := r.Context()
 	return r.WithContext(ctxWithAuthInfo(ctx, info))
 }
