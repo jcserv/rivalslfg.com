@@ -182,8 +182,28 @@ SELECT
 		'voiceChat', g.voice_chat,
 		'mic', g.mic
 	) AS group_settings,
-	players,
-	jsonb_array_length(players) AS size,
+	COALESCE(
+        (
+            SELECT jsonb_agg(
+                jsonb_build_object(
+                    'id', p.id,
+                    'name', p.name,
+                    'leader', gm.leader,
+                    'platform', p.platform,
+                    'roles', p.roles,
+                    'rank', rank_value_to_id(p.rank),
+                    'characters', p.characters,
+                    'voiceChat', p.voice_chat,
+                    'mic', p.mic
+                )
+            )
+            FROM GroupMembers gm
+            JOIN Players p ON p.id = gm.player_id
+            WHERE gm.group_id = g.id
+        ),
+        '[]'::jsonb
+    ) as players,
+	(SELECT COUNT(*) FROM GroupMembers WHERE group_id = g.id) AS size,
 	last_active_at
 FROM Groups g
 WHERE g.id = $1`
