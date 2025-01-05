@@ -36,16 +36,16 @@ export const formSchema = z.object({
       sum: z.any().optional(), // Used to render the error message
     })
     .optional(),
-    // .refine(
-    //   (data) =>
-    //     data &&
-    //     data?.vanguards + data?.duelists + data?.strategists === TEAM_SIZE,
-    //   {
-    //     message:
-    //       "Number of desired vanguards, duelists, and strategists must add up to 6",
-    //     path: ["sum"],
-    //   },
-    // ),
+  // .refine(
+  //   (data) =>
+  //     data &&
+  //     data?.vanguards + data?.duelists + data?.strategists === TEAM_SIZE,
+  //   {
+  //     message:
+  //       "Number of desired vanguards, duelists, and strategists must add up to 6",
+  //     path: ["sum"],
+  //   },
+  // ),
   groupSettings: z
     .object({
       platforms: z.array(z.nativeEnum(Platform)),

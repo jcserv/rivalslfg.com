@@ -10,22 +10,22 @@ import { ErrorBanner, FindGroupDialog, GroupTable } from "@/components";
 import { Button } from "@/components/ui";
 import { useProfile } from "@/hooks";
 
-type BrowsePageSearchParams = {
+type GroupsPageSearchParams = {
   queue?: boolean;
 };
 
-export const Route = createFileRoute("/browse")({
-  component: BrowsePage,
+export const Route = createFileRoute("/groups/")({
+  component: GroupsPage,
   validateSearch: (
     search: { queue?: boolean } & SearchSchemaInput,
-  ): BrowsePageSearchParams => {
+  ): GroupsPageSearchParams => {
     return {
       ...(search.queue !== undefined && { queue: search.queue }),
     };
   },
 });
 
-function BrowsePage() {
+function GroupsPage() {
   const searchParams = Route.useSearch();
   const [show, setShow] = useState(searchParams.queue ?? false);
 

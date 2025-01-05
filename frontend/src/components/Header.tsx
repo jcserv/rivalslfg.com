@@ -16,7 +16,7 @@ export const Header: React.FC = () => {
         <Link to="/" className="inline-flex items-center hover:underline">
           Home
         </Link>
-        <Link to="/browse" className="inline-flex items-center hover:underline">
+        <Link to="/groups" className="inline-flex items-center hover:underline">
           Browse
         </Link>
         <Link
