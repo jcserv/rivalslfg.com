@@ -99,6 +99,8 @@ func parsePagination(args *repository.GetGroupsParams, paginateBy *httputil.Offs
 }
 
 type CreateGroup struct {
+	PlayerID int    `json:"player_id"`
+	GroupID  string `json:"group_id"`
 	Owner    string `json:"owner"`
 	Region   string `json:"region"`
 	Gamemode string `json:"gamemode"`
@@ -167,18 +169,20 @@ func (c *CreateGroup) Parse() (*repository.CreateGroupParams, error) {
 		return nil, fmt.Errorf("strategists must be between 0 and 6")
 	}
 
-	if (c.Vanguards + c.Duelists + c.Strategists) != 6 {
-		return nil, fmt.Errorf("vanguards, duelists, and strategists must add up to 6")
-	}
+	// if (c.Vanguards + c.Duelists + c.Strategists) != 6 {
+	// 	return nil, fmt.Errorf("vanguards, duelists, and strategists must add up to 6")
+	// }
 
 	if len(types.Platforms.Intersection(types.NewSet(c.Platforms...))) != len(c.Platforms) {
 		return nil, fmt.Errorf("one or more provided platforms %v is not supported", c.Platforms)
 	}
 
+	params.PlayerID = int32(c.PlayerID)
+	params.GroupID = c.GroupID
 	params.Owner = c.Owner
 	params.Platform = c.Platform
 	params.Roles = c.Roles
-	params.RankValue = int32(types.RankIDToRankVal[c.RankID])
+	params.RankVal = int32(types.RankIDToRankVal[c.RankID])
 	params.Characters = c.Characters
 	params.VoiceChat = c.VoiceChat
 	params.Mic = c.Mic

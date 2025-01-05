@@ -17,7 +17,11 @@ func NewGroup(repo *repository.Queries) *Group {
 }
 
 func (s *Group) CreateGroup(ctx context.Context, arg repository.CreateGroupParams) (repository.CreateGroupRow, error) {
-	return s.repo.CreateGroup(ctx, arg)
+	result, err := s.repo.CreateGroup(ctx, arg)
+	if err != nil {
+		return repository.CreateGroupRow{}, err
+	}
+	return result, nil
 }
 
 func (s *Group) GetGroups(ctx context.Context, arg repository.GetGroupsParams) ([]repository.GroupWithPlayers, int32, error) {

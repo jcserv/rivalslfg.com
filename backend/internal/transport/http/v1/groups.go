@@ -14,34 +14,26 @@ import (
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
+// httputil.BadRequest(w, fmt.Errorf("Player is already in group: %s", group.ID),
+//
+//	map[string]any{
+//		"groupId": group.ID,
+//	},
+//
+// )
 func (a *API) CreateGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		// Check if they already have a group
-		groupID := reqCtx.GetGroupID(ctx)
-		group, err := a.groupService.GetGroupByID(ctx, groupID)
-		if err != nil {
-			httputil.InternalServerError(ctx, w, err)
-			return
-		}
-		if group != nil {
-			httputil.BadRequest(w, fmt.Errorf("Player is already in group: %s", group.ID),
-				map[string]any{
-					"groupId": group.ID,
-				},
-			)
-			return
-		}
-
 		var input CreateGroup
-		err = json.NewDecoder(r.Body).Decode(&input)
+		err := json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
 			log.Debug(ctx, err.Error())
 			httputil.BadRequest(w, err)
 			return
 		}
 
+		input.PlayerID, input.GroupID = reqCtx.GetPlayerID(ctx), reqCtx.GetGroupID(ctx)
 		params, err := input.Parse()
 		if err != nil {
 			log.Debug(ctx, err.Error())

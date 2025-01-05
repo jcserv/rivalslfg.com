@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { TEAM_SIZE } from "@/types/constants";
+// import { TEAM_SIZE } from "@/types/constants";
 import { Gamemode, Platform, Rank, Region, Roles } from "@/types/types";
 
 export const formSchema = z.object({
@@ -35,17 +35,17 @@ export const formSchema = z.object({
         .max(6, "Please select a maximum of 6 strategists"),
       sum: z.any().optional(), // Used to render the error message
     })
-    .optional()
-    .refine(
-      (data) =>
-        data &&
-        data?.vanguards + data?.duelists + data?.strategists === TEAM_SIZE,
-      {
-        message:
-          "Number of desired vanguards, duelists, and strategists must add up to 6",
-        path: ["sum"],
-      },
-    ),
+    .optional(),
+    // .refine(
+    //   (data) =>
+    //     data &&
+    //     data?.vanguards + data?.duelists + data?.strategists === TEAM_SIZE,
+    //   {
+    //     message:
+    //       "Number of desired vanguards, duelists, and strategists must add up to 6",
+    //     path: ["sum"],
+    //   },
+    // ),
   groupSettings: z
     .object({
       platforms: z.array(z.nativeEnum(Platform)),

@@ -12,7 +12,25 @@ import (
 )
 
 const createGroup = `-- name: CreateGroup :one
-WITH new_player AS (
+WITH 
+existing_membership AS (
+    SELECT 
+        group_id::text,
+        player_id::integer
+    FROM GroupMembers
+    WHERE 
+        CASE 
+            WHEN $1 != '' AND $2 != 0 THEN 
+                group_id = $1 AND player_id = $2
+            WHEN $1 != '' THEN 
+                group_id = $1
+            WHEN $2 != 0 THEN 
+                player_id = $2
+            ELSE FALSE
+        END
+    LIMIT 1
+),
+new_player AS (
     INSERT INTO Players (
         name,
         platform,
@@ -21,16 +39,30 @@ WITH new_player AS (
         characters,
         voice_chat,
         mic
-    ) VALUES (
-        $1,
-        $2,
+    )
+    SELECT 
         $3,
         $4,
         $5,
         $6,
-        $7
-    )
+        $7,
+        $8,
+        $9
+    WHERE 
+        NOT EXISTS (SELECT 1 FROM existing_membership) AND
+        ($2 = 0 OR NOT EXISTS (SELECT 1 FROM Players WHERE id = $2))
     RETURNING id
+),
+final_player AS (
+    SELECT 
+        CASE
+            WHEN EXISTS (SELECT 1 FROM existing_membership) THEN 
+                (SELECT player_id FROM existing_membership)
+            WHEN $2 != 0 AND EXISTS (SELECT 1 FROM Players WHERE id = $2) THEN 
+                $2
+            ELSE 
+                (SELECT id FROM new_player)
+        END as player_id
 ),
 new_group AS (
     INSERT INTO Groups (
@@ -44,43 +76,64 @@ new_group AS (
         platforms,
         voice_chat,
         mic
-    ) VALUES (
-        $1,
-        $8,
-        $9,
+    )
+    SELECT
+        $3,
         $10,
         $11,
         $12,
         $13,
         $14,
         $15,
-        $16
-    )
-    RETURNING id
+        $16,
+        $17,
+        $18
+    WHERE 
+        NOT EXISTS (SELECT 1 FROM existing_membership) AND
+        ($1 = '' OR NOT EXISTS (SELECT 1 FROM Groups WHERE id = $1))
+    RETURNING id::text
 ),
-group_member AS (
+final_group AS (
+    SELECT 
+        CASE
+            WHEN EXISTS (SELECT 1 FROM existing_membership) THEN 
+                (SELECT group_id FROM existing_membership)
+            WHEN $1 != '' AND EXISTS (SELECT 1 FROM Groups WHERE id = $1) THEN 
+                $1
+            ELSE 
+                (SELECT id FROM new_group)
+        END as group_id
+),
+new_membership AS (
     INSERT INTO GroupMembers (
         group_id,
         player_id,
         leader
     )
     SELECT 
-        new_group.id,
-        new_player.id,
+        fg.group_id,
+        fp.player_id,
         true
-    FROM new_group, new_player
+    FROM final_group fg, final_player fp
+    WHERE NOT EXISTS (SELECT 1 FROM existing_membership)
+    RETURNING group_id::text, player_id::integer
 )
-SELECT 
-    new_group.id as group_id,
-    new_player.id as player_id
-FROM new_group, new_player
+SELECT group_id::text, player_id::integer
+FROM (
+    SELECT group_id, player_id FROM existing_membership
+    UNION ALL
+    SELECT group_id, player_id FROM new_membership
+) results
+LIMIT 1
 `
 
 type CreateGroupParams struct {
+	GroupID        interface{} `json:"group_id"`
+	PlayerID       interface{} `json:"player_id"`
 	Owner          string      `json:"owner"`
 	Platform       string      `json:"platform"`
 	Roles          []string    `json:"roles"`
-	RankValue      int32       `json:"rank_value"`
+	RankVal        int32       `json:"rank_val"`
 	Characters     []string    `json:"characters"`
 	VoiceChat      bool        `json:"voice_chat"`
 	Mic            bool        `json:"mic"`
@@ -100,12 +153,22 @@ type CreateGroupRow struct {
 	PlayerID int32  `json:"player_id"`
 }
 
+// The result row will contain group_id text and player_id integer
+// First check if this combination already exists
+// If no membership exists, we might need to create a new player
+// Get final player_id (either existing, provided, or new)
+// If no membership exists, we might need to create a new group
+// Get final group_id (either existing, provided, or new)
+// Create the membership if it doesn't exist
+// Return either the existing or new membership
 func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (CreateGroupRow, error) {
 	row := q.db.QueryRow(ctx, createGroup,
+		arg.GroupID,
+		arg.PlayerID,
 		arg.Owner,
 		arg.Platform,
 		arg.Roles,
-		arg.RankValue,
+		arg.RankVal,
 		arg.Characters,
 		arg.VoiceChat,
 		arg.Mic,

@@ -1,5 +1,26 @@
 -- name: CreateGroup :one
-WITH new_player AS (
+-- The result row will contain group_id text and player_id integer
+WITH 
+-- First check if this combination already exists
+existing_membership AS (
+    SELECT 
+        group_id::text,
+        player_id::integer
+    FROM GroupMembers
+    WHERE 
+        CASE 
+            WHEN @group_id != '' AND @player_id != 0 THEN 
+                group_id = @group_id AND player_id = @player_id
+            WHEN @group_id != '' THEN 
+                group_id = @group_id
+            WHEN @player_id != 0 THEN 
+                player_id = @player_id
+            ELSE FALSE
+        END
+    LIMIT 1
+),
+-- If no membership exists, we might need to create a new player
+new_player AS (
     INSERT INTO Players (
         name,
         platform,
@@ -8,17 +29,33 @@ WITH new_player AS (
         characters,
         voice_chat,
         mic
-    ) VALUES (
+    )
+    SELECT 
         @owner,
         @platform,
         @roles,
-        @rank_value,
+        @rank_val,
         @characters,
         @voice_chat,
         @mic
-    )
+    WHERE 
+        NOT EXISTS (SELECT 1 FROM existing_membership) AND
+        (@player_id = 0 OR NOT EXISTS (SELECT 1 FROM Players WHERE id = @player_id))
     RETURNING id
 ),
+-- Get final player_id (either existing, provided, or new)
+final_player AS (
+    SELECT 
+        CASE
+            WHEN EXISTS (SELECT 1 FROM existing_membership) THEN 
+                (SELECT player_id FROM existing_membership)
+            WHEN @player_id != 0 AND EXISTS (SELECT 1 FROM Players WHERE id = @player_id) THEN 
+                @player_id
+            ELSE 
+                (SELECT id FROM new_player)
+        END as player_id
+),
+-- If no membership exists, we might need to create a new group
 new_group AS (
     INSERT INTO Groups (
         owner,
@@ -31,7 +68,8 @@ new_group AS (
         platforms,
         voice_chat,
         mic
-    ) VALUES (
+    )
+    SELECT
         @owner,
         @region,
         @gamemode,
@@ -42,184 +80,43 @@ new_group AS (
         @platforms,
         @group_voice_chat,
         @group_mic
-    )
-    RETURNING id
+    WHERE 
+        NOT EXISTS (SELECT 1 FROM existing_membership) AND
+        (@group_id = '' OR NOT EXISTS (SELECT 1 FROM Groups WHERE id = @group_id))
+    RETURNING id::text
 ),
-group_member AS (
+-- Get final group_id (either existing, provided, or new)
+final_group AS (
+    SELECT 
+        CASE
+            WHEN EXISTS (SELECT 1 FROM existing_membership) THEN 
+                (SELECT group_id FROM existing_membership)
+            WHEN @group_id != '' AND EXISTS (SELECT 1 FROM Groups WHERE id = @group_id) THEN 
+                @group_id
+            ELSE 
+                (SELECT id FROM new_group)
+        END as group_id
+),
+-- Create the membership if it doesn't exist
+new_membership AS (
     INSERT INTO GroupMembers (
         group_id,
         player_id,
         leader
     )
     SELECT 
-        new_group.id,
-        new_player.id,
+        fg.group_id,
+        fp.player_id,
         true
-    FROM new_group, new_player
+    FROM final_group fg, final_player fp
+    WHERE NOT EXISTS (SELECT 1 FROM existing_membership)
+    RETURNING group_id::text, player_id::integer
 )
-SELECT 
-    new_group.id as group_id,
-    new_player.id as player_id
-FROM new_group, new_player;
-
--- -- name: UpsertGroup :one
--- WITH id_check AS (
---     SELECT id FROM Groups WHERE id = @id
--- )
--- INSERT INTO Groups (
---     id,
---     owner,
---     region,
---     gamemode,
---     open,
---     vanguards,
---     duelists,
---     strategists,
---     platforms,
---     voice_chat,
---     mic,
---     last_active_at
--- ) VALUES (
---     CASE 
---         WHEN @id IS NULL OR @id = '' THEN generate_group_id()
---         ELSE @id
---     END,
---     @owner,
---     @region,
---     @gamemode,
---     COALESCE(@players, '[]'::jsonb),
---     @open,
---     @vanguards,
---     @duelists,
---     @strategists,
---     @platforms,
---     @voice_chat,
---     @mic,
---     NOW()
--- )
--- ON CONFLICT (id) DO UPDATE SET
---     owner = EXCLUDED.owner,
---     region = EXCLUDED.region,
---     gamemode = EXCLUDED.gamemode,
---     players = EXCLUDED.players,
---     open = EXCLUDED.open,
---     vanguards = EXCLUDED.vanguards,
---     duelists = EXCLUDED.duelists,
---     strategists = EXCLUDED.strategists,
---     platforms = EXCLUDED.platforms,
---     voice_chat = EXCLUDED.voice_chat,
---     mic = EXCLUDED.mic,
---     last_active_at = NOW(),
---     updated_at = NOW()
--- WHERE 
---     (SELECT 1 FROM id_check) IS NULL OR -- no specific id provided
---     Groups.id = @id -- match provided id
--- RETURNING id;
-
--- -- name: CheckCanJoinGroup :one
--- SELECT 
---     CASE
---         WHEN NOT EXISTS (SELECT 1 FROM Groups WHERE g.id = @id) THEN 404
---         WHEN NOT g.open AND g.passcode != @passcode THEN 403
---         WHEN EXISTS (
---             SELECT 1 FROM jsonb_array_elements(g.players) AS p
---             WHERE p->>'name' = @player_name::text
---         ) THEN 200
---         ELSE 202
---     END as status
--- FROM Groups g
--- WHERE g.id = @id;
-
--- -- name: JoinGroup :exec
--- UPDATE Groups g
--- SET 
---     players = jsonb_insert(COALESCE(players, '[]'::jsonb), '{-1}', @player::jsonb),
---     last_active_at = NOW(),
---     updated_at = NOW()
--- WHERE g.id = @id;
-
--- -- name: RemovePlayerFromGroup :one
--- WITH group_check AS (
---     SELECT 
---         CASE
---             WHEN NOT EXISTS (SELECT 1 FROM Groups g WHERE g.id = @id) THEN 404
---             WHEN @requester_name != g.owner 
---                 AND @requester_name != @player_name THEN 403
---             WHEN NOT EXISTS (
---                 SELECT 1 FROM jsonb_array_elements(players) AS p
---                 WHERE p->>'name' = @player_name::text
---             ) THEN 404
---             ELSE 200
---         END as status,
---         players,
---         owner
---     FROM Groups g
---     WHERE g.id = @id
--- ),
--- player_update AS (
---     UPDATE Groups g
---     SET 
---         players = COALESCE(
---             (
---                 SELECT jsonb_agg(value)
---                 FROM jsonb_array_elements(g.players) AS p
---                 WHERE p->>'name' != @player_name::text
---             ),
---             '[]'::jsonb
---         ),
---         last_active_at = NOW(),
---         updated_at = NOW()
---     WHERE g.id = @id
---         AND (SELECT status FROM group_check) = 200
---     RETURNING jsonb_array_length(players) AS remaining_players
--- )
--- SELECT 
---     (SELECT status FROM group_check) AS status,
---     (SELECT remaining_players FROM player_update) AS remaining_players,
---     (SELECT owner FROM group_check) AS owner;
-
--- -- name: PromoteOwnerOrDeleteGroup :one
--- WITH group_check AS (
---     SELECT 
---         CASE
---             WHEN NOT EXISTS (SELECT 1 FROM Groups g WHERE g.id = @id) THEN 404
---             ELSE 200
---         END as status
--- ),
--- owner_promotion AS (
---     UPDATE Groups g
---     SET 
---         owner = (
---             SELECT p->>'name'
---             FROM jsonb_array_elements(players) AS p
---             LIMIT 1
---         ),
---         players = (
---             SELECT jsonb_agg(
---                 CASE 
---                     WHEN p->>'name' = (SELECT p->>'name' FROM jsonb_array_elements(players) AS p LIMIT 1) THEN
---                         jsonb_set(p, '{leader}', 'true'::jsonb)
---                     ELSE p
---                 END
---             )
---             FROM jsonb_array_elements(players) AS p
---         ),
---         updated_at = NOW()
---     WHERE g.id = @id
---       AND @remaining_players > 0
---     RETURNING g.id AS group_id, 'promoted' AS action
--- ),
--- group_deletion AS (
---     DELETE FROM Groups g
---     WHERE g.id = @id
---       AND @remaining_players = 0
---     RETURNING id AS group_id, 'deleted' AS action
--- )
--- SELECT 
---     CASE 
---         WHEN (SELECT status FROM group_check) = 404 THEN '404'
---         ELSE COALESCE(
---             (SELECT group_id FROM owner_promotion),
---             (SELECT group_id FROM group_deletion)
---         )
---     END AS group_id;
+-- Return either the existing or new membership
+SELECT group_id::text, player_id::integer
+FROM (
+    SELECT * FROM existing_membership
+    UNION ALL
+    SELECT * FROM new_membership
+) results
+LIMIT 1;
