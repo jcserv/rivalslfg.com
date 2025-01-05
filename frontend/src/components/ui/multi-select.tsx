@@ -51,7 +51,6 @@ const useMultiSelect = () => {
  * MultiSelect Docs: {@link: https://shadcn-extension.vercel.app/docs/multi-select}
  */
 
-
 const MultiSelector = ({
   values: value,
   onValuesChange: onValueChange,

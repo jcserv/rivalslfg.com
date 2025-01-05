@@ -217,7 +217,7 @@ export function getGroupFromProfile(owner: Profile, id: string): Group {
 
 export function getPlayerFromProfile(profile: Profile): Player {
   return {
-    id: profile.id ?? 0, 
+    id: profile.id ?? 0,
     name: profile.name,
     leader: false,
     platform: profile.platform,

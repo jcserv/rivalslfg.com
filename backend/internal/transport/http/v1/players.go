@@ -1,15 +1,10 @@
 package v1
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 
-	"github.com/gorilla/mux"
-	"github.com/jcserv/rivalslfg/internal/services"
 	"github.com/jcserv/rivalslfg/internal/transport/http/httputil"
-	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
-	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
 func (a *API) CreatePlayer() http.HandlerFunc {
@@ -47,80 +42,83 @@ func (a *API) CreatePlayer() http.HandlerFunc {
 
 func (a *API) JoinGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
+		return
 
-		var input JoinGroup
-		err := json.NewDecoder(r.Body).Decode(&input)
-		if err != nil {
-			log.Debug(ctx, err.Error())
-			httputil.BadRequest(w)
-			return
-		}
+		// ctx := r.Context()
 
-		vars := mux.Vars(r)
-		groupID := vars["id"]
-		input.GroupID = groupID
+		// var input JoinGroup
+		// err := json.NewDecoder(r.Body).Decode(&input)
+		// if err != nil {
+		// 	log.Debug(ctx, err.Error())
+		// 	httputil.BadRequest(w)
+		// 	return
+		// }
 
-		params, err := input.Parse()
-		if err != nil {
-			log.Debug(ctx, err.Error())
-			httputil.BadRequest(w)
-			return
-		}
+		// vars := mux.Vars(r)
+		// groupID := vars["id"]
+		// input.GroupID = groupID
 
-		err = a.groupService.JoinGroup(ctx, *params)
-		if err != nil {
-			if serviceErr, ok := err.(services.Error); ok {
-				if serviceErr.Code() == http.StatusNotFound {
-					httputil.NotFound(w)
-					return
-				}
-				if serviceErr.Code() == http.StatusForbidden {
-					httputil.Forbidden(w)
-					return
-				}
-			}
-			httputil.InternalServerError(ctx, w, err)
-			return
-		}
-		httputil.OK(w, nil)
+		// params, err := input.Parse()
+		// if err != nil {
+		// 	log.Debug(ctx, err.Error())
+		// 	httputil.BadRequest(w)
+		// 	return
+		// }
+
+		// err = a.groupService.JoinGroup(ctx, *params)
+		// if err != nil {
+		// 	if serviceErr, ok := err.(services.Error); ok {
+		// 		if serviceErr.Code() == http.StatusNotFound {
+		// 			httputil.NotFound(w)
+		// 			return
+		// 		}
+		// 		if serviceErr.Code() == http.StatusForbidden {
+		// 			httputil.Forbidden(w)
+		// 			return
+		// 		}
+		// 	}
+		// 	httputil.InternalServerError(ctx, w, err)
+		// 	return
+		// }
+		// httputil.OK(w, nil)
 	}
 }
 
 func (a *API) RemovePlayer() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
+		return
+		// ctx := r.Context()
 
-		vars := mux.Vars(r)
-		input := RemovePlayer{
-			GroupID:          vars["id"],
-			RequesterID:      reqCtx.GetPlayerID(ctx),
-			PlayerToRemoveID: vars["playerId"],
-		}
+		// vars := mux.Vars(r)
+		// input := RemovePlayer{
+		// 	GroupID:          vars["id"],
+		// 	RequesterID:      reqCtx.GetPlayerID(ctx),
+		// 	PlayerToRemoveID: vars["playerId"],
+		// }
 
-		params, err := input.Parse()
-		if err != nil {
-			log.Debug(ctx, err.Error())
-			httputil.BadRequest(w)
-			return
-		}
+		// params, err := input.Parse()
+		// if err != nil {
+		// 	log.Debug(ctx, err.Error())
+		// 	httputil.BadRequest(w)
+		// 	return
+		// }
 
-		err = a.groupService.RemovePlayerFromGroup(ctx, *params)
-		if err != nil {
-			if serviceErr, ok := err.(services.Error); ok {
-				switch serviceErr.Code() {
-				case http.StatusNotFound:
-					httputil.NotFound(w)
-					return
-				case http.StatusForbidden:
-					httputil.Forbidden(w)
-					return
-				}
-			}
-			httputil.InternalServerError(ctx, w, err)
-			return
-		}
+		// err = a.groupService.RemovePlayerFromGroup(ctx, *params)
+		// if err != nil {
+		// 	if serviceErr, ok := err.(services.Error); ok {
+		// 		switch serviceErr.Code() {
+		// 		case http.StatusNotFound:
+		// 			httputil.NotFound(w)
+		// 			return
+		// 		case http.StatusForbidden:
+		// 			httputil.Forbidden(w)
+		// 			return
+		// 		}
+		// 	}
+		// 	httputil.InternalServerError(ctx, w, err)
+		// 	return
+		// }
 
-		httputil.OK(w, nil)
+		// httputil.OK(w, nil)
 	}
 }

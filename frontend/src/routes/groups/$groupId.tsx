@@ -35,7 +35,7 @@ type GroupPageSearchParams = {
 export const Route = createFileRoute("/groups/$groupId")({
   component: GroupPage,
   validateSearch: (
-    search: { join?: boolean; passcode?: string } & SearchSchemaInput
+    search: { join?: boolean; passcode?: string } & SearchSchemaInput,
   ): GroupPageSearchParams => {
     return {
       ...(search.join !== undefined && { join: search.join }),
@@ -81,7 +81,7 @@ function GroupPage() {
   const [showAccessDialog, setShowAccessDialog] = useState(false);
 
   const [canUserAccessGroup, setCanUserAccessGroup] = useState<boolean | null>(
-    null
+    null,
   );
 
   const { isPlayerInGroup, isOwner } = useMemo(() => {
@@ -141,7 +141,7 @@ function GroupPage() {
       setGroup,
       setShowAccessDialog,
       setCanUserAccessGroup,
-    ]
+    ],
   );
 
   async function onRemove(playerToRemoveId: number) {
@@ -158,7 +158,7 @@ function GroupPage() {
 
       if (isPlayerInGroup) {
         const updatedPlayers = group.players.filter(
-          (p) => p.id !== playerToRemoveId
+          (p) => p.id !== playerToRemoveId,
         );
 
         let newGroup = {
@@ -174,7 +174,7 @@ function GroupPage() {
             owner: newOwner.name,
             name: `${newOwner.name}'s group`,
             players: updatedPlayers.map((p) =>
-              p.name === newOwner.name ? { ...p, leader: true } : p
+              p.name === newOwner.name ? { ...p, leader: true } : p,
             ),
           };
         }

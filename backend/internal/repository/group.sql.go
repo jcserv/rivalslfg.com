@@ -11,262 +11,115 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const checkCanJoinGroup = `-- name: CheckCanJoinGroup :one
-SELECT 
-    CASE
-        WHEN NOT EXISTS (SELECT 1 FROM Groups WHERE g.id = $1) THEN 404
-        WHEN NOT g.open AND g.passcode != $2 THEN 403
-        WHEN EXISTS (
-            SELECT 1 FROM jsonb_array_elements(g.players) AS p
-            WHERE p->>'name' = $3::text
-        ) THEN 200
-        ELSE 202
-    END as status
-FROM Groups g
-WHERE g.id = $1
-`
-
-type CheckCanJoinGroupParams struct {
-	ID         string `json:"id"`
-	Passcode   string `json:"passcode"`
-	PlayerName string `json:"player_name"`
-}
-
-func (q *Queries) CheckCanJoinGroup(ctx context.Context, arg CheckCanJoinGroupParams) (int32, error) {
-	row := q.db.QueryRow(ctx, checkCanJoinGroup, arg.ID, arg.Passcode, arg.PlayerName)
-	var status int32
-	err := row.Scan(&status)
-	return status, err
-}
-
-const joinGroup = `-- name: JoinGroup :exec
-UPDATE Groups g
-SET 
-    players = jsonb_insert(COALESCE(players, '[]'::jsonb), '{-1}', $1::jsonb),
-    last_active_at = NOW(),
-    updated_at = NOW()
-WHERE g.id = $2
-`
-
-type JoinGroupParams struct {
-	Player []byte `json:"player"`
-	ID     string `json:"id"`
-}
-
-func (q *Queries) JoinGroup(ctx context.Context, arg JoinGroupParams) error {
-	_, err := q.db.Exec(ctx, joinGroup, arg.Player, arg.ID)
-	return err
-}
-
-const promoteOwnerOrDeleteGroup = `-- name: PromoteOwnerOrDeleteGroup :one
-WITH group_check AS (
+const createGroup = `-- name: CreateGroup :one
+WITH new_player AS (
+    INSERT INTO Players (
+        name,
+        platform,
+        roles,
+        rank,
+        characters,
+        voice_chat,
+        mic
+    ) VALUES (
+        $1,
+        $2,
+        $3,
+        $4,
+        $5,
+        $6,
+        $7
+    )
+    RETURNING id
+),
+new_group AS (
+    INSERT INTO Groups (
+        owner,
+        region,
+        gamemode,
+        open,
+        vanguards,
+        duelists,
+        strategists,
+        platforms,
+        voice_chat,
+        mic
+    ) VALUES (
+        $1,
+        $8,
+        $9,
+        $10,
+        $11,
+        $12,
+        $13,
+        $14,
+        $15,
+        $16
+    )
+    RETURNING id
+),
+group_member AS (
+    INSERT INTO GroupMembers (
+        group_id,
+        player_id,
+        leader
+    )
     SELECT 
-        CASE
-            WHEN NOT EXISTS (SELECT 1 FROM Groups g WHERE g.id = $1) THEN 404
-            ELSE 200
-        END as status
-),
-owner_promotion AS (
-    UPDATE Groups g
-    SET 
-        owner = (
-            SELECT p->>'name'
-            FROM jsonb_array_elements(players) AS p
-            LIMIT 1
-        ),
-        players = (
-            SELECT jsonb_agg(
-                CASE 
-                    WHEN p->>'name' = (SELECT p->>'name' FROM jsonb_array_elements(players) AS p LIMIT 1) THEN
-                        jsonb_set(p, '{leader}', 'true'::jsonb)
-                    ELSE p
-                END
-            )
-            FROM jsonb_array_elements(players) AS p
-        ),
-        updated_at = NOW()
-    WHERE g.id = $1
-      AND $2 > 0
-    RETURNING g.id AS group_id, 'promoted' AS action
-),
-group_deletion AS (
-    DELETE FROM Groups g
-    WHERE g.id = $1
-      AND $2 = 0
-    RETURNING id AS group_id, 'deleted' AS action
+        new_group.id,
+        new_player.id,
+        true
+    FROM new_group, new_player
 )
 SELECT 
-    CASE 
-        WHEN (SELECT status FROM group_check) = 404 THEN '404'
-        ELSE COALESCE(
-            (SELECT group_id FROM owner_promotion),
-            (SELECT group_id FROM group_deletion)
-        )
-    END AS group_id
+    new_group.id as group_id,
+    new_player.id as player_id
+FROM new_group, new_player
 `
 
-type PromoteOwnerOrDeleteGroupParams struct {
-	ID               string      `json:"id"`
-	RemainingPlayers interface{} `json:"remaining_players"`
+type CreateGroupParams struct {
+	OwnerName      string      `json:"owner_name"`
+	Platform       string      `json:"platform"`
+	Roles          []string    `json:"roles"`
+	RankValue      int32       `json:"rank_value"`
+	Characters     []string    `json:"characters"`
+	VoiceChat      bool        `json:"voice_chat"`
+	Mic            bool        `json:"mic"`
+	Region         string      `json:"region"`
+	Gamemode       string      `json:"gamemode"`
+	Open           bool        `json:"open"`
+	Vanguards      pgtype.Int4 `json:"vanguards"`
+	Duelists       pgtype.Int4 `json:"duelists"`
+	Strategists    pgtype.Int4 `json:"strategists"`
+	Platforms      []string    `json:"platforms"`
+	GroupVoiceChat pgtype.Bool `json:"group_voice_chat"`
+	GroupMic       pgtype.Bool `json:"group_mic"`
 }
 
-func (q *Queries) PromoteOwnerOrDeleteGroup(ctx context.Context, arg PromoteOwnerOrDeleteGroupParams) (interface{}, error) {
-	row := q.db.QueryRow(ctx, promoteOwnerOrDeleteGroup, arg.ID, arg.RemainingPlayers)
-	var group_id interface{}
-	err := row.Scan(&group_id)
-	return group_id, err
+type CreateGroupRow struct {
+	GroupID  string `json:"group_id"`
+	PlayerID int32  `json:"player_id"`
 }
 
-const removePlayerFromGroup = `
--- name: RemovePlayerFromGroup :one
--- $1: Group ID, $2: Player to remove ID, $3: Requester ID
-WITH group_check AS (
-    SELECT 
-        CASE
-            WHEN NOT EXISTS (SELECT 1 FROM Groups g WHERE g.id = $1) THEN 404
-            WHEN $2 != g.owner 
-                AND $2 != $3 THEN 403
-            WHEN NOT EXISTS (
-                SELECT 1 FROM jsonb_array_elements(players) AS p
-                WHERE p->>'name' = $3::text
-            ) THEN 404
-            ELSE 200
-        END as status,
-        players,
-        owner
-    FROM Groups g
-    WHERE g.id = $1
-),
-player_update AS (
-    UPDATE Groups g
-    SET 
-        players = COALESCE(
-            (
-                SELECT jsonb_agg(value)
-                FROM jsonb_array_elements(g.players) AS p
-                WHERE p->>'id' != $3::text
-            ),
-            '[]'::jsonb
-        ),
-        last_active_at = NOW(),
-        updated_at = NOW()
-    WHERE g.id = $1
-        AND (SELECT status FROM group_check) = 200
-    RETURNING jsonb_array_length(players) AS remaining_players
-)
-SELECT 
-    (SELECT status FROM group_check) AS status,
-    (SELECT remaining_players FROM player_update) AS remaining_players,
-    (SELECT owner FROM group_check) AS owner
-`
-
-type RemovePlayerFromGroupParams struct {
-	ID            string      `json:"id"`
-    RequesterID   string      `json:"requesterId"`
-    PlayerToRemoveID string      `json:"playerToRemoveId"`
-}
-
-type RemovePlayerFromGroupRow struct {
-	Status           int32  `json:"status"`
-	RemainingPlayers int32  `json:"remaining_players"`
-	Owner            string `json:"owner"`
-}
-
-// TODO: Fix, requires groups to contain group owner and/or group members table
-func (q *Queries) RemovePlayerFromGroup(ctx context.Context, arg RemovePlayerFromGroupParams) (RemovePlayerFromGroupRow, error) {
-	row := q.db.QueryRow(ctx, removePlayerFromGroup, arg.ID, arg.PlayerToRemoveID, arg.RequesterID)
-	var i RemovePlayerFromGroupRow
-	err := row.Scan(&i.Status, &i.RemainingPlayers, &i.Owner)
-	return i, err
-}
-
-const upsertGroup = `-- name: UpsertGroup :one
-WITH id_check AS (
-    SELECT id FROM Groups WHERE id = $1
-)
-INSERT INTO Groups (
-    id,
-    owner,
-    region,
-    gamemode,
-    players,
-    open,
-    vanguards,
-    duelists,
-    strategists,
-    platforms,
-    voice_chat,
-    mic,
-    last_active_at
-) VALUES (
-    CASE 
-        WHEN $1 IS NULL OR $1 = '' THEN generate_group_id()
-        ELSE $1
-    END,
-    $2,
-    $3,
-    $4,
-    COALESCE($5, '[]'::jsonb),
-    $6,
-    $7,
-    $8,
-    $9,
-    $10,
-    $11,
-    $12,
-    NOW()
-)
-ON CONFLICT (id) DO UPDATE SET
-    owner = EXCLUDED.owner,
-    region = EXCLUDED.region,
-    gamemode = EXCLUDED.gamemode,
-    players = EXCLUDED.players,
-    open = EXCLUDED.open,
-    vanguards = EXCLUDED.vanguards,
-    duelists = EXCLUDED.duelists,
-    strategists = EXCLUDED.strategists,
-    platforms = EXCLUDED.platforms,
-    voice_chat = EXCLUDED.voice_chat,
-    mic = EXCLUDED.mic,
-    last_active_at = NOW(),
-    updated_at = NOW()
-WHERE 
-    (SELECT 1 FROM id_check) IS NULL OR -- no specific id provided
-    Groups.id = $1 -- match provided id
-RETURNING id
-`
-
-type UpsertGroupParams struct {
-	ID          interface{} `json:"id"`
-	Owner       string      `json:"owner"`
-	Region      string      `json:"region"`
-	Gamemode    string      `json:"gamemode"`
-	Players     interface{} `json:"players"`
-	Open        bool        `json:"open"`
-	Vanguards   pgtype.Int4 `json:"vanguards"`
-	Duelists    pgtype.Int4 `json:"duelists"`
-	Strategists pgtype.Int4 `json:"strategists"`
-	Platforms   []string    `json:"platforms"`
-	VoiceChat   pgtype.Bool `json:"voice_chat"`
-	Mic         pgtype.Bool `json:"mic"`
-}
-
-func (q *Queries) UpsertGroup(ctx context.Context, arg UpsertGroupParams) (string, error) {
-	row := q.db.QueryRow(ctx, upsertGroup,
-		arg.ID,
-		arg.Owner,
+func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (CreateGroupRow, error) {
+	row := q.db.QueryRow(ctx, createGroup,
+		arg.OwnerName,
+		arg.Platform,
+		arg.Roles,
+		arg.RankValue,
+		arg.Characters,
+		arg.VoiceChat,
+		arg.Mic,
 		arg.Region,
 		arg.Gamemode,
-		arg.Players,
 		arg.Open,
 		arg.Vanguards,
 		arg.Duelists,
 		arg.Strategists,
 		arg.Platforms,
-		arg.VoiceChat,
-		arg.Mic,
+		arg.GroupVoiceChat,
+		arg.GroupMic,
 	)
-	var id string
-	err := row.Scan(&id)
-	return id, err
+	var i CreateGroupRow
+	err := row.Scan(&i.GroupID, &i.PlayerID)
+	return i, err
 }

@@ -1,6 +1,7 @@
 import { HTTPClient, StatusCode, StatusCodes } from "@/api";
 import {
-  getGroupFromProfile,
+  CreateGroupResponse,
+  getCreateGroupFromProfile,
   Group,
   PaginatedGroupsResponse,
   Profile,
@@ -16,21 +17,18 @@ export class RivalsLFGClient extends HTTPClient {
     this.baseURL = baseURL;
   }
 
-  async upsertGroup(owner: Profile, groupId: string = ""): Promise<string> {
-    const newGroup = getGroupFromProfile(owner, groupId);
-      const response = await this.fetchWithAuth(
-        `${this.baseURL}/api/v1/groups`,
-        {
-          method: "POST",
-          body: JSON.stringify(newGroup),
-        },
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error, status: ${response.status}`);
-      }
+  async createGroup(owner: Profile): Promise<CreateGroupResponse> {
+    const body = getCreateGroupFromProfile(owner);
+    const response = await this.fetchWithAuth(`${this.baseURL}/api/v1/groups`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error, status: ${response.status}`);
+    }
 
-      const data = await response.json();
-      return data.id || "";
+    const data = await response.json();
+    return data ?? { groupId: "", playerId: 0 };
   }
 
   async getGroups(query?: QueryParams): Promise<PaginatedGroupsResponse> {

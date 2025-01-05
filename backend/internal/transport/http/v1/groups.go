@@ -8,16 +8,14 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/jcserv/rivalslfg/internal/transport/http/httputil"
-	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
-func (a *API) UpsertGroup() http.HandlerFunc {
+func (a *API) CreateGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		var input UpsertGroup
+		var input CreateGroup
 		err := json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
 			log.Debug(ctx, err.Error())
@@ -32,19 +30,14 @@ func (a *API) UpsertGroup() http.HandlerFunc {
 			return
 		}
 
-		groupID, err := a.groupService.UpsertGroup(ctx, *params)
+		result, err := a.groupService.CreateGroup(ctx, *params)
 		if err != nil {
 			httputil.InternalServerError(ctx, w, err)
 			return
 		}
-
-		authInfo := reqCtx.GetAuthInfoOrDefault(ctx, &reqCtx.AuthInfo{
-			PlayerID: "1", // TODO: This should be generated server-side
-			GroupID:  groupID,
-		})
-		httputil.EmbedTokenInResponse(ctx, w, authInfo, auth.GroupOwnerRights)
-		httputil.OK(w, map[string]string{
-			"id": groupID,
+		httputil.OK(w, map[string]any{
+			"groupId":  result.GroupID,
+			"playerId": result.PlayerID,
 		})
 	}
 }

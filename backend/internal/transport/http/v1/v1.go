@@ -38,6 +38,7 @@ func NewAPI(authService services.IAuth, groupService services.IGroup) *API {
 
 // RegisterRoutes registers the routes for the V1 API.
 func (a *API) RegisterRoutes(r *mux.Router) {
+	r.HandleFunc(groups, a.CreateGroup()).Methods(http.MethodPost)
 	r.HandleFunc(group, a.GetGroupByID()).Methods(http.MethodGet)
 	r.HandleFunc(groups, a.GetGroups()).Methods(http.MethodGet)
 	r.HandleFunc(player, a.JoinGroup()).Methods(http.MethodPost)
@@ -53,14 +54,4 @@ func (a *API) RegisterRoutes(r *mux.Router) {
 			auth.RightLeaveGroup,
 		)(a.RemovePlayer()),
 	).Methods(http.MethodDelete)
-
-	r.HandleFunc(groups,
-		middleware.RequireAuth(middleware.AuthConfig{
-			ResourceType:   "group",
-			ResourceIDFrom: middleware.FromBody,
-			RequiredRight:  auth.RightUpdateGroup,
-			Body:           &UpsertGroup{},
-			AllowCreate:    true,
-		})(a.UpsertGroup()),
-	)
 }

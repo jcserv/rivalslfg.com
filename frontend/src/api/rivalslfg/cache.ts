@@ -6,6 +6,7 @@ import {
 } from "@/api";
 import { rivalslfgAPIClient } from "@/routes/__root";
 import {
+  CreateGroupResponse,
   getGroupFromProfile,
   Group,
   PaginatedQueryFnResponse,
@@ -13,17 +14,16 @@ import {
   QueryParams,
 } from "@/types";
 
-export const upsertGroup = async (
+export const createGroup = async (
   profile: Profile,
-  _groupId: string,
-): Promise<string> => {
-  const groupId = await rivalslfgAPIClient.upsertGroup(profile, _groupId);
+): Promise<CreateGroupResponse> => {
+  const { groupId, playerId } = await rivalslfgAPIClient.createGroup(profile);
   const newGroup = getGroupFromProfile(profile, groupId);
 
   rivalsStoreActions.setAuthedGroup(groupId);
   rivalsStoreActions.upsertGroup(newGroup);
 
-  return groupId;
+  return { groupId, playerId };
 };
 
 export const fetchGroups = async (
@@ -64,10 +64,7 @@ export const removePlayer = async (
   groupId: string,
   requesterId: number,
 ): Promise<StatusCode> => {
-  const result = await rivalslfgAPIClient.removePlayer(
-    groupId,
-    requesterId,
-  );
+  const result = await rivalslfgAPIClient.removePlayer(groupId, requesterId);
   // if (result === StatusCodes.OK) {
   //   rivalsStoreActions.removePlayerFromGroup(playerId);
   // }

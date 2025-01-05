@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 
-import { useToast, useUpsertGroup } from "@/hooks";
+import { useCreateGroup, useToast } from "@/hooks";
 import { emptyState, formSchema, Profile, ProfileFormType } from "@/types";
 
 interface UseProfileFormProps {
@@ -14,10 +14,16 @@ interface UseProfileFormProps {
   setProfile: (profile: Profile) => void;
 }
 
-const formMessages: Record<ProfileFormType, { success: string; error: string }> = {
+const formMessages: Record<
+  ProfileFormType,
+  { success: string; error: string }
+> = {
   find: { success: "Preferences saved", error: "Failed to save preferences." },
   create: { success: "Group created!", error: "Failed to create group." },
-  profile: { success: "Preferences saved", error: "Failed to save preferences." },
+  profile: {
+    success: "Preferences saved",
+    error: "Failed to save preferences.",
+  },
 };
 
 export function useProfileForm({
@@ -30,12 +36,12 @@ export function useProfileForm({
       ...emptyState,
       ...profile,
     }),
-    [profile]
+    [profile],
   );
 
   const router = useRouter();
   const { toast } = useToast();
-  const upsertGroup = useUpsertGroup();
+  const createGroup = useCreateGroup();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,16 +55,18 @@ export function useProfileForm({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      let groupId = "";
+      let groupId = "",
+        playerId = 0;
       if (isGroup) {
-        groupId = await upsertGroup({
+        const data = await createGroup({
           profile: values as Profile,
-          id: "",
         });
+        groupId = data.groupId;
+        playerId = data.playerId;
       }
 
       setProfile({
-        id: profile?.id ?? 0,
+        id: playerId,
         ...values,
       } as Profile);
 
