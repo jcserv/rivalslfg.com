@@ -9,7 +9,7 @@ WITH new_player AS (
         voice_chat,
         mic
     ) VALUES (
-        @owner_name,
+        @owner,
         @platform,
         @roles,
         @rank_value,
@@ -32,7 +32,7 @@ new_group AS (
         voice_chat,
         mic
     ) VALUES (
-        @owner_name,
+        @owner,
         @region,
         @gamemode,
         @open,

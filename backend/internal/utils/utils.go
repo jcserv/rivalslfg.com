@@ -1,6 +1,9 @@
 package utils
 
-import "strings"
+import (
+	"strconv"
+	"strings"
+)
 
 func StringSliceToLower(s []string) []string {
 	out := make([]string, len(s))
@@ -8,4 +11,13 @@ func StringSliceToLower(s []string) []string {
 		out[i] = strings.ToLower(v)
 	}
 	return out
+}
+
+func IntToString(i int) string {
+	return strconv.Itoa(i)
+}
+
+func StringToInt(s string) int {
+	i, _ := strconv.Atoi(s)
+	return i
 }

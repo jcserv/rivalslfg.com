@@ -77,7 +77,7 @@ FROM new_group, new_player
 `
 
 type CreateGroupParams struct {
-	OwnerName      string      `json:"owner_name"`
+	Owner          string      `json:"owner"`
 	Platform       string      `json:"platform"`
 	Roles          []string    `json:"roles"`
 	RankValue      int32       `json:"rank_value"`
@@ -102,7 +102,7 @@ type CreateGroupRow struct {
 
 func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (CreateGroupRow, error) {
 	row := q.db.QueryRow(ctx, createGroup,
-		arg.OwnerName,
+		arg.Owner,
 		arg.Platform,
 		arg.Roles,
 		arg.RankValue,

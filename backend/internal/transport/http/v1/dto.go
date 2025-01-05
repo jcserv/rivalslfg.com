@@ -175,7 +175,6 @@ func (c *CreateGroup) Parse() (*repository.CreateGroupParams, error) {
 		return nil, fmt.Errorf("one or more provided platforms %v is not supported", c.Platforms)
 	}
 
-	params.OwnerName = c.Owner
 	params.Platform = c.Platform
 	params.Roles = c.Roles
 	params.RankValue = int32(types.RankIDToRankVal[c.RankID])

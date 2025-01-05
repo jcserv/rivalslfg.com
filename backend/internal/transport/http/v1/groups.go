@@ -8,13 +8,22 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/jcserv/rivalslfg/internal/transport/http/httputil"
+	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
 func (a *API) CreateGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
+		playerID, groupID := reqCtx.GetPlayerID(ctx), reqCtx.GetGroupID(ctx)
+		// Player already has a group
+		if playerID != 0 && groupID != "" {
+			httputil.BadRequest(w)
+			return
+		}
+
 		var input CreateGroup
 		err := json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
@@ -35,6 +44,12 @@ func (a *API) CreateGroup() http.HandlerFunc {
 			httputil.InternalServerError(ctx, w, err)
 			return
 		}
+
+		httputil.EmbedTokenInResponse(ctx, w, &reqCtx.AuthInfo{
+			PlayerID: int(result.PlayerID),
+			GroupID:  result.GroupID,
+		}, auth.GroupOwnerRights)
+
 		httputil.OK(w, map[string]any{
 			"groupId":  result.GroupID,
 			"playerId": result.PlayerID,
