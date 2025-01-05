@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 
+import { HTTPError } from "@/api";
 import { useCreateGroup, useToast } from "@/hooks";
 import { emptyState, formSchema, Profile, ProfileFormType } from "@/types";
 
@@ -80,10 +81,18 @@ export function useProfileForm({
       } else if (profileFormType === "find") {
         router.navigate({ to: "/browse", search: { queue: true } });
       }
-    } catch {
+    } catch (error) {
+      if (!(error instanceof HTTPError)) {
+        toast({
+          title: formMessages[profileFormType].error,
+          description: "Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
       toast({
-        title: formMessages[profileFormType].error,
-        description: "Please try again.",
+        title: error.statusText,
+        description: error.message,
         variant: "destructive",
       });
     }

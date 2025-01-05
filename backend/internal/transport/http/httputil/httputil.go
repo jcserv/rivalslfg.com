@@ -12,19 +12,29 @@ import (
 )
 
 type HTTPError struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
+	Code    int            `json:"code"`
+	Message string         `json:"message"`
+	Details map[string]any `json:"details,omitempty"`
 }
 
-func NewHTTPError(code int, message string) *HTTPError {
+func NewHTTPError(code int, message string, details ...map[string]any) *HTTPError {
+	detailsMap := map[string]any{}
+	for _, detail := range details {
+		for k, v := range detail {
+			detailsMap[k] = v
+		}
+	}
+
 	return &HTTPError{
 		Code:    code,
 		Message: message,
+		Details: detailsMap,
 	}
 }
 
-func BadRequest(w http.ResponseWriter) {
+func BadRequest(w http.ResponseWriter, err error, details ...map[string]any) {
 	w.WriteHeader(http.StatusBadRequest)
+	writeResponse(w, NewHTTPError(http.StatusBadRequest, err.Error(), details...))
 }
 
 func NotFound(w http.ResponseWriter) {

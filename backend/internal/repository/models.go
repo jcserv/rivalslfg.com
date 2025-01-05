@@ -25,9 +25,9 @@ type Group struct {
 	Gamemode     string      `json:"gamemode"`
 	Open         bool        `json:"open"`
 	Passcode     string      `json:"passcode"`
-	Vanguards    pgtype.Int4 `json:"vanguards"`
-	Duelists     pgtype.Int4 `json:"duelists"`
-	Strategists  pgtype.Int4 `json:"strategists"`
+	Vanguards    int32       `json:"vanguards"`
+	Duelists     int32       `json:"duelists"`
+	Strategists  int32       `json:"strategists"`
 	Platforms    []string    `json:"platforms"`
 	VoiceChat    pgtype.Bool `json:"voice_chat"`
 	Mic          pgtype.Bool `json:"mic"`
@@ -43,17 +43,17 @@ type Groupmember struct {
 }
 
 type Player struct {
-	ID          int32       `json:"id"`
-	Name        string      `json:"name"`
-	Platform    string      `json:"platform"`
-	Roles       []string    `json:"roles"`
-	Rank        int32       `json:"rank"`
-	Characters  []string    `json:"characters"`
-	VoiceChat   bool        `json:"voice_chat"`
-	Mic         bool        `json:"mic"`
-	Vanguards   pgtype.Int4 `json:"vanguards"`
-	Duelists    pgtype.Int4 `json:"duelists"`
-	Strategists pgtype.Int4 `json:"strategists"`
+	ID          int32    `json:"id"`
+	Name        string   `json:"name"`
+	Platform    string   `json:"platform"`
+	Roles       []string `json:"roles"`
+	Rank        int32    `json:"rank"`
+	Characters  []string `json:"characters"`
+	VoiceChat   bool     `json:"voice_chat"`
+	Mic         bool     `json:"mic"`
+	Vanguards   int32    `json:"vanguards"`
+	Duelists    int32    `json:"duelists"`
+	Strategists int32    `json:"strategists"`
 }
 
 type Rank struct {

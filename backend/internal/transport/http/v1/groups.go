@@ -17,25 +17,35 @@ import (
 func (a *API) CreateGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		playerID, groupID := reqCtx.GetPlayerID(ctx), reqCtx.GetGroupID(ctx)
-		// Player already has a group
-		if playerID != 0 && groupID != "" {
-			httputil.BadRequest(w)
+
+		// Check if they already have a group
+		groupID := reqCtx.GetGroupID(ctx)
+		group, err := a.groupService.GetGroupByID(ctx, groupID)
+		if err != nil {
+			httputil.InternalServerError(ctx, w, err)
+			return
+		}
+		if group != nil {
+			httputil.BadRequest(w, fmt.Errorf("Player is already in group: %s", group.ID),
+				map[string]any{
+					"groupId": group.ID,
+				},
+			)
 			return
 		}
 
 		var input CreateGroup
-		err := json.NewDecoder(r.Body).Decode(&input)
+		err = json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
 			log.Debug(ctx, err.Error())
-			httputil.BadRequest(w)
+			httputil.BadRequest(w, err)
 			return
 		}
 
 		params, err := input.Parse()
 		if err != nil {
 			log.Debug(ctx, err.Error())
-			httputil.BadRequest(w)
+			httputil.BadRequest(w, err)
 			return
 		}
 
@@ -63,7 +73,7 @@ func (a *API) GetGroupByID() http.HandlerFunc {
 		vars := mux.Vars(r)
 		groupID := vars["id"]
 		if groupID == "" {
-			httputil.BadRequest(w)
+			httputil.BadRequest(w, fmt.Errorf("groupId is required"))
 			return
 		}
 
@@ -89,14 +99,14 @@ func (a *API) GetGroups() http.HandlerFunc {
 		queryParams, err := httputil.ParseQueryParams(r)
 		if err != nil {
 			log.Debug(ctx, fmt.Sprintf("error parsing query params: %v", err))
-			httputil.BadRequest(w)
+			httputil.BadRequest(w, err)
 			return
 		}
 
 		args, err := Parse(queryParams)
 		if err != nil {
 			log.Debug(ctx, fmt.Sprintf("error parsing query params: %v", err))
-			httputil.BadRequest(w)
+			httputil.BadRequest(w, err)
 			return
 		}
 

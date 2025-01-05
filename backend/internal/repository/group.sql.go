@@ -87,9 +87,9 @@ type CreateGroupParams struct {
 	Region         string      `json:"region"`
 	Gamemode       string      `json:"gamemode"`
 	Open           bool        `json:"open"`
-	Vanguards      pgtype.Int4 `json:"vanguards"`
-	Duelists       pgtype.Int4 `json:"duelists"`
-	Strategists    pgtype.Int4 `json:"strategists"`
+	Vanguards      int32       `json:"vanguards"`
+	Duelists       int32       `json:"duelists"`
+	Strategists    int32       `json:"strategists"`
 	Platforms      []string    `json:"platforms"`
 	GroupVoiceChat pgtype.Bool `json:"group_voice_chat"`
 	GroupMic       pgtype.Bool `json:"group_mic"`

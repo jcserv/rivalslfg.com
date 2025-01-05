@@ -175,15 +175,21 @@ func (c *CreateGroup) Parse() (*repository.CreateGroupParams, error) {
 		return nil, fmt.Errorf("one or more provided platforms %v is not supported", c.Platforms)
 	}
 
+	params.Owner = c.Owner
 	params.Platform = c.Platform
 	params.Roles = c.Roles
 	params.RankValue = int32(types.RankIDToRankVal[c.RankID])
 	params.Characters = c.Characters
 	params.VoiceChat = c.VoiceChat
 	params.Mic = c.Mic
-	params.Vanguards = pgtype.Int4{Int32: int32(c.Vanguards), Valid: true}
-	params.Duelists = pgtype.Int4{Int32: int32(c.Duelists), Valid: true}
-	params.Strategists = pgtype.Int4{Int32: int32(c.Strategists), Valid: true}
+	params.Region = c.Region
+	params.Gamemode = c.Gamemode
+	params.Open = c.Open
+
+	params.Vanguards = int32(c.Vanguards)
+	params.Duelists = int32(c.Duelists)
+	params.Strategists = int32(c.Strategists)
+
 	params.Platforms = c.Platforms
 	params.GroupVoiceChat = pgtype.Bool{Bool: c.GroupVoiceChat, Valid: true}
 	params.GroupMic = pgtype.Bool{Bool: c.GroupMic, Valid: true}

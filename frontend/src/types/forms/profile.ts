@@ -66,9 +66,9 @@ export const emptyState = {
   voiceChat: false,
   mic: false,
   roleQueue: {
-    vanguards: 2,
-    duelists: 2,
-    strategists: 2,
+    vanguards: 0,
+    duelists: 0,
+    strategists: 0,
   },
   groupSettings: {
     platforms: [],

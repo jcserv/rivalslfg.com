@@ -1,0 +1,28 @@
+-- -- name: JoinGroup :one
+-- WITH group_check AS (
+--     SELECT g.id
+--     FROM Groups g
+--     WHERE g.id = @group_id
+--     LIMIT 1
+-- ),
+
+-- new_player AS (
+--     INSERT INTO Players (
+--         name,
+--         platform,
+--         roles,
+--         rank,
+--         characters,
+--         voice_chat,
+--         mic
+--     ) VALUES (
+--         @name,
+--         @platform,
+--         @roles,
+--         @rank_value,
+--         @characters,
+--         @voice_chat,
+--         @mic
+--     )
+--     RETURNING id
+-- ),

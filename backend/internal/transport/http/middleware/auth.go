@@ -100,7 +100,7 @@ func RequireAuth(config AuthConfig) func(http.HandlerFunc) http.HandlerFunc {
 				if config.Body != nil && r.Body != nil {
 					bodyData := config.Body.(RequestWithID)
 					if err := json.NewDecoder(r.Body).Decode(&bodyData); err != nil {
-						httputil.BadRequest(w)
+						httputil.BadRequest(w, err)
 						return
 					}
 

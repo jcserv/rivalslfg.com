@@ -67,9 +67,9 @@ CREATE TABLE Groups (
     passcode VARCHAR(4) NOT NULL DEFAULT generate_passcode(),
 
     -- role_queue
-    vanguards INTEGER,
-    duelists INTEGER,
-    strategists INTEGER,
+    vanguards INTEGER NOT NULL DEFAULT 0,
+    duelists INTEGER NOT NULL DEFAULT 0,
+    strategists INTEGER NOT NULL DEFAULT 0,
 
     -- group_settings
     platforms CHAR(2)[],
@@ -131,9 +131,9 @@ CREATE TABLE Players (
     mic BOOLEAN NOT NULL,
     
     -- role_queue
-    vanguards INTEGER,
-    duelists INTEGER,
-    strategists INTEGER
+    vanguards INTEGER NOT NULL DEFAULT 0,
+    duelists INTEGER NOT NULL DEFAULT 0,
+    strategists INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE GroupMembers (
