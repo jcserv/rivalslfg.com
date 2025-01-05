@@ -114,6 +114,11 @@ func RequireAuth(config AuthConfig) func(http.HandlerFunc) http.HandlerFunc {
 				return
 			}
 
+			if isCreate && config.AllowCreate && auth.HasNotCreatedGroup(claims) {
+				next(w, reqCtx.WithAuthInfo(r, claims))
+				return
+			}
+
 			if !auth.HasOwnership(claims, config.ResourceType, resourceID) {
 				httputil.Forbidden(w)
 				return

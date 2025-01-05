@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/jcserv/rivalslfg/internal/repository"
+	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
@@ -83,7 +84,7 @@ func (s *Group) RemovePlayerFromGroup(ctx context.Context, arg repository.Remove
 
 	switch out.Status {
 	case 200:
-		if !(arg.PlayerName == out.Owner) {
+		if !(reqCtx.IsGroupOwner(ctx, arg.ID)) {
 			return nil
 		}
 		return s.PromoteOwnerOrDeleteGroup(ctx, repository.PromoteOwnerOrDeleteGroupParams{

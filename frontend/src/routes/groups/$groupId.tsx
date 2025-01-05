@@ -35,7 +35,7 @@ type GroupPageSearchParams = {
 export const Route = createFileRoute("/groups/$groupId")({
   component: GroupPage,
   validateSearch: (
-    search: { join?: boolean; passcode?: string } & SearchSchemaInput,
+    search: { join?: boolean; passcode?: string } & SearchSchemaInput
   ): GroupPageSearchParams => {
     return {
       ...(search.join !== undefined && { join: search.join }),
@@ -81,7 +81,7 @@ function GroupPage() {
   const [showAccessDialog, setShowAccessDialog] = useState(false);
 
   const [canUserAccessGroup, setCanUserAccessGroup] = useState<boolean | null>(
-    null,
+    null
   );
 
   const { isPlayerInGroup, isOwner } = useMemo(() => {
@@ -141,17 +141,16 @@ function GroupPage() {
       setGroup,
       setShowAccessDialog,
       setCanUserAccessGroup,
-    ],
+    ]
   );
 
-  async function onRemove(id: number, playerToRemove: string) {
+  async function onRemove(playerToRemoveId: number) {
     if (!group) return;
+    const isPlayerLeavingGroup = playerToRemoveId === profile.id;
     try {
       const status = await removePlayer({
         groupId,
-        playerId: 1, // TODO: This should be generated server-side
-        requesterName: profile.name,
-        playerName: playerToRemove,
+        playerId: playerToRemoveId,
       });
       if (status !== StatusCodes.OK) {
         throw new Error(`${status}`);
@@ -159,7 +158,7 @@ function GroupPage() {
 
       if (isPlayerInGroup) {
         const updatedPlayers = group.players.filter(
-          (p) => p.name !== playerToRemove,
+          (p) => p.id !== playerToRemoveId
         );
 
         let newGroup = {
@@ -167,7 +166,7 @@ function GroupPage() {
           players: updatedPlayers,
         };
 
-        if (group.owner === playerToRemove) {
+        if (group.ownerId === playerToRemoveId) {
           const newOwner = updatedPlayers[0];
 
           newGroup = {
@@ -175,7 +174,7 @@ function GroupPage() {
             owner: newOwner.name,
             name: `${newOwner.name}'s group`,
             players: updatedPlayers.map((p) =>
-              p.name === newOwner.name ? { ...p, leader: true } : p,
+              p.name === newOwner.name ? { ...p, leader: true } : p
             ),
           };
         }
@@ -184,18 +183,16 @@ function GroupPage() {
       }
 
       toast({
-        title:
-          playerToRemove === profile.name
-            ? "Left group"
-            : "Removed player from group",
+        title: isPlayerLeavingGroup
+          ? "Left group"
+          : "Removed player from group",
         variant: "success",
       });
     } catch {
       toast({
-        title:
-          playerToRemove === profile.name
-            ? "Unable to leave group"
-            : "Unable to remove player from group",
+        title: isPlayerLeavingGroup
+          ? "Unable to leave group"
+          : "Unable to remove player from group",
         description: "Please try again.",
         variant: "destructive",
       });
@@ -223,7 +220,7 @@ function GroupPage() {
                   {isPlayerInGroup && (
                     <Button
                       variant="destructive"
-                      onClick={() => onRemove(profile.id, profile.name)}
+                      onClick={() => onRemove(profile.id ?? 0)}
                     >
                       Leave
                     </Button>

@@ -12,7 +12,7 @@ import (
 const (
 	APIV1URLPath = "/api/v1/"
 	byId         = "/{id}"
-	byPlayerID   = "/{playerID}"
+	byPlayerID   = "/{playerId}"
 
 	groups = APIV1URLPath + "groups"
 	group  = groups + byId

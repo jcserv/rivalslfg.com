@@ -21,8 +21,6 @@ export function useJoinGroup() {
 type RemovePlayerArgs = {
   groupId: string;
   playerId: number;
-  requesterName: string;
-  playerName: string;
 };
 
 export function useRemovePlayer() {
@@ -31,8 +29,6 @@ export function useRemovePlayer() {
       return removePlayer(
         input.groupId,
         input.playerId,
-        input.requesterName,
-        input.playerName,
       );
     },
   });

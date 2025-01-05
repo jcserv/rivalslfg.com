@@ -15,9 +15,9 @@ import {
 
 export const upsertGroup = async (
   profile: Profile,
-  id: string,
+  _groupId: string,
 ): Promise<string> => {
-  const groupId = await rivalslfgAPIClient.upsertGroup(profile, id);
+  const groupId = await rivalslfgAPIClient.upsertGroup(profile, _groupId);
   const newGroup = getGroupFromProfile(profile, groupId);
 
   rivalsStoreActions.setAuthedGroup(groupId);
@@ -62,15 +62,11 @@ export const joinGroup = async (
 
 export const removePlayer = async (
   groupId: string,
-  playerId: number,
-  requesterName: string,
-  playerName: string,
+  requesterId: number,
 ): Promise<StatusCode> => {
   const result = await rivalslfgAPIClient.removePlayer(
     groupId,
-    playerId,
-    requesterName,
-    playerName,
+    requesterId,
   );
   // if (result === StatusCodes.OK) {
   //   rivalsStoreActions.removePlayerFromGroup(playerId);

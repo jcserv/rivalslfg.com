@@ -16,9 +16,8 @@ export class RivalsLFGClient extends HTTPClient {
     this.baseURL = baseURL;
   }
 
-  async upsertGroup(owner: Profile, id: string = ""): Promise<string> {
-    const newGroup = getGroupFromProfile(owner, id);
-    try {
+  async upsertGroup(owner: Profile, groupId: string = ""): Promise<string> {
+    const newGroup = getGroupFromProfile(owner, groupId);
       const response = await this.fetchWithAuth(
         `${this.baseURL}/api/v1/groups`,
         {
@@ -32,9 +31,6 @@ export class RivalsLFGClient extends HTTPClient {
 
       const data = await response.json();
       return data.id || "";
-    } catch {
-      return "";
-    }
   }
 
   async getGroups(query?: QueryParams): Promise<PaginatedGroupsResponse> {
@@ -95,19 +91,13 @@ export class RivalsLFGClient extends HTTPClient {
 
   async removePlayer(
     groupId: string,
-    playerId: number,
-    requesterName: string,
-    playerName: string,
+    playerToRemoveId: number,
   ): Promise<StatusCode> {
     try {
       const response = await this.fetchWithAuth(
-        `${this.baseURL}/api/v1/groups/${groupId}/players/${playerId}`,
+        `${this.baseURL}/api/v1/groups/${groupId}/players/${playerToRemoveId}`,
         {
           method: "DELETE",
-          body: JSON.stringify({
-            requesterName,
-            playerName,
-          }),
         },
       );
       return response.status as StatusCode;

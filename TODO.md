@@ -65,10 +65,11 @@ Bugs:
 4. [X] Join Group (if private, authenticate provided passcode)
 5. [X] Remove Player from Group
 6. [X] Leave Group
+7. [ ] Get Group Passcode
 
-7. Chat
+8. Chat
 
-8. Matchmaking
+9. Matchmaking
    - Find groups the user can join
      - Prioritize groups that are close to completion
    - Acquire lock on group

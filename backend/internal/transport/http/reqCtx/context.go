@@ -51,6 +51,11 @@ func GetGroupID(ctx context.Context) string {
 	return info.GroupID
 }
 
+func IsGroupOwner(ctx context.Context, groupID string) bool {
+	claimGroupID := GetGroupID(ctx)
+	return claimGroupID == groupID
+}
+
 func GetToken(ctx context.Context) string {
 	info, ok := GetAuthInfo(ctx)
 	if !ok {

@@ -192,30 +192,25 @@ func (c *JoinGroup) Parse() (*services.JoinGroupArgs, error) {
 }
 
 type RemovePlayer struct {
-	GroupID string `json:"groupId"`
-
-	// TODO: This should use IDs
-	PlayerName    string `json:"playerName"`
-	RequesterName string `json:"requesterName"` // Name of user making request
+	GroupID          string `json:"groupId"`
+	RequesterID      string `json:"requesterId"`
+	PlayerToRemoveID string `json:"playerToRemoveId"`
 }
 
 func (c *RemovePlayer) Parse() (*repository.RemovePlayerFromGroupParams, error) {
 	if c.GroupID == "" {
 		return nil, fmt.Errorf("groupId is required")
 	}
-	if c.PlayerName == "" {
-		return nil, fmt.Errorf("playerName is required")
+	if c.RequesterID == "" {
+		return nil, fmt.Errorf("requesterId is required")
 	}
-
-	// TODO[AUTH]: This should be provided via the cookie/session
-	if c.RequesterName == "" {
-		return nil, fmt.Errorf("requesterName is required")
+	if c.PlayerToRemoveID == "" {
+		return nil, fmt.Errorf("playerToRemoveId is required")
 	}
 
 	params := &repository.RemovePlayerFromGroupParams{
-		ID:            c.GroupID,
-		PlayerName:    c.PlayerName,
-		RequesterName: c.RequesterName,
+		ID:               c.GroupID,
+		PlayerToRemoveID: c.PlayerToRemoveID,
 	}
 
 	return params, nil

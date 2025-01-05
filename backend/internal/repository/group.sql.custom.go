@@ -87,10 +87,9 @@ func (g *GetGroupsRow) ToGroupWithPlayers() GroupWithPlayers {
 			GroupSettings: g.GroupSettings,
 			LastActiveAt:  g.LastActiveAt,
 		},
-		Name:         g.Name,
-		Size:         g.Size,
-		Players:      g.Players,
-		LastActiveAt: g.LastActiveAt,
+		Name:    g.Name,
+		Size:    g.Size,
+		Players: g.Players,
 	}
 }
 

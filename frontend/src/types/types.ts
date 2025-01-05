@@ -166,7 +166,8 @@ export function canJoinGroup(userRank: RankKey, groupRanks: RankKey[]) {
 }
 
 export type Profile = {
-  id: number;
+  // id is not generated until the user has: 1. joined a group, 2. created a group, 3. queued up
+  id?: number;
   name: string;
   region: Region;
   platform: Platform;
@@ -187,15 +188,17 @@ export function getGroupFromProfile(owner: Profile, id: string): Group {
     mic: false,
   };
 
+  const ownerId = owner.id ?? 0;
   return {
     id,
     name: `${owner.name}'s Group`,
     owner: owner.name,
+    ownerId,
     region: owner.region,
     gamemode: owner.gamemode,
     players: [
       {
-        id: 1, // TODO: This should be generated server-side
+        id: ownerId,
         name: owner.name,
         leader: true,
         platform: owner.platform,
@@ -214,7 +217,7 @@ export function getGroupFromProfile(owner: Profile, id: string): Group {
 
 export function getPlayerFromProfile(profile: Profile): Player {
   return {
-    id: 1, // TODO: This should be generated server-side
+    id: profile.id ?? 0, 
     name: profile.name,
     leader: false,
     platform: profile.platform,
@@ -241,6 +244,7 @@ export type GroupSettings = {
 export type Group = {
   id: string;
   owner: string;
+  ownerId: number;
   name: string;
   region: Region;
   gamemode: Gamemode;

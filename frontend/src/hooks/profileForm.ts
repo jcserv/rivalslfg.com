@@ -14,6 +14,12 @@ interface UseProfileFormProps {
   setProfile: (profile: Profile) => void;
 }
 
+const formMessages: Record<ProfileFormType, { success: string; error: string }> = {
+  find: { success: "Preferences saved", error: "Failed to save preferences." },
+  create: { success: "Group created!", error: "Failed to create group." },
+  profile: { success: "Preferences saved", error: "Failed to save preferences." },
+};
+
 export function useProfileForm({
   profileFormType,
   profile,
@@ -24,7 +30,7 @@ export function useProfileForm({
       ...emptyState,
       ...profile,
     }),
-    [profile],
+    [profile]
   );
 
   const router = useRouter();
@@ -52,29 +58,23 @@ export function useProfileForm({
       }
 
       setProfile({
-        id: 1, // TODO: This should be generated server-side
+        id: profile?.id ?? 0,
         ...values,
       } as Profile);
 
-      if (!isGroup) {
-        toast({
-          title: "Preferences saved",
-          variant: "success",
-        });
-        if (profileFormType === "find") {
-          router.navigate({ to: "/browse", search: { queue: true } });
-        }
-        return;
-      }
-
       toast({
-        title: "Group created",
+        title: formMessages[profileFormType].success,
         variant: "success",
       });
-      router.navigate({ to: `/groups/${groupId}` });
+
+      if (isGroup) {
+        router.navigate({ to: `/groups/${groupId}` });
+      } else if (profileFormType === "find") {
+        router.navigate({ to: "/browse", search: { queue: true } });
+      }
     } catch {
       toast({
-        title: "Failed to save preferences",
+        title: formMessages[profileFormType].error,
         description: "Please try again.",
         variant: "destructive",
       });

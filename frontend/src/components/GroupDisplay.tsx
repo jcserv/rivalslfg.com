@@ -31,7 +31,7 @@ interface GroupDisplayProps {
   canUserAccessGroup: boolean | null;
   isOwner: boolean;
   passcode: string;
-  onRemove: (id: number, playerToRemove: string) => void;
+  onRemove: (playerToRemoveId: number) => void;
 }
 
 export function GroupDisplay({
@@ -194,7 +194,7 @@ export function GroupDisplay({
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => onRemove(player.id, player.name)}
+                        onClick={() => onRemove(player.id)}
                       >
                         <X className="w-4 h-4" />
                       </Button>

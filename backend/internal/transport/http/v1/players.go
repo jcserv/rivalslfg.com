@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jcserv/rivalslfg/internal/services"
 	"github.com/jcserv/rivalslfg/internal/transport/http/httputil"
+	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
@@ -91,17 +92,12 @@ func (a *API) RemovePlayer() http.HandlerFunc {
 		ctx := r.Context()
 
 		vars := mux.Vars(r)
-		groupID := vars["id"]
-
-		var input RemovePlayer
-		err := json.NewDecoder(r.Body).Decode(&input)
-		if err != nil {
-			log.Debug(ctx, err.Error())
-			httputil.BadRequest(w)
-			return
+		input := RemovePlayer{
+			GroupID:          vars["id"],
+			RequesterID:      reqCtx.GetPlayerID(ctx),
+			PlayerToRemoveID: vars["playerId"],
 		}
 
-		input.GroupID = groupID
 		params, err := input.Parse()
 		if err != nil {
 			log.Debug(ctx, err.Error())
@@ -121,7 +117,6 @@ func (a *API) RemovePlayer() http.HandlerFunc {
 					return
 				}
 			}
-			log.Error(ctx, err.Error())
 			httputil.InternalServerError(ctx, w, err)
 			return
 		}

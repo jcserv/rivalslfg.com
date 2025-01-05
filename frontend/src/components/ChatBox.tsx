@@ -102,7 +102,6 @@ export function ChatBox({ canUserAccessGroup, isPlayerInGroup }: ChatBoxProps) {
       </CardHeader>
       <CardContent className="p-0 h-[400px]">
         {" "}
-        {/* TODO: Responsive? */}
         {!canUserAccessGroup && (
           <Skeleton className="h-full w-full rounded-xl" />
         )}

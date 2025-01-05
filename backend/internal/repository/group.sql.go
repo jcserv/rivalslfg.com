@@ -117,7 +117,9 @@ func (q *Queries) PromoteOwnerOrDeleteGroup(ctx context.Context, arg PromoteOwne
 	return group_id, err
 }
 
-const removePlayerFromGroup = `-- name: RemovePlayerFromGroup :one
+const removePlayerFromGroup = `
+-- name: RemovePlayerFromGroup :one
+-- $1: Group ID, $2: Player to remove ID, $3: Requester ID
 WITH group_check AS (
     SELECT 
         CASE
@@ -142,7 +144,7 @@ player_update AS (
             (
                 SELECT jsonb_agg(value)
                 FROM jsonb_array_elements(g.players) AS p
-                WHERE p->>'name' != $3::text
+                WHERE p->>'id' != $3::text
             ),
             '[]'::jsonb
         ),
@@ -160,8 +162,8 @@ SELECT
 
 type RemovePlayerFromGroupParams struct {
 	ID            string      `json:"id"`
-	RequesterName string      `json:"requester_name"`
-	PlayerName    interface{} `json:"player_name"`
+    RequesterID   string      `json:"requesterId"`
+    PlayerToRemoveID string      `json:"playerToRemoveId"`
 }
 
 type RemovePlayerFromGroupRow struct {
@@ -170,8 +172,9 @@ type RemovePlayerFromGroupRow struct {
 	Owner            string `json:"owner"`
 }
 
+// TODO: Fix, requires groups to contain group owner and/or group members table
 func (q *Queries) RemovePlayerFromGroup(ctx context.Context, arg RemovePlayerFromGroupParams) (RemovePlayerFromGroupRow, error) {
-	row := q.db.QueryRow(ctx, removePlayerFromGroup, arg.ID, arg.RequesterName, arg.PlayerName)
+	row := q.db.QueryRow(ctx, removePlayerFromGroup, arg.ID, arg.PlayerToRemoveID, arg.RequesterID)
 	var i RemovePlayerFromGroupRow
 	err := row.Scan(&i.Status, &i.RemainingPlayers, &i.Owner)
 	return i, err
