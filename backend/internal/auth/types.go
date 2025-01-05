@@ -21,7 +21,7 @@ const (
 )
 
 // This is granted when a user joins a group, creates a group, or begins queuing up.
-var baseRights = []Right{
+var BaseRights = []Right{
 	RightReadUser,
 	RightUpdateUser,
 	RightDeleteUser,
@@ -30,11 +30,11 @@ var baseRights = []Right{
 	RightJoinGroup,
 }
 
-var groupMemberRights = []Right{
+var GroupMemberRights = []Right{
 	RightLeaveGroup,
 }
 
-var groupOwnerRights = []Right{
+var GroupOwnerRights = []Right{
 	RightUpdateGroup,
 	RightDeleteGroup,
 	RightLeaveGroup,

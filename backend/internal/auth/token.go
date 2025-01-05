@@ -18,7 +18,7 @@ func GenerateToken(subject string, additionalClaims map[string]string, additiona
 		return "", err
 	}
 
-	rights := append(baseRights, additionalRights...)
+	rights := append(BaseRights, additionalRights...)
 	claims := jwt.MapClaims{
 		"sub":    subject,
 		"iat":    time.Now().Unix(),

@@ -3,11 +3,14 @@ package v1
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/jcserv/rivalslfg/internal/transport/http/httputil"
+	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
@@ -35,6 +38,11 @@ func (a *API) UpsertGroup() http.HandlerFunc {
 			return
 		}
 
+		authInfo := reqCtx.GetAuthInfoOrDefault(ctx, &reqCtx.AuthInfo{
+			PlayerID: "1", // TODO: This should be generated server-side
+			GroupID:  groupID,
+		})
+		httputil.EmbedTokenInResponse(ctx, w, authInfo, auth.GroupOwnerRights)
 		httputil.OK(w, map[string]string{
 			"id": groupID,
 		})
@@ -72,12 +80,14 @@ func (a *API) GetGroups() http.HandlerFunc {
 
 		queryParams, err := httputil.ParseQueryParams(r)
 		if err != nil {
+			log.Debug(ctx, fmt.Sprintf("error parsing query params: %v", err))
 			httputil.BadRequest(w)
 			return
 		}
 
 		args, err := Parse(queryParams)
 		if err != nil {
+			log.Debug(ctx, fmt.Sprintf("error parsing query params: %v", err))
 			httputil.BadRequest(w)
 			return
 		}
@@ -101,6 +111,8 @@ func (a *API) DeleteGroup() http.HandlerFunc {
 		ctx := r.Context()
 		err := errors.New("test error")
 		httputil.InternalServerError(ctx, w, err)
+
+		// TODO: Generate token with groupId = "", and remove group owner rights
 		return
 	}
 }

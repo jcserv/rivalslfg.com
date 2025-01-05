@@ -18,6 +18,8 @@ func (a *API) CreatePlayer() http.HandlerFunc {
 		httputil.InternalServerError(ctx, w, err)
 		return
 
+		// TODO: Generate token
+
 		// ctx := r.Context()
 		// token, err := a.authService.CreateAuth(ctx, "1")
 		// if err != nil {

@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/jcserv/rivalslfg/internal/transport/http/httputil"
+	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 )
 
 func RequireRight(right auth.Right) func(http.HandlerFunc) http.HandlerFunc {
@@ -34,7 +35,7 @@ func RequireRight(right auth.Right) func(http.HandlerFunc) http.HandlerFunc {
 
 			for _, userRight := range rights {
 				if auth.IsEqual(userRight.(string), right) {
-					next(w, r)
+					next(w, reqCtx.WithAuthInfo(r, claims))
 					return
 				}
 			}
@@ -125,7 +126,7 @@ func RequireAuth(config AuthConfig) func(http.HandlerFunc) http.HandlerFunc {
 				}
 			}
 
-			next(w, r)
+			next(w, reqCtx.WithAuthInfo(r, claims))
 		}
 	}
 }

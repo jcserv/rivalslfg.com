@@ -36,7 +36,24 @@ func NewAPI(authService services.IAuth, groupService services.IGroup) *API {
 	}
 }
 
+// RegisterRoutes registers the routes for the V1 API.
 func (a *API) RegisterRoutes(r *mux.Router) {
+	r.HandleFunc(group, a.GetGroupByID()).Methods(http.MethodGet)
+	r.HandleFunc(groups, a.GetGroups()).Methods(http.MethodGet)
+	r.HandleFunc(player, a.JoinGroup()).Methods(http.MethodPost)
+	r.HandleFunc(playaz, a.CreatePlayer()).Methods(http.MethodPost)
+
+	r.HandleFunc(groups,
+		middleware.RequireRight(auth.RightDeleteGroup)(
+			a.DeleteGroup(),
+		),
+	).Methods(http.MethodDelete)
+	r.HandleFunc(player,
+		middleware.RequireRight(
+			auth.RightLeaveGroup,
+		)(a.RemovePlayer()),
+	).Methods(http.MethodDelete)
+
 	r.HandleFunc(groups,
 		middleware.RequireAuth(middleware.AuthConfig{
 			ResourceType:   "group",
@@ -46,18 +63,4 @@ func (a *API) RegisterRoutes(r *mux.Router) {
 			AllowCreate:    true,
 		})(a.UpsertGroup()),
 	)
-	r.HandleFunc(group, a.GetGroupByID()).Methods(http.MethodGet)
-	r.HandleFunc(groups, a.GetGroups()).Methods(http.MethodGet)
-	r.HandleFunc(groups,
-		middleware.RequireRight(auth.RightDeleteGroup)(
-			a.DeleteGroup(),
-		),
-	).Methods(http.MethodDelete)
-	r.HandleFunc(playaz, a.CreatePlayer()).Methods(http.MethodPost)
-	r.HandleFunc(player, a.JoinGroup()).Methods(http.MethodPost)
-	r.HandleFunc(player,
-		middleware.RequireRight(
-			auth.RightLeaveGroup,
-		)(a.RemovePlayer()),
-	).Methods(http.MethodDelete)
 }

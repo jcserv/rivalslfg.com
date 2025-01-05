@@ -19,14 +19,13 @@ export class RivalsLFGClient extends HTTPClient {
   async upsertGroup(owner: Profile, id: string = ""): Promise<string> {
     const newGroup = getGroupFromProfile(owner, id);
     try {
-      const response = await fetch(`${this.baseURL}/api/v1/groups`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await this.fetchWithAuth(
+        `${this.baseURL}/api/v1/groups`,
+        {
+          method: "POST",
+          body: JSON.stringify(newGroup),
         },
-        body: JSON.stringify(newGroup),
-      });
-
+      );
       if (!response.ok) {
         throw new Error(`HTTP error, status: ${response.status}`);
       }
@@ -46,7 +45,6 @@ export class RivalsLFGClient extends HTTPClient {
       );
       const totalCount = parseInt(response.headers.get("X-Total-Count") ?? "0");
       const data = await response.json();
-
       return {
         groups: data ?? [],
         pageCount: Math.ceil(totalCount / (query?.paginateBy?.limit || 10)),
@@ -79,13 +77,10 @@ export class RivalsLFGClient extends HTTPClient {
     passcode: string,
   ): Promise<StatusCode> {
     try {
-      const response = await fetch(
+      const response = await this.fetchWithAuth(
         `${this.baseURL}/api/v1/groups/${groupId}/players/${player.id}`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({
             player,
             passcode,
@@ -105,13 +100,10 @@ export class RivalsLFGClient extends HTTPClient {
     playerName: string,
   ): Promise<StatusCode> {
     try {
-      const response = await fetch(
+      const response = await this.fetchWithAuth(
         `${this.baseURL}/api/v1/groups/${groupId}/players/${playerId}`,
         {
           method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({
             requesterName,
             playerName,

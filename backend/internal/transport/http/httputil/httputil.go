@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/jcserv/rivalslfg/internal/auth"
+	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
@@ -50,6 +52,19 @@ func PermanentRedirect(w http.ResponseWriter, url string) {
 func OK(w http.ResponseWriter, response any) {
 	w.WriteHeader(http.StatusOK)
 	writeResponse(w, response)
+}
+
+func EmbedTokenInResponse(ctx context.Context, w http.ResponseWriter, authInfo *reqCtx.AuthInfo, rights []auth.Right) {
+	newToken, err := auth.GenerateToken(authInfo.PlayerID, map[string]string{
+		"playerId": authInfo.PlayerID,
+		"groupId":  authInfo.GroupID,
+	}, rights...)
+	if err != nil {
+		InternalServerError(ctx, w, err)
+		return
+	}
+
+	w.Header().Set("X-Token", newToken)
 }
 
 func writeResponse(w http.ResponseWriter, response any) {

@@ -80,6 +80,8 @@ Bugs:
 - No auth right now, so users can modify other users' info if they know their id
 - prevent group creation if user already has group
 - supported filters/sorters for ParseQueryParams
+- Unable to leave your own group if you are the only member
+  - v1/players.go:124	can't scan into dest[0]: cannot scan NULL into *int32
 
 Before release:
 - [ ] Squash migrations into one, remove seed data
