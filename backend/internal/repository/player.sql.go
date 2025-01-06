@@ -19,9 +19,9 @@ player_check AS (
 
 role_counts AS (
     SELECT 
-        COUNT(CASE WHEN 'vanguard' = ANY(p.roles) THEN 1 END) as curr_vanguards,
-        COUNT(CASE WHEN 'duelist' = ANY(p.roles) THEN 1 END) as curr_duelists,
-        COUNT(CASE WHEN 'strategist' = ANY(p.roles) THEN 1 END) as curr_strategists
+        COUNT(CASE WHEN p.role = 'vanguard' THEN 1 END) as curr_vanguards,
+        COUNT(CASE WHEN p.role = 'duelist' THEN 1 END) as curr_duelists,
+        COUNT(CASE WHEN p.role = 'strategist' THEN 1 END) as curr_strategists
     FROM GroupMembers gm
     JOIN Players p ON p.id = gm.player_id
     WHERE gm.group_id = $1
@@ -45,9 +45,9 @@ valid_group AS (
         OR
         (
             -- Can fill at least one role
-            ('vanguard' = ANY($8) AND rc.curr_vanguards < g.vanguards)
-            OR ('duelist' = ANY($8) AND rc.curr_duelists < g.duelists)
-            OR ('strategist' = ANY($8) AND rc.curr_strategists < g.strategists)
+            ($8 = 'vanguard' AND rc.curr_vanguards < g.vanguards)
+            OR ($8 = 'duelist' AND rc.curr_duelists < g.duelists)
+            OR ($8 = 'strategist' AND rc.curr_strategists < g.strategists)
         )
     )
     -- Rank check
@@ -69,7 +69,7 @@ player_creation AS (
     INSERT INTO Players (
         name,
         platform,
-        roles,
+        role,
         rank,
         characters,
         voice_chat,
@@ -138,7 +138,7 @@ type JoinGroupParams struct {
 	Gamemode    string      `json:"gamemode"`
 	Region      string      `json:"region"`
 	Platform    string      `json:"platform"`
-	Roles       interface{} `json:"roles"`
+	Role        interface{} `json:"role"`
 	RankVal     int32       `json:"rank_val"`
 	Name        string      `json:"name"`
 	Characters  []string    `json:"characters"`
@@ -164,7 +164,7 @@ func (q *Queries) JoinGroup(ctx context.Context, arg JoinGroupParams) (string, e
 		arg.Gamemode,
 		arg.Region,
 		arg.Platform,
-		arg.Roles,
+		arg.Role,
 		arg.RankVal,
 		arg.Name,
 		arg.Characters,

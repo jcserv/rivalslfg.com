@@ -20,12 +20,7 @@ import {
   FormMessage,
   Input,
   Label,
-  MultiSelector,
-  MultiSelectorContent,
-  MultiSelectorInput,
-  MultiSelectorItem,
-  MultiSelectorList,
-  MultiSelectorTrigger,
+  MultiSelect,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -36,7 +31,7 @@ import {
   SelectValue,
   Switch,
 } from "@/components/ui";
-import { cn } from "@/lib/utils";
+import { cn, toTitleCase } from "@/lib/utils";
 import { formSchema } from "@/types";
 
 import characters from "@/assets/characters.json";
@@ -227,31 +222,24 @@ export function RolesField({ form }: FormFieldProps) {
   return (
     <FormField
       control={form.control}
-      name="roles"
+      name="role"
       render={({ field }) => (
         <FormItem className="m-2">
           <FormLabel>Roles</FormLabel>
-          <FormControl>
-            <MultiSelector
-              values={field.value}
-              onValuesChange={field.onChange}
-              loop
-              className="max-w-xs"
-            >
-              <MultiSelectorTrigger>
-                <MultiSelectorInput placeholder="Select your preferred role(s)" />
-              </MultiSelectorTrigger>
-              <MultiSelectorContent>
-                <MultiSelectorList className="z-50">
-                  {roles.map((role) => (
-                    <MultiSelectorItem key={role} value={role}>
-                      {role}
-                    </MultiSelectorItem>
-                  ))}
-                </MultiSelectorList>
-              </MultiSelectorContent>
-            </MultiSelector>
-          </FormControl>
+          <Select onValueChange={field.onChange} value={field.value}>
+            <FormControl>
+              <SelectTrigger>
+                <SelectValue placeholder="Select your preferred role" />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              {roles.map((role) => (
+                <SelectItem key={role} value={role}>
+                  {toTitleCase(role)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <FormMessage />
         </FormItem>
       )}
@@ -268,28 +256,16 @@ export function CharactersField({ form }: FormFieldProps) {
         <FormItem className="m-2">
           <FormLabel>Characters</FormLabel>
           <FormControl>
-            <MultiSelector
-              values={field.value}
-              onValuesChange={field.onChange}
-              loop
-              className="max-w-xs"
-            >
-              <MultiSelectorTrigger>
-                <MultiSelectorInput placeholder="Select your preferred character(s)" />
-              </MultiSelectorTrigger>
-              <MultiSelectorContent>
-                <MultiSelectorList className="h-28">
-                  {characters.map((character) => (
-                    <MultiSelectorItem
-                      key={character.name}
-                      value={character.name}
-                    >
-                      {character.name} - {character.role}
-                    </MultiSelectorItem>
-                  ))}
-                </MultiSelectorList>
-              </MultiSelectorContent>
-            </MultiSelector>
+            <MultiSelect
+              value={field.value}
+              defaultValue={field.value}
+              options={characters}
+              onValueChange={field.onChange}
+              placeholder="Select your preferred character(s)"
+              variant="inverted"
+              animation={2}
+              maxCount={3}
+            />
           </FormControl>
           <FormMessage />
         </FormItem>

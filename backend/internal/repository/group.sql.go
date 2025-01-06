@@ -34,7 +34,7 @@ new_player AS (
     INSERT INTO Players (
         name,
         platform,
-        roles,
+        role,
         rank,
         characters,
         voice_chat,
@@ -132,7 +132,7 @@ type CreateGroupParams struct {
 	PlayerID       interface{} `json:"player_id"`
 	Owner          string      `json:"owner"`
 	Platform       string      `json:"platform"`
-	Roles          []string    `json:"roles"`
+	Role           string      `json:"role"`
 	RankVal        int32       `json:"rank_val"`
 	Characters     []string    `json:"characters"`
 	VoiceChat      bool        `json:"voice_chat"`
@@ -167,7 +167,7 @@ func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (Creat
 		arg.PlayerID,
 		arg.Owner,
 		arg.Platform,
-		arg.Roles,
+		arg.Role,
 		arg.RankVal,
 		arg.Characters,
 		arg.VoiceChat,

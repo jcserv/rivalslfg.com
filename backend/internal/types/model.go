@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/jcserv/rivalslfg/internal/utils"
 )
@@ -53,6 +54,13 @@ func ValidateRegion(region string) error {
 }
 
 var Roles = NewSet("vanguard", "duelist", "strategist")
+
+func ValidateRole(role string) error {
+	if !Roles.Contains(strings.ToLower(role)) {
+		return fmt.Errorf("role %s is not supported", role)
+	}
+	return nil
+}
 
 func ValidateRoles(roles []string) error {
 	if len(roles) > 0 && len(Roles.Intersection(NewSet(utils.StringSliceToLower(roles)...))) != len(roles) {

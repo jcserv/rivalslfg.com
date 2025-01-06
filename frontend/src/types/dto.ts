@@ -13,7 +13,7 @@ export type CreateGroup = {
   open: boolean;
 
   platform: string;
-  roles: string[];
+  role: string;
   rankId: string;
   characters: string[];
   voiceChat: boolean;
@@ -36,7 +36,7 @@ export function getCreateGroupFromProfile(profile: Profile): CreateGroup {
     open: true,
 
     platform: profile.platform,
-    roles: profile.roles,
+    role: profile.role,
     rankId: profile.rank,
     characters: profile.characters,
     voiceChat: profile.voiceChat,

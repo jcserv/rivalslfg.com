@@ -16,11 +16,8 @@ FE-Only:
 - [x] Chat
 - [/] Matchmaking
 - [ ] Set default filters based on user profile (region=, gamemode=, canjoin=) (\*)
-- [ ] Filter or sort characters based on selected roles
-- [ ] vice versa, derive roles from characters?
 - [x] Remove player from group
-- [ ] Display the current & required characters for the teamup, red border if missing. green border if present.
-- [ ] Replace hard-coded player IDs
+- [X] Replace hard-coded player IDs
 
 API Integration:
 
@@ -34,7 +31,9 @@ API Integration:
 - [x] Integrate remove player from group
 - [ ] Chat
 - [ ] Matchmaking
-- [ ] Pagination: Server-side filtering (open, requirements met)
+- [ ] Pagination: Server-side filtering
+  - [X] open
+  - [ ] requirements met
 
 Bugs:
 
@@ -63,8 +62,8 @@ Bugs:
 2. [X] Upsert Group
 3. [ ] Delete Group
 4. [X] Join Group (if private, authenticate provided passcode)
-5. [X] Remove Player from Group
-6. [X] Leave Group
+5. [ ] Remove Player from Group
+6. [ ] Leave Group
 7. [ ] Get Group Passcode
 
 8. Chat

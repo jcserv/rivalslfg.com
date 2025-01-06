@@ -21,7 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useProfile, useToast } from "@/hooks";
-import { strArrayToTitleCase, toTitleCase } from "@/lib";
+import { toTitleCase } from "@/lib";
 import { getGroupInfo, getPlatform, getRank, getRegion, Group } from "@/types";
 
 import teamUps from "@/assets/teamups.json";
@@ -88,7 +88,6 @@ export function GroupDisplay({
   };
 
   if (!group) return null;
-
   return (
     <Card>
       <CardHeader>
@@ -171,7 +170,7 @@ export function GroupDisplay({
             <TableRow>
               <TableHead>Player</TableHead>
               <TableHead>Rank</TableHead>
-              <TableHead>Roles</TableHead>
+              <TableHead>Role</TableHead>
               <TableHead>Characters</TableHead>
               <TableHead>Platform</TableHead>
               {isOwner && <TableHead>Kick</TableHead>}
@@ -185,7 +184,7 @@ export function GroupDisplay({
                   {player.leader ? " 🚩" : ""}
                 </TableCell>
                 <TableCell>{getRank(player.rank)}</TableCell>
-                <TableCell>{strArrayToTitleCase(player.roles)}</TableCell>
+                <TableCell>{toTitleCase(player.role)}</TableCell>
                 <TableCell>{player.characters.join(", ")}</TableCell>
                 <TableCell>{getPlatform(player.platform)}</TableCell>
                 {isOwner && (

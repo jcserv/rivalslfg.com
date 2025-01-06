@@ -12,9 +12,7 @@ export const formSchema = z.object({
   region: z.nativeEnum(Region).or(z.string()),
   platform: z.nativeEnum(Platform).or(z.string()),
   gamemode: z.nativeEnum(Gamemode).or(z.string()),
-  roles: z
-    .array(z.enum(Roles).or(z.string()))
-    .min(1, "Please select at least one role"),
+  role: z.enum(Roles).or(z.string()),
   rank: z.nativeEnum(Rank).or(z.string()),
   voiceChat: z.boolean(),
   mic: z.boolean(),
@@ -60,7 +58,7 @@ export const emptyState = {
   region: "",
   platform: "",
   gamemode: "",
-  roles: [] as string[],
+  roles: "",
   rank: "",
   characters: [] as string[],
   voiceChat: false,

@@ -10,9 +10,9 @@ player_check AS (
 -- Get current role counts for the group
 role_counts AS (
     SELECT 
-        COUNT(CASE WHEN 'vanguard' = ANY(p.roles) THEN 1 END) as curr_vanguards,
-        COUNT(CASE WHEN 'duelist' = ANY(p.roles) THEN 1 END) as curr_duelists,
-        COUNT(CASE WHEN 'strategist' = ANY(p.roles) THEN 1 END) as curr_strategists
+        COUNT(CASE WHEN p.role = 'vanguard' THEN 1 END) as curr_vanguards,
+        COUNT(CASE WHEN p.role = 'duelist' THEN 1 END) as curr_duelists,
+        COUNT(CASE WHEN p.role = 'strategist' THEN 1 END) as curr_strategists
     FROM GroupMembers gm
     JOIN Players p ON p.id = gm.player_id
     WHERE gm.group_id = @group_id
@@ -37,9 +37,9 @@ valid_group AS (
         OR
         (
             -- Can fill at least one role
-            ('vanguard' = ANY(@roles) AND rc.curr_vanguards < g.vanguards)
-            OR ('duelist' = ANY(@roles) AND rc.curr_duelists < g.duelists)
-            OR ('strategist' = ANY(@roles) AND rc.curr_strategists < g.strategists)
+            (@role = 'vanguard' AND rc.curr_vanguards < g.vanguards)
+            OR (@role = 'duelist' AND rc.curr_duelists < g.duelists)
+            OR (@role = 'strategist' AND rc.curr_strategists < g.strategists)
         )
     )
     -- Rank check
@@ -62,7 +62,7 @@ player_creation AS (
     INSERT INTO Players (
         name,
         platform,
-        roles,
+        role,
         rank,
         characters,
         voice_chat,
@@ -74,7 +74,7 @@ player_creation AS (
     SELECT 
         @name,
         @platform::TEXT,
-        @roles,
+        @role,
         @rank_val,
         @characters,
         @voice_chat,

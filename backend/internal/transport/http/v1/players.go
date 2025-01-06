@@ -69,7 +69,6 @@ func (a *API) JoinGroup() http.HandlerFunc {
 			return
 		}
 
-		// TODO: Change player.roles to single role
 		err = a.groupService.JoinGroup(ctx, *params)
 		if err != nil {
 			if serviceErr, ok := err.(services.Error); ok {

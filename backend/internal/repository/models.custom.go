@@ -41,7 +41,7 @@ type PlayerInGroup struct {
 	Name       string   `json:"name"`
 	Leader     bool     `json:"leader"`
 	Platform   string   `json:"platform"`
-	Roles      []string `json:"roles"`
+	Role       string   `json:"role"`
 	Rank       string   `json:"rank"`
 	Characters []string `json:"characters"`
 	VoiceChat  bool     `json:"voiceChat"`

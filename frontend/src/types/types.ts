@@ -172,7 +172,7 @@ export type Profile = {
   region: Region;
   platform: Platform;
   gamemode: Gamemode;
-  roles: Role[];
+  role: Role;
   rank: Rank;
   characters: string[];
   voiceChat: boolean;
@@ -202,7 +202,7 @@ export function getGroupFromProfile(owner: Profile, id: string): Group {
         name: owner.name,
         leader: true,
         platform: owner.platform,
-        roles: owner.roles,
+        role: owner.role,
         rank: owner.rank,
         characters: owner.characters,
         voiceChat: owner.voiceChat,
@@ -221,7 +221,7 @@ export function getPlayerFromProfile(profile: Profile): Player {
     name: profile.name,
     leader: false,
     platform: profile.platform,
-    roles: profile.roles,
+    role: profile.role,
     rank: profile.rank,
     characters: profile.characters,
     voiceChat: profile.voiceChat,
@@ -287,9 +287,9 @@ export function getGroupInfo(group: Group | undefined): GroupInfo {
       const rankKey = player.rank as RankKey;
       acc.minRank = Math.min(acc.minRank, RankVals[rankKey]);
       acc.maxRank = Math.max(acc.maxRank, RankVals[rankKey]);
-      acc.currVanguards += player.roles.includes("vanguard") ? 1 : 0;
-      acc.currDuelists += player.roles.includes("duelist") ? 1 : 0;
-      acc.currStrategists += player.roles.includes("strategist") ? 1 : 0;
+      acc.currVanguards += player.role === "vanguard" ? 1 : 0;
+      acc.currDuelists += player.role === "duelist" ? 1 : 0;
+      acc.currStrategists += player.role === "strategist" ? 1 : 0;
       acc.currCharacters = acc.currCharacters.union(new Set(player.characters));
       return acc;
     },
@@ -373,8 +373,8 @@ export function areRequirementsMet(
   if (!basicRequirementsMet) return false;
   if (!group.roleQueue) return true;
 
-  const canFill = profile.roles.some((role) => {
-    switch (role.toLowerCase()) {
+  const canFill = (() => {
+    switch (profile.role.toLowerCase()) {
       case Roles[0]: {
         const vanguardSpots = requirements.requestedRoles.vanguards;
         return vanguardSpots.curr < vanguardSpots.max;
@@ -390,7 +390,7 @@ export function areRequirementsMet(
       default:
         return false;
     }
-  });
+  })();
 
   return (
     isAdjacentRank(rankKey, minRank) &&
@@ -404,7 +404,7 @@ export type Player = {
   name: string;
   leader?: boolean;
   rank: string;
-  roles: string[];
+  role: string;
   characters: string[];
   platform: string;
   voiceChat: boolean;

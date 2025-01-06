@@ -24,7 +24,7 @@ new_player AS (
     INSERT INTO Players (
         name,
         platform,
-        roles,
+        role,
         rank,
         characters,
         voice_chat,
@@ -33,7 +33,7 @@ new_player AS (
     SELECT 
         @owner,
         @platform,
-        @roles,
+        @role,
         @rank_val,
         @characters,
         @voice_chat,

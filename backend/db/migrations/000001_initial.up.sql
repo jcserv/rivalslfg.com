@@ -124,7 +124,7 @@ CREATE TABLE Players (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR(14) NOT NULL,
     platform CHAR(2) NOT NULL,
-    roles TEXT[] NOT NULL,
+    role TEXT NOT NULL,
     rank INTEGER NOT NULL,
     characters TEXT[] NOT NULL,
     voice_chat BOOLEAN NOT NULL,

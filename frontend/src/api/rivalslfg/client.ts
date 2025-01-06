@@ -78,7 +78,7 @@ export class RivalsLFGClient extends HTTPClient {
             gamemode: player.gamemode,
             region: player.region,
             platform: player.platform,
-            roles: player.roles,
+            role: player.role,
             rankId: player.rank,
             characters: player.characters,
             voiceChat: player.voiceChat,

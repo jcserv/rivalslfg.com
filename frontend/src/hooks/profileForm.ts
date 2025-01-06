@@ -48,7 +48,6 @@ export function useProfileForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       ...defaultValues,
-      ...profile,
     },
   });
 

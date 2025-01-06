@@ -1,134 +1,134 @@
 [
   {
-    "name": "Captain America",
-    "role": "Vanguard"
+    "label": "Captain America - Vanguard",
+    "value": "Captain America"
   },
   {
-    "name": "Doctor Strange",
-    "role": "Vanguard"
+    "label": "Doctor Strange - Vanguard",
+    "value": "Doctor Strange"
   },
   {
-    "name": "Groot",
-    "role": "Vanguard"
+    "label": "Groot - Vanguard",
+    "value": "Groot"
   },
   {
-    "name": "Hulk",
-    "role": "Vanguard"
+    "label": "Hulk - Vanguard",
+    "value": "Hulk"
   },
   {
-    "name": "Magneto",
-    "role": "Vanguard"
+    "label": "Magneto - Vanguard",
+    "value": "Magneto"
   },
   {
-    "name": "Peni Parker",
-    "role": "Vanguard"
+    "label": "Peni Parker - Vanguard",
+    "value": "Peni Parker"
   },
   {
-    "name": "Thor",
-    "role": "Vanguard"
+    "label": "Thor - Vanguard",
+    "value": "Thor"
   },
   {
-    "name": "Venom",
-    "role": "Vanguard"
+    "label": "Venom - Vanguard",
+    "value": "Venom"
   },
   {
-    "name": "Black Panther",
-    "role": "Duelist"
+    "label": "Black Panther - Duelist",
+    "value": "Black Panther"
   },
   {
-    "name": "Black Widow",
-    "role": "Duelist"
+    "label": "Black Widow - Duelist",
+    "value": "Black Widow"
   },
   {
-    "name": "Hawkeye",
-    "role": "Duelist"
+    "label": "Hawkeye - Duelist",
+    "value": "Hawkeye"
   },
   {
-    "name": "Hela",
-    "role": "Duelist"
+    "label": "Hela - Duelist",
+    "value": "Hela"
   },
   {
-    "name": "Iron Fist",
-    "role": "Duelist"
+    "label": "Iron Fist - Duelist",
+    "value": "Iron Fist"
   },
   {
-    "name": "Iron Man",
-    "role": "Duelist"
+    "label": "Iron Man - Duelist",
+    "value": "Iron Man"
   },
   {
-    "name": "Magik",
-    "role": "Duelist"
+    "label": "Magik - Duelist",
+    "value": "Magik"
   },
   {
-    "name": "Moon Knight",
-    "role": "Duelist"
+    "label": "Moon Knight - Duelist",
+    "value": "Moon Knight"
   },
   {
-    "name": "Namor",
-    "role": "Duelist"
+    "label": "Namor - Duelist",
+    "value": "Namor"
   },
   {
-    "name": "Psylocke",
-    "role": "Duelist"
+    "label": "Psylocke - Duelist",
+    "value": "Psylocke"
   },
   {
-    "name": "Scarlet Witch",
-    "role": "Duelist"
+    "label": "Scarlet Witch - Duelist",
+    "value": "Scarlet Witch"
   },
   {
-    "name": "Spiderman",
-    "role": "Duelist"
+    "label": "Spiderman - Duelist",
+    "value": "Spiderman"
   },
   {
-    "name": "Squirrel Girl",
-    "role": "Duelist"
+    "label": "Squirrel Girl - Duelist",
+    "value": "Squirrel Girl"
   },
   {
-    "name": "Star-Lord",
-    "role": "Duelist"
+    "label": "Star-Lord - Duelist",
+    "value": "Star-Lord"
   },
   {
-    "name": "Storm",
-    "role": "Duelist"
+    "label": "Storm - Duelist",
+    "value": "Storm"
   },
   {
-    "name": "The Punisher",
-    "role": "Duelist"
+    "label": "The Punisher - Duelist",
+    "value": "The Punisher"
   },
   {
-    "name": "Winter Soldier",
-    "role": "Duelist"
+    "label": "Winter Soldier - Duelist",
+    "value": "Winter Soldier"
   },
   {
-    "name": "Wolverine",
-    "role": "Duelist"
+    "label": "Wolverine - Duelist",
+    "value": "Wolverine"
   },
   {
-    "name": "Adam Warlock",
-    "role": "Strategist"
+    "label": "Adam Warlock - Strategist",
+    "value": "Adam Warlock"
   },
   {
-    "name": "Cloak & Dagger",
-    "role": "Strategist"
+    "label": "Cloak & Dagger - Strategist",
+    "value": "Cloak & Dagger"
   },
   {
-    "name": "Jeff the Land Shark",
-    "role": "Strategist"
+    "label": "Jeff the Land Shark - Strategist",
+    "value": "Jeff the Land Shark"
   },
   {
-    "name": "Loki",
-    "role": "Strategist"
+    "label": "Loki - Strategist",
+    "value": "Loki"
   },
   {
-    "name": "Luna Snow",
-    "role": "Strategist"
+    "label": "Luna Snow - Strategist",
+    "value": "Luna Snow"
   },
   {
-    "name": "Mantis",
-    "role": "Strategist"
+    "label": "Mantis - Strategist",
+    "value": "Mantis"
   },
   {
-    "name": "Rocket Raccoon",
-    "role": "Strategist"
+    "label": "Rocket Raccoon - Strategist",
+    "value": "Rocket Raccoon"
   }
 ]

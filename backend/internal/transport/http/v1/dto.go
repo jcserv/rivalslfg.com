@@ -7,7 +7,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jcserv/rivalslfg/internal/transport/http/httputil"
 	"github.com/jcserv/rivalslfg/internal/types"
-	"github.com/jcserv/rivalslfg/internal/utils"
 
 	"github.com/jcserv/rivalslfg/internal/repository"
 )
@@ -107,7 +106,7 @@ type CreateGroup struct {
 	Open     bool   `json:"open"`
 
 	Platform   string   `json:"platform"`
-	Roles      []string `json:"roles"`
+	Role       string   `json:"role"`
 	RankID     string   `json:"rankId"`
 	Characters []string `json:"characters"`
 	VoiceChat  bool     `json:"voiceChat"`
@@ -136,7 +135,7 @@ func (c *CreateGroup) validate() error {
 		return err
 	}
 
-	if err := types.ValidateRoles(c.Roles); err != nil {
+	if err := types.ValidateRole(c.Role); err != nil {
 		return err
 	}
 
@@ -173,7 +172,7 @@ func (c *CreateGroup) Parse() (*repository.CreateGroupParams, error) {
 	params.GroupID = c.GroupID
 	params.Owner = c.Owner
 	params.Platform = c.Platform
-	params.Roles = utils.StringSliceToLower(c.Roles)
+	params.Role = strings.ToLower(c.Role)
 	params.RankVal = int32(types.RankIDToRankVal[c.RankID])
 	params.Characters = c.Characters
 	params.VoiceChat = c.VoiceChat
@@ -202,7 +201,7 @@ type JoinGroup struct {
 	Platform    string   `json:"platform"`
 	Gamemode    string   `json:"gamemode"`
 	Region      string   `json:"region"`
-	Roles       []string `json:"roles"`
+	Role        string   `json:"role"`
 	RankID      string   `json:"rankId"`
 	Characters  []string `json:"characters"`
 	VoiceChat   bool     `json:"voiceChat"`
@@ -233,7 +232,7 @@ func (c *JoinGroup) validate() error {
 		return err
 	}
 
-	if err := types.ValidateRoles(c.Roles); err != nil {
+	if err := types.ValidateRole(c.Role); err != nil {
 		return err
 	}
 
@@ -257,7 +256,7 @@ func (c *JoinGroup) Parse() (*repository.JoinGroupParams, error) {
 	params.Gamemode = c.Gamemode
 	params.Region = c.Region
 	params.Platform = c.Platform
-	params.Roles = utils.StringSliceToLower(c.Roles)
+	params.Role = strings.ToLower(c.Role)
 	params.RankVal = int32(types.RankIDToRankVal[c.RankID])
 	params.Name = c.Name
 	params.Passcode = c.Passcode

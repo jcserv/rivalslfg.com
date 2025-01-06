@@ -46,7 +46,7 @@ type Player struct {
 	ID          int32    `json:"id"`
 	Name        string   `json:"name"`
 	Platform    string   `json:"platform"`
-	Roles       []string `json:"roles"`
+	Role        string   `json:"role"`
 	Rank        int32    `json:"rank"`
 	Characters  []string `json:"characters"`
 	VoiceChat   bool     `json:"voice_chat"`
