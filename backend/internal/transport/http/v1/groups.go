@@ -14,13 +14,6 @@ import (
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
-// httputil.BadRequest(w, fmt.Errorf("Player is already in group: %s", group.ID),
-//
-//	map[string]any{
-//		"groupId": group.ID,
-//	},
-//
-// )
 func (a *API) CreateGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()

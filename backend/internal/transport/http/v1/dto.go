@@ -127,61 +127,53 @@ type CreateGroupResult struct {
 	PlayerID string `json:"playerId"`
 }
 
-func (c *CreateGroup) Parse() (*repository.CreateGroupParams, error) {
-	params := &repository.CreateGroupParams{}
+func (c *CreateGroup) validate() error {
 	if c.Owner == "" {
-		return nil, fmt.Errorf("owner is required")
+		return fmt.Errorf("owner is required")
 	}
 
-	if c.Platform == "" {
-		return nil, fmt.Errorf("platform is required")
+	if err := types.ValidatePlatform(c.Platform); err != nil {
+		return err
 	}
 
-	if !types.Platforms.Contains(c.Platform) {
-		return nil, fmt.Errorf("platform %s is not supported", c.Platform)
-	}
-
-	if len(c.Roles) > 0 && len(types.Roles.Intersection(types.NewSet(utils.StringSliceToLower(c.Roles)...))) != len(c.Roles) {
-		return nil, fmt.Errorf("one or more provided roles %v is not supported", c.Roles)
+	if err := types.ValidateRoles(c.Roles); err != nil {
+		return err
 	}
 
 	if !types.IsValidRankID(c.RankID) {
-		return nil, fmt.Errorf("invalid rank %s", c.RankID)
+		return fmt.Errorf("invalid rank %s", c.RankID)
 	}
 
 	if !types.Regions.Contains(c.Region) {
-		return nil, fmt.Errorf("region %s is not supported", c.Region)
+		return fmt.Errorf("region %s is not supported", c.Region)
 	}
 
 	if !types.Gamemodes.Contains(c.Gamemode) {
-		return nil, fmt.Errorf("gamemode %s is not supported", c.Gamemode)
+		return fmt.Errorf("gamemode %s is not supported", c.Gamemode)
 	}
 
-	if c.Vanguards < 0 || c.Vanguards > 6 {
-		return nil, fmt.Errorf("vanguards must be between 0 and 6")
+	if err := types.ValidateRoleQueue(c.Vanguards, c.Duelists, c.Strategists); err != nil {
+		return err
 	}
 
-	if c.Duelists < 0 || c.Duelists > 6 {
-		return nil, fmt.Errorf("duelists must be between 0 and 6")
+	if err := types.ValidatePlatforms(c.Platforms); err != nil {
+		return err
 	}
+	return nil
+}
 
-	if c.Strategists < 0 || c.Strategists > 6 {
-		return nil, fmt.Errorf("strategists must be between 0 and 6")
-	}
+func (c *CreateGroup) Parse() (*repository.CreateGroupParams, error) {
+	params := &repository.CreateGroupParams{}
 
-	// if (c.Vanguards + c.Duelists + c.Strategists) != 6 {
-	// 	return nil, fmt.Errorf("vanguards, duelists, and strategists must add up to 6")
-	// }
-
-	if len(types.Platforms.Intersection(types.NewSet(c.Platforms...))) != len(c.Platforms) {
-		return nil, fmt.Errorf("one or more provided platforms %v is not supported", c.Platforms)
+	if err := c.validate(); err != nil {
+		return nil, err
 	}
 
 	params.PlayerID = int32(c.PlayerID)
 	params.GroupID = c.GroupID
 	params.Owner = c.Owner
 	params.Platform = c.Platform
-	params.Roles = c.Roles
+	params.Roles = utils.StringSliceToLower(c.Roles)
 	params.RankVal = int32(types.RankIDToRankVal[c.RankID])
 	params.Characters = c.Characters
 	params.VoiceChat = c.VoiceChat
@@ -201,119 +193,79 @@ func (c *CreateGroup) Parse() (*repository.CreateGroupParams, error) {
 	return params, nil
 }
 
-type UpsertGroup struct {
-	ID            string                     `json:"id"`
-	Owner         string                     `json:"owner"`
-	Region        string                     `json:"region"`
-	Gamemode      string                     `json:"gamemode"`
-	Players       []repository.PlayerInGroup `json:"players"`
-	Open          bool                       `json:"open"`
-	RoleQueue     *repository.RoleQueue      `json:"roleQueue"`
-	GroupSettings *repository.GroupSettings  `json:"groupSettings"`
+type JoinGroup struct {
+	GroupID  string `json:"groupId"`
+	PlayerID int    `json:"playerId"`
+
+	Name        string   `json:"name"`
+	Passcode    string   `json:"passcode"`
+	Platform    string   `json:"platform"`
+	Gamemode    string   `json:"gamemode"`
+	Region      string   `json:"region"`
+	Roles       []string `json:"roles"`
+	RankID      string   `json:"rankId"`
+	Characters  []string `json:"characters"`
+	VoiceChat   bool     `json:"voiceChat"`
+	Mic         bool     `json:"mic"`
+	Vanguards   int      `json:"vanguards"`
+	Duelists    int      `json:"duelists"`
+	Strategists int      `json:"strategists"`
 }
 
-// // GetID returns the ID of the group, and also allows this to implement the RequestWithID interface
-// func (c *UpsertGroup) GetID() string {
-// 	return c.ID
-// }
+func (c *JoinGroup) validate() error {
+	if c.GroupID == "" {
+		return fmt.Errorf("groupId is required")
+	}
 
-// func (c *UpsertGroup) ToMap() map[string]any {
-// 	out := map[string]any{}
-// 	_ = mapstructure.Decode(c, &out)
-// 	return out
-// }
+	if c.Name == "" {
+		return fmt.Errorf("playerName is required")
+	}
 
-// func (c *UpsertGroup) Parse() (*repository.UpsertGroupParams, error) {
-// 	if c.Owner == "" {
-// 		return nil, fmt.Errorf("owner is required")
-// 	}
-// 	if c.Region == "" {
-// 		return nil, fmt.Errorf("region is required")
-// 	}
-// 	if c.Gamemode == "" {
-// 		return nil, fmt.Errorf("gamemode is required")
-// 	}
-// 	if len(c.Players) == 0 {
-// 		return nil, fmt.Errorf("one or more players are required")
-// 	}
+	if err := types.ValidateGamemode(c.Gamemode); err != nil {
+		return err
+	}
 
-// 	params := &repository.UpsertGroupParams{
-// 		ID:       c.ID,
-// 		Owner:    c.Owner,
-// 		Region:   c.Region,
-// 		Gamemode: c.Gamemode,
-// 		Players:  c.Players,
-// 		Open:     c.Open,
-// 	}
+	if err := types.ValidateRegion(c.Region); err != nil {
+		return err
+	}
 
-// 	if c.RoleQueue != nil {
-// 		params.Vanguards = pgtype.Int4{Int32: int32(c.RoleQueue.Vanguards), Valid: true}
-// 		params.Duelists = pgtype.Int4{Int32: int32(c.RoleQueue.Duelists), Valid: true}
-// 		params.Strategists = pgtype.Int4{Int32: int32(c.RoleQueue.Strategists), Valid: true}
-// 	}
-// 	if c.GroupSettings != nil {
-// 		params.Platforms = c.GroupSettings.Platforms
-// 		params.VoiceChat = pgtype.Bool{Bool: c.GroupSettings.VoiceChat, Valid: true}
-// 		params.Mic = pgtype.Bool{Bool: c.GroupSettings.Mic, Valid: true}
-// 	}
+	if err := types.ValidatePlatform(c.Platform); err != nil {
+		return err
+	}
 
-// 	return params, nil
-// }
+	if err := types.ValidateRoles(c.Roles); err != nil {
+		return err
+	}
 
-// type JoinGroup struct {
-// 	GroupID  string              `json:"groupId"`
-// 	Player   *repository.Profile `json:"player"`
-// 	Passcode string              `json:"passcode"`
-// }
+	if valid := types.IsValidRankID(c.RankID); !valid {
+		return fmt.Errorf("rankId %s is invalid", c.RankID)
+	}
 
-// func (c *JoinGroup) Parse() (*services.JoinGroupArgs, error) {
-// 	if c.GroupID == "" {
-// 		return nil, fmt.Errorf("groupId is required")
-// 	}
-// 	if c.Player == nil {
-// 		return nil, fmt.Errorf("player is required")
-// 	}
+	if err := types.ValidateRoleQueue(c.Vanguards, c.Duelists, c.Strategists); err != nil {
+		return err
+	}
+	return nil
+}
 
-// 	player, err := json.Marshal(c.Player)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	args := &services.JoinGroupArgs{
-// 		CheckCanJoinGroup: repository.CheckCanJoinGroupParams{
-// 			ID:         c.GroupID,
-// 			Passcode:   c.Passcode,
-// 			PlayerName: c.Player.Name,
-// 		},
-// 		JoinGroup: repository.JoinGroupParams{
-// 			Player: player,
-// 			ID:     c.GroupID,
-// 		},
-// 	}
-// 	return args, nil
-// }
-
-// type RemovePlayer struct {
-// 	GroupID          string `json:"groupId"`
-// 	RequesterID      string `json:"requesterId"`
-// 	PlayerToRemoveID string `json:"playerToRemoveId"`
-// }
-
-// func (c *RemovePlayer) Parse() (*repository.RemovePlayerFromGroupParams, error) {
-// 	if c.GroupID == "" {
-// 		return nil, fmt.Errorf("groupId is required")
-// 	}
-// 	if c.RequesterID == "" {
-// 		return nil, fmt.Errorf("requesterId is required")
-// 	}
-// 	if c.PlayerToRemoveID == "" {
-// 		return nil, fmt.Errorf("playerToRemoveId is required")
-// 	}
-
-// 	params := &repository.RemovePlayerFromGroupParams{
-// 		ID:               c.GroupID,
-// 		PlayerToRemoveID: c.PlayerToRemoveID,
-// 	}
-
-// 	return params, nil
-// }
+func (c *JoinGroup) Parse() (*repository.JoinGroupParams, error) {
+	if err := c.validate(); err != nil {
+		return nil, err
+	}
+	params := &repository.JoinGroupParams{}
+	params.GroupID = c.GroupID
+	params.PlayerID = int32(c.PlayerID)
+	params.Gamemode = c.Gamemode
+	params.Region = c.Region
+	params.Platform = c.Platform
+	params.Roles = utils.StringSliceToLower(c.Roles)
+	params.RankVal = int32(types.RankIDToRankVal[c.RankID])
+	params.Name = c.Name
+	params.Passcode = c.Passcode
+	params.Characters = c.Characters
+	params.VoiceChat = c.VoiceChat
+	params.Mic = c.Mic
+	params.Vanguards = int32(c.Vanguards)
+	params.Duelists = int32(c.Duelists)
+	params.Strategists = int32(c.Strategists)
+	return params, nil
+}

@@ -1,10 +1,16 @@
 package v1
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
+	"github.com/gorilla/mux"
+	"github.com/jcserv/rivalslfg/internal/services"
 	"github.com/jcserv/rivalslfg/internal/transport/http/httputil"
+	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
+	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
 func (a *API) CreatePlayer() http.HandlerFunc {
@@ -42,45 +48,53 @@ func (a *API) CreatePlayer() http.HandlerFunc {
 
 func (a *API) JoinGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		return
+		ctx := r.Context()
 
-		// ctx := r.Context()
+		var input JoinGroup
+		err := json.NewDecoder(r.Body).Decode(&input)
+		if err != nil {
+			log.Debug(ctx, err.Error())
+			httputil.BadRequest(w, fmt.Errorf("unable to decode request body"))
+			return
+		}
 
-		// var input JoinGroup
-		// err := json.NewDecoder(r.Body).Decode(&input)
-		// if err != nil {
-		// 	log.Debug(ctx, err.Error())
-		// 	httputil.BadRequest(w)
-		// 	return
-		// }
+		vars := mux.Vars(r)
+		input.GroupID = vars["id"]
+		input.PlayerID = reqCtx.GetPlayerID(ctx)
 
-		// vars := mux.Vars(r)
-		// groupID := vars["id"]
-		// input.GroupID = groupID
+		params, err := input.Parse()
+		if err != nil {
+			log.Debug(ctx, err.Error())
+			httputil.BadRequest(w, err)
+			return
+		}
 
-		// params, err := input.Parse()
-		// if err != nil {
-		// 	log.Debug(ctx, err.Error())
-		// 	httputil.BadRequest(w)
-		// 	return
-		// }
+		// TODO: Change player.roles to single role
+		err = a.groupService.JoinGroup(ctx, *params)
+		if err != nil {
+			if serviceErr, ok := err.(services.Error); ok {
+				if serviceErr.Code() == http.StatusBadRequest {
+					httputil.BadRequest(w, serviceErr)
+					return
+				}
+				if serviceErr.Code() == http.StatusNotFound {
+					httputil.NotFound(w)
+					return
+				}
+				if serviceErr.Code() == http.StatusForbidden {
+					httputil.Forbidden(w)
+					return
+				}
+				httputil.InternalServerError(ctx, w, err)
+			}
+			return
+		}
 
-		// err = a.groupService.JoinGroup(ctx, *params)
-		// if err != nil {
-		// 	if serviceErr, ok := err.(services.Error); ok {
-		// 		if serviceErr.Code() == http.StatusNotFound {
-		// 			httputil.NotFound(w)
-		// 			return
-		// 		}
-		// 		if serviceErr.Code() == http.StatusForbidden {
-		// 			httputil.Forbidden(w)
-		// 			return
-		// 		}
-		// 	}
-		// 	httputil.InternalServerError(ctx, w, err)
-		// 	return
-		// }
-		// httputil.OK(w, nil)
+		// httputil.EmbedTokenInResponse(ctx, w, &reqCtx.AuthInfo{
+		// 	PlayerID: int(result.PlayerID),
+		// 	GroupID:  result.GroupID,
+		// }, auth.GroupMemberRights)
+		httputil.OK(w, nil)
 	}
 }
 

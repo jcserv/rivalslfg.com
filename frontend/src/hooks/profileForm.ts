@@ -79,7 +79,7 @@ export function useProfileForm({
       if (isGroup) {
         router.navigate({ to: `/groups/${groupId}` });
       } else if (profileFormType === "find") {
-        router.navigate({ to: "/browse", search: { queue: true } });
+        router.navigate({ to: "/groups", search: { queue: true } });
       }
     } catch (error) {
       if (!(error instanceof HTTPError)) {

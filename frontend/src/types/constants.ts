@@ -15,6 +15,6 @@ export function getSubmitButtonLabel(p: ProfileFormType): string {
     case "create":
       return "Create Group";
     default:
-      return "Submit";
+      return "Save";
   }
 }

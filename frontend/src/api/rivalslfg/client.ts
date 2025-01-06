@@ -73,8 +73,19 @@ export class RivalsLFGClient extends HTTPClient {
         {
           method: "POST",
           body: JSON.stringify({
-            player,
+            name: player.name,
             passcode,
+            gamemode: player.gamemode,
+            region: player.region,
+            platform: player.platform,
+            roles: player.roles,
+            rankId: player.rank,
+            characters: player.characters,
+            voiceChat: player.voiceChat,
+            mic: player.mic,
+            vanguards: player.roleQueue?.vanguards ?? 0,
+            duelists: player.roleQueue?.duelists ?? 0,
+            strategists: player.roleQueue?.strategists ?? 0,
           }),
         },
       );

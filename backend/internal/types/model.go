@@ -1,12 +1,65 @@
 package types
 
+import (
+	"fmt"
+
+	"github.com/jcserv/rivalslfg/internal/utils"
+)
+
 var Gamemodes = NewSet("competitive", "quickplay")
+
+func ValidateGamemode(gamemode string) error {
+	if gamemode == "" {
+		return fmt.Errorf("gamemode is required")
+	}
+
+	if !Gamemodes.Contains(gamemode) {
+		return fmt.Errorf("gamemode %s is not supported", gamemode)
+	}
+	return nil
+}
 
 var Platforms = NewSet("xb", "ps", "pc")
 
+func ValidatePlatform(platform string) error {
+	if platform == "" {
+		return fmt.Errorf("platform is required")
+	}
+
+	if !Platforms.Contains(platform) {
+		return fmt.Errorf("platform %s is not supported", platform)
+	}
+	return nil
+}
+
+func ValidatePlatforms(platforms []string) error {
+	if len(platforms) > 0 && len(Platforms.Intersection(NewSet(utils.StringSliceToLower(platforms)...))) != len(platforms) {
+		return fmt.Errorf("one or more provided platforms %v is not supported", platforms)
+	}
+	return nil
+}
+
 var Regions = NewSet("na", "eu", "ap", "sa", "me")
 
+func ValidateRegion(region string) error {
+	if region == "" {
+		return fmt.Errorf("region is required")
+	}
+
+	if !Regions.Contains(region) {
+		return fmt.Errorf("region %s is not supported", region)
+	}
+	return nil
+}
+
 var Roles = NewSet("vanguard", "duelist", "strategist")
+
+func ValidateRoles(roles []string) error {
+	if len(roles) > 0 && len(Roles.Intersection(NewSet(utils.StringSliceToLower(roles)...))) != len(roles) {
+		return fmt.Errorf("one or more provided roles %v is not supported", roles)
+	}
+	return nil
+}
 
 var RankIDToRankVal = map[string]int{
 	"b3":  0,
@@ -62,4 +115,17 @@ func IsValidRankID(value string) bool {
 func IsValidRankValue(value int) bool {
 	_, exists := RankValToRankID[value]
 	return exists
+}
+
+func ValidateRoleQueue(vanguards, duelists, strategists int) error {
+	if vanguards < 0 || vanguards > 6 {
+		return fmt.Errorf("vanguards must be between 0 and 6")
+	}
+	if duelists < 0 || duelists > 6 {
+		return fmt.Errorf("duelists must be between 0 and 6")
+	}
+	if strategists < 0 || strategists > 6 {
+		return fmt.Errorf("strategists must be between 0 and 6")
+	}
+	return nil
 }

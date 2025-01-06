@@ -54,13 +54,13 @@ export function ProfileForm({
     profile?.roleQueue ? true : false,
   );
 
-  const isGroup = profileFormType === "create";
-
   const { form, onSubmit, onClear, onReset } = useProfileForm({
     profileFormType,
     profile,
     setProfile,
   });
+
+  const isGroup = profileFormType === "create";
 
   const personalInfo = (form: UseFormReturn<z.infer<typeof formSchema>>) => (
     <div>
