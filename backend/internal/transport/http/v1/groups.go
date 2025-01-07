@@ -106,7 +106,7 @@ func (a *API) GetGroups() http.HandlerFunc {
 			return
 		}
 
-		if queryParams.PaginateBy.Count {
+		if queryParams != nil && queryParams.PaginateBy.Count {
 			w.Header().Set("X-Total-Count", strconv.FormatInt(int64(totalCount), 10))
 		}
 
