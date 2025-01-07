@@ -14,63 +14,8 @@ import (
 	reflect "reflect"
 
 	repository "github.com/jcserv/rivalslfg/internal/repository"
-	services "github.com/jcserv/rivalslfg/internal/services"
 	gomock "go.uber.org/mock/gomock"
 )
-
-// MockIAuth is a mock of IAuth interface.
-type MockIAuth struct {
-	ctrl     *gomock.Controller
-	recorder *MockIAuthMockRecorder
-	isgomock struct{}
-}
-
-// MockIAuthMockRecorder is the mock recorder for MockIAuth.
-type MockIAuthMockRecorder struct {
-	mock *MockIAuth
-}
-
-// NewMockIAuth creates a new mock instance.
-func NewMockIAuth(ctrl *gomock.Controller) *MockIAuth {
-	mock := &MockIAuth{ctrl: ctrl}
-	mock.recorder = &MockIAuthMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockIAuth) EXPECT() *MockIAuthMockRecorder {
-	return m.recorder
-}
-
-// CreateAuth mocks base method.
-func (m *MockIAuth) CreateAuth(ctx context.Context, playerID string) (services.Token, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateAuth", ctx, playerID)
-	ret0, _ := ret[0].(services.Token)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateAuth indicates an expected call of CreateAuth.
-func (mr *MockIAuthMockRecorder) CreateAuth(ctx, playerID any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAuth", reflect.TypeOf((*MockIAuth)(nil).CreateAuth), ctx, playerID)
-}
-
-// ValidateToken mocks base method.
-func (m *MockIAuth) ValidateToken(ctx context.Context, token services.Token) (*services.PlayerAuth, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ValidateToken", ctx, token)
-	ret0, _ := ret[0].(*services.PlayerAuth)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ValidateToken indicates an expected call of ValidateToken.
-func (mr *MockIAuthMockRecorder) ValidateToken(ctx, token any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateToken", reflect.TypeOf((*MockIAuth)(nil).ValidateToken), ctx, token)
-}
 
 // MockIGroup is a mock of IGroup interface.
 type MockIGroup struct {

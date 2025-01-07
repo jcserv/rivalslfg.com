@@ -25,13 +25,11 @@ const (
 )
 
 type API struct {
-	authService  services.IAuth
 	groupService services.IGroup
 }
 
-func NewAPI(authService services.IAuth, groupService services.IGroup) *API {
+func NewAPI(groupService services.IGroup) *API {
 	return &API{
-		authService:  authService,
 		groupService: groupService,
 	}
 }

@@ -19,11 +19,9 @@ import (
 func TestIntegration_GetGroupByID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	r := mux.NewRouter()
-	mockAuthService := mocks.NewMockIAuth(ctrl)
 	mockGroupService := mocks.NewMockIGroup(ctrl)
 
 	a := NewAPI(
-		mockAuthService,
 		mockGroupService,
 	)
 	a.RegisterRoutes(r)

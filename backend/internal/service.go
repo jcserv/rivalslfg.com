@@ -50,7 +50,6 @@ func NewService() (*Service, error) {
 	// store := store.New(client)
 
 	s.api = _http.NewAPI(
-		services.NewAuth(),
 		services.NewGroup(repo),
 	)
 	return s, nil
