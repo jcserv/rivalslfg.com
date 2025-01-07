@@ -122,4 +122,8 @@ SELECT
         ) THEN '403'
         WHEN NOT EXISTS (SELECT 1 FROM valid_group) THEN '400e'
         ELSE '500'
-    END as status;
+    END as status,
+    COALESCE(
+        (SELECT player_id FROM group_member_creation),
+        0
+    )::integer as player_id;

@@ -73,6 +73,11 @@ func (a *API) GetGroupByID() http.HandlerFunc {
 			return
 		}
 
+		if !group.Open && reqCtx.GetGroupID(ctx) != group.ID {
+			httputil.Forbidden(w)
+			return
+		}
+
 		httputil.OK(w, group)
 	}
 }
@@ -109,6 +114,9 @@ func (a *API) GetGroups() http.HandlerFunc {
 	}
 }
 
+// GetGroupDetails: TODO
+
+// DeleteGroup: TODO
 func (a *API) DeleteGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()

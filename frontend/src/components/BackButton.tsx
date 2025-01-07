@@ -15,7 +15,7 @@ export function BackButton({
 }: BackButtonProps) {
   const router = useRouter();
   const handleBack = () => {
-    router.history.back();
+    router.navigate({ to: ".." });
   };
   return (
     <Button

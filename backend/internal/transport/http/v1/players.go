@@ -7,12 +7,14 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/jcserv/rivalslfg/internal/services"
 	"github.com/jcserv/rivalslfg/internal/transport/http/httputil"
 	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
+// CreatePlayer: TODO
 func (a *API) CreatePlayer() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -69,7 +71,7 @@ func (a *API) JoinGroup() http.HandlerFunc {
 			return
 		}
 
-		err = a.groupService.JoinGroup(ctx, *params)
+		playerID, err := a.groupService.JoinGroup(ctx, *params)
 		if err != nil {
 			if serviceErr, ok := err.(services.Error); ok {
 				if serviceErr.Code() == http.StatusBadRequest {
@@ -89,14 +91,16 @@ func (a *API) JoinGroup() http.HandlerFunc {
 			return
 		}
 
-		// httputil.EmbedTokenInResponse(ctx, w, &reqCtx.AuthInfo{
-		// 	PlayerID: int(result.PlayerID),
-		// 	GroupID:  result.GroupID,
-		// }, auth.GroupMemberRights)
+		httputil.EmbedTokenInResponse(ctx, w, &reqCtx.AuthInfo{
+			PlayerID: int(playerID),
+			GroupID:  input.GroupID,
+		}, auth.GroupMemberRights)
+
 		httputil.OK(w, nil)
 	}
 }
 
+// RemovePlayer: TODO
 func (a *API) RemovePlayer() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		return

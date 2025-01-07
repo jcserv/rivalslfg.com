@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-router";
 
 import { fetchGroup, joinGroup } from "@/api";
-import { StatusCodes } from "@/api/types";
+import { HTTPError, StatusCodes } from "@/api/types";
 import {
   AccessGroupDialog,
   BackButton,
@@ -45,14 +45,22 @@ export const Route = createFileRoute("/groups/$groupId")({
   beforeLoad: async ({ params, search }) => {
     const { groupId } = params;
     const { join, passcode } = search;
-    const group = await fetchGroup(groupId.toUpperCase());
-    if (!group) throw notFound();
-    if (!join) return;
-    if (join && !group.open) {
+    try {
+      await fetchGroup(groupId.toUpperCase());
       return;
+    } catch (error) {
+      if (!(error instanceof HTTPError)) {
+        return;
+      }
+      if (error.statusCode === StatusCodes.NotFound) {
+        throw notFound();
+      }
+      if (error.statusCode === StatusCodes.Forbidden) {
+        if (!join) return;
+        const profile: Profile = getStorageValue("profile", {});
+        await joinGroup(groupId.toUpperCase(), profile, passcode ?? "");
+      }
     }
-    const profile: Profile = getStorageValue("profile", {});
-    await joinGroup(groupId.toUpperCase(), profile, passcode ?? "");
   },
   notFoundComponent: () => (
     <section className="p-2 md:p-4 h-[80vh]">
@@ -65,6 +73,7 @@ export const Route = createFileRoute("/groups/$groupId")({
 });
 
 function GroupPage() {
+  // TODO: Get passcode from backend
   const passcode = "abcd";
 
   const { groupId } = Route.useParams();
@@ -104,14 +113,11 @@ function GroupPage() {
     async (p: Profile, passcode: string = "") => {
       if (!group) return;
       try {
-        const status = await joinGroup({
+        await joinGroup({
           groupId,
           player: p,
           passcode,
         });
-        if (status !== StatusCodes.OK) {
-          throw new Error(`${status}`);
-        }
         if (!isPlayerInGroup) {
           setGroup({
             ...group,
@@ -126,12 +132,21 @@ function GroupPage() {
           title: "Joined group",
           variant: "success",
         });
-      } catch {
+      } catch (error) {
+        if (!(error instanceof HTTPError)) {
+          toast({
+            title: "Access denied",
+            description: "Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
         toast({
-          title: "Access denied",
-          description: "Please try again.",
+          title: error.statusText,
+          description: error.message,
           variant: "destructive",
         });
+        
       }
     },
     [

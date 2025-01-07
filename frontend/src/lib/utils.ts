@@ -18,3 +18,12 @@ export function toTitleCase(str: string) {
 export function strArrayToTitleCase(strArray: string[]) {
   return strArray.map((str) => toTitleCase(str)).join(", ");
 }
+
+export const safeJsonParse = async (response: Response) => {
+  try {
+    const text = await response.text(); 
+    return text ? JSON.parse(text) : {};
+  } catch {
+    throw new Error("Invalid JSON response");
+  }
+};

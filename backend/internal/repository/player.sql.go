@@ -127,7 +127,11 @@ SELECT
         ) THEN '403'
         WHEN NOT EXISTS (SELECT 1 FROM valid_group) THEN '400e'
         ELSE '500'
-    END as status
+    END as status,
+    COALESCE(
+        (SELECT player_id FROM group_member_creation),
+        0
+    )::integer as player_id
 `
 
 type JoinGroupParams struct {
@@ -149,13 +153,18 @@ type JoinGroupParams struct {
 	Strategists int32       `json:"strategists"`
 }
 
+type JoinGroupRow struct {
+	Status   string `json:"status"`
+	PlayerID int32  `json:"player_id"`
+}
+
 // First check if player is already in a group
 // Get current role counts for the group
 // Check all requirements in a single query
 // Insert player if they don't exist and group is valid
 // Create group membership if everything valid
 // Return status code
-func (q *Queries) JoinGroup(ctx context.Context, arg JoinGroupParams) (string, error) {
+func (q *Queries) JoinGroup(ctx context.Context, arg JoinGroupParams) (JoinGroupRow, error) {
 	row := q.db.QueryRow(ctx, joinGroup,
 		arg.GroupID,
 		arg.ID,
@@ -174,7 +183,7 @@ func (q *Queries) JoinGroup(ctx context.Context, arg JoinGroupParams) (string, e
 		arg.Duelists,
 		arg.Strategists,
 	)
-	var status string
-	err := row.Scan(&status)
-	return status, err
+	var i JoinGroupRow
+	err := row.Scan(&i.Status, &i.PlayerID)
+	return i, err
 }

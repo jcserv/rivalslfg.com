@@ -1,3 +1,5 @@
+import { safeJsonParse } from "@/lib";
+
 import { HTTPError } from "./types";
 
 export class HTTPClient {
@@ -55,8 +57,8 @@ export class HTTPClient {
       headers,
     });
 
-    if (!response.ok) {
-      const respBody = await response.json();
+    if ((response.status >= 400 && response.status < 500) || (!response.ok)) {
+      const respBody = await safeJsonParse(response);
       throw new HTTPError(response.status, response.statusText, respBody);
     }
 
@@ -78,7 +80,6 @@ export class HTTPClient {
     for (let attempt = 0; attempt < retries; attempt++) {
       try {
         const response = await fetch(url, { headers });
-
         if (response.status === 429) {
           const retryAfter = response.headers.get("Retry-After");
           const delayMs = retryAfter ? parseInt(retryAfter) * 1000 : 1000;
@@ -86,13 +87,18 @@ export class HTTPClient {
           continue;
         }
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        if ((response.status >= 400 && response.status < 500) || (!response.ok)) {
+          const respBody = await safeJsonParse(response);
+          throw new HTTPError(response.status, response.statusText, respBody);
         }
 
         this.handleNewToken(response);
         return response;
       } catch (error) {
+        if (error instanceof HTTPError) {
+          throw error;
+        }
+
         if (attempt === retries - 1) throw error;
         await this.delay(1000 * (attempt + 1)); // Exponential backoff
       }

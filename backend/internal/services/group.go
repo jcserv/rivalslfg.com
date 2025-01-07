@@ -41,24 +41,24 @@ func (s *Group) GetGroupByID(ctx context.Context, id string) (*repository.GroupW
 	return group, nil
 }
 
-func (s *Group) JoinGroup(ctx context.Context, arg repository.JoinGroupParams) error {
-	status, err := s.repo.JoinGroup(ctx, arg)
+func (s *Group) JoinGroup(ctx context.Context, arg repository.JoinGroupParams) (int32, error) {
+	result, err := s.repo.JoinGroup(ctx, arg)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	switch status {
+	switch result.Status {
 	case "200":
-		return nil
+		return result.PlayerID, nil
 	case "400a":
-		return NewError(http.StatusBadRequest, "Player is already in a group.", nil)
+		return 0, NewError(http.StatusBadRequest, "Player is already in a group.", nil)
 	case "404":
-		return NewError(http.StatusNotFound, "Group not found.", nil)
+		return 0, NewError(http.StatusNotFound, "Group not found.", nil)
 	case "403":
-		return NewError(http.StatusForbidden, "Access denied.", nil)
+		return 0, NewError(http.StatusForbidden, "Access denied.", nil)
 	case "400e":
-		return NewError(http.StatusBadRequest, "Group requirements not met.", nil)
+		return 0, NewError(http.StatusBadRequest, "Group requirements not met.", nil)
 	default:
-		return NewError(http.StatusInternalServerError, "An unexpected error occurred.", nil)
+		return 0, NewError(http.StatusInternalServerError, "An unexpected error occurred.", nil)
 	}
 }

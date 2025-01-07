@@ -32,7 +32,7 @@ export class RivalsLFGClient extends HTTPClient {
     try {
       const params = query ? toURLSearchParams(query) : new URLSearchParams();
       const response = await this.fetchWithRetry(
-        `${this.baseURL}/api/v1/groups?${params.toString()}`,
+        `${this.baseURL}/api/v1/groups?${params.toString()}`
       );
       const totalCount = parseInt(response.headers.get("X-Total-Count") ?? "0");
       const data = await response.json();
@@ -51,60 +51,52 @@ export class RivalsLFGClient extends HTTPClient {
   }
 
   async getGroup(id: string): Promise<Group | undefined> {
-    try {
-      const response = await this.fetchWithRetry(
-        `${this.baseURL}/api/v1/groups/${id}`,
-      );
-      const data = await response.json();
-      return data;
-    } catch {
-      return undefined;
-    }
+    const response = await this.fetchWithRetry(
+      `${this.baseURL}/api/v1/groups/${id}`
+    );
+    const data = await response.json();
+    return data;
   }
 
   async joinGroup(
     groupId: string,
     player: Profile,
-    passcode: string,
+    passcode: string
   ): Promise<StatusCode> {
-    try {
-      const response = await this.fetchWithAuth(
-        `${this.baseURL}/api/v1/groups/${groupId}/players/${player.id}`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            name: player.name,
-            passcode,
-            gamemode: player.gamemode,
-            region: player.region,
-            platform: player.platform,
-            role: player.role,
-            rankId: player.rank,
-            characters: player.characters,
-            voiceChat: player.voiceChat,
-            mic: player.mic,
-            vanguards: player.roleQueue?.vanguards ?? 0,
-            duelists: player.roleQueue?.duelists ?? 0,
-            strategists: player.roleQueue?.strategists ?? 0,
-          }),
-        },
-      );
-      return response.status as StatusCode;
-    } catch {
-      return StatusCodes.InternalServerError as StatusCode;
-    }
+    const response = await this.fetchWithAuth(
+      `${this.baseURL}/api/v1/groups/${groupId}/players/${player.id}`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          name: player.name,
+          passcode,
+          gamemode: player.gamemode,
+          region: player.region,
+          platform: player.platform,
+          role: player.role,
+          rankId: player.rank,
+          characters: player.characters,
+          voiceChat: player.voiceChat,
+          mic: player.mic,
+          vanguards: player.roleQueue?.vanguards ?? 0,
+          duelists: player.roleQueue?.duelists ?? 0,
+          strategists: player.roleQueue?.strategists ?? 0,
+        }),
+      }
+    );
+    return response.status as StatusCode;
   }
 
   async removePlayer(
     groupId: string,
-    playerToRemoveId: number,
+    playerToRemoveId: number
   ): Promise<StatusCode> {
     try {
       const response = await this.fetchWithAuth(
         `${this.baseURL}/api/v1/groups/${groupId}/players/${playerToRemoveId}`,
         {
           method: "DELETE",
-        },
+        }
       );
       return response.status as StatusCode;
     } catch {

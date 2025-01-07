@@ -1,4 +1,5 @@
 import {
+  HTTPError,
   rivalslfgStore,
   rivalsStoreActions,
   StatusCode,
@@ -7,11 +8,13 @@ import {
 import { rivalslfgAPIClient } from "@/routes/__root";
 import {
   CreateGroupResponse,
+  Gamemode,
   getGroupFromProfile,
   Group,
   PaginatedQueryFnResponse,
   Profile,
   QueryParams,
+  Region,
 } from "@/types";
 
 export const createGroup = async (
@@ -40,12 +43,39 @@ export const fetchGroup = async (id: string): Promise<Group | undefined> => {
     return cached;
   }
 
-  const group = await rivalslfgAPIClient.getGroup(id);
-  if (!group) {
-    return undefined;
+  try {
+    const group = await rivalslfgAPIClient.getGroup(id);
+    if (!group) {
+      return undefined;
+    }
+    rivalsStoreActions.upsertGroup(group);
+    return group;
+  } catch (error) {
+    if (!(error instanceof HTTPError)) {
+      return undefined;
+    }
+    if (!(error.statusCode === StatusCodes.Forbidden)) {
+      throw error;
+    }
+    // For forbidden groups, return a minimal group object
+    return {
+      id,
+      open: false,
+      // Add other required fields with placeholder/default values
+      name: "Private Group",
+      owner: "",
+      ownerId: 0,
+      region: "" as Region,
+      gamemode: "" as Gamemode,
+      players: [],
+      groupSettings: {
+        platforms: [],
+        voiceChat: false,
+        mic: false
+      }
+    };
   }
-  rivalsStoreActions.upsertGroup(group);
-  return group;
+  
 };
 
 export const joinGroup = async (
