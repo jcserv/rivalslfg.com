@@ -14,6 +14,7 @@ import (
 	"github.com/jcserv/rivalslfg/internal/repository"
 	"github.com/jcserv/rivalslfg/internal/services"
 	_http "github.com/jcserv/rivalslfg/internal/transport/http"
+	v1 "github.com/jcserv/rivalslfg/internal/transport/http/v1"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
@@ -50,7 +51,10 @@ func NewService() (*Service, error) {
 	// store := store.New(client)
 
 	s.api = _http.NewAPI(
-		services.NewGroup(repo),
+		&v1.Dependencies{
+			GroupService:  services.NewGroup(repo),
+			PlayerService: services.NewPlayer(repo),
+		},
 	)
 	return s, nil
 }

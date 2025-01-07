@@ -20,9 +20,13 @@ func TestIntegration_GetGroupByID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	r := mux.NewRouter()
 	mockGroupService := mocks.NewMockIGroup(ctrl)
+	mockPlayerService := mocks.NewMockIPlayer(ctrl)
 
 	a := NewAPI(
-		mockGroupService,
+		&Dependencies{
+			GroupService:  mockGroupService,
+			PlayerService: mockPlayerService,
+		},
 	)
 	a.RegisterRoutes(r)
 	t.Parallel()

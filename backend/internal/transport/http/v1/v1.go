@@ -25,12 +25,19 @@ const (
 )
 
 type API struct {
-	groupService services.IGroup
+	groupService  services.IGroup
+	playerService services.IPlayer
 }
 
-func NewAPI(groupService services.IGroup) *API {
+type Dependencies struct {
+	GroupService  services.IGroup
+	PlayerService services.IPlayer
+}
+
+func NewAPI(deps *Dependencies) *API {
 	return &API{
-		groupService: groupService,
+		groupService:  deps.GroupService,
+		playerService: deps.PlayerService,
 	}
 }
 

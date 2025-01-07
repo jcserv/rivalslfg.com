@@ -87,8 +87,32 @@ func (mr *MockIGroupMockRecorder) GetGroups(ctx, arg any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroups", reflect.TypeOf((*MockIGroup)(nil).GetGroups), ctx, arg)
 }
 
+// MockIPlayer is a mock of IPlayer interface.
+type MockIPlayer struct {
+	ctrl     *gomock.Controller
+	recorder *MockIPlayerMockRecorder
+	isgomock struct{}
+}
+
+// MockIPlayerMockRecorder is the mock recorder for MockIPlayer.
+type MockIPlayerMockRecorder struct {
+	mock *MockIPlayer
+}
+
+// NewMockIPlayer creates a new mock instance.
+func NewMockIPlayer(ctrl *gomock.Controller) *MockIPlayer {
+	mock := &MockIPlayer{ctrl: ctrl}
+	mock.recorder = &MockIPlayerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockIPlayer) EXPECT() *MockIPlayerMockRecorder {
+	return m.recorder
+}
+
 // JoinGroup mocks base method.
-func (m *MockIGroup) JoinGroup(ctx context.Context, arg repository.JoinGroupParams) (int32, error) {
+func (m *MockIPlayer) JoinGroup(ctx context.Context, arg repository.JoinGroupParams) (int32, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "JoinGroup", ctx, arg)
 	ret0, _ := ret[0].(int32)
@@ -97,7 +121,7 @@ func (m *MockIGroup) JoinGroup(ctx context.Context, arg repository.JoinGroupPara
 }
 
 // JoinGroup indicates an expected call of JoinGroup.
-func (mr *MockIGroupMockRecorder) JoinGroup(ctx, arg any) *gomock.Call {
+func (mr *MockIPlayerMockRecorder) JoinGroup(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JoinGroup", reflect.TypeOf((*MockIGroup)(nil).JoinGroup), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JoinGroup", reflect.TypeOf((*MockIPlayer)(nil).JoinGroup), ctx, arg)
 }

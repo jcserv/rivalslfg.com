@@ -71,7 +71,7 @@ func (a *API) JoinGroup() http.HandlerFunc {
 			return
 		}
 
-		playerID, err := a.groupService.JoinGroup(ctx, *params)
+		playerID, err := a.playerService.JoinGroup(ctx, *params)
 		if err != nil {
 			if serviceErr, ok := err.(services.Error); ok {
 				if serviceErr.Code() == http.StatusBadRequest {
