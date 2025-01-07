@@ -10,5 +10,14 @@
   "eslint.format.enable": true,
   "files.eol": "\n",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "npm.enableRunFromFolder": true
+  "npm.enableRunFromFolder": true,
+  "go.useLanguageServer": true,
+  "go.formatTool": "gofmt",
+  "go.lintTool": "golangci-lint",
+  "[go]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "always"
+    }
+  }
 }
