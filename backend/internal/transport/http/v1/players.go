@@ -86,8 +86,8 @@ func (a *API) JoinGroup() http.HandlerFunc {
 					httputil.Forbidden(w)
 					return
 				}
-				httputil.InternalServerError(ctx, w, err)
 			}
+			httputil.InternalServerError(ctx, w, err)
 			return
 		}
 
