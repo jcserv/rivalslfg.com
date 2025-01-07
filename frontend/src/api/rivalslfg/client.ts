@@ -1,4 +1,4 @@
-import { HTTPClient, StatusCode, StatusCodes } from "@/api";
+import { HTTPClient, StatusCode } from "@/api";
 import {
   CreateGroupResponse,
   getCreateGroupFromProfile,
@@ -64,7 +64,7 @@ export class RivalsLFGClient extends HTTPClient {
     passcode: string,
   ): Promise<StatusCode> {
     const response = await this.fetchWithAuth(
-      `${this.baseURL}/api/v1/groups/${groupId}/players/${player.id}`,
+      `${this.baseURL}/api/v1/groups/${groupId}/players/${player.id ?? 0}`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -87,20 +87,13 @@ export class RivalsLFGClient extends HTTPClient {
     return response.status as StatusCode;
   }
 
-  async removePlayer(
-    groupId: string,
-    playerToRemoveId: number,
-  ): Promise<StatusCode> {
-    try {
-      const response = await this.fetchWithAuth(
-        `${this.baseURL}/api/v1/groups/${groupId}/players/${playerToRemoveId}`,
-        {
-          method: "DELETE",
-        },
-      );
-      return response.status as StatusCode;
-    } catch {
-      return StatusCodes.InternalServerError as StatusCode;
-    }
+  async removePlayer(groupId: string, playerId: number): Promise<StatusCode> {
+    const response = await this.fetchWithAuth(
+      `${this.baseURL}/api/v1/groups/${groupId}/players/${playerId}`,
+      {
+        method: "DELETE",
+      },
+    );
+    return response.status as StatusCode;
   }
 }

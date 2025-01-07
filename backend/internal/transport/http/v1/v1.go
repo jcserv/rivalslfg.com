@@ -4,7 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/jcserv/rivalslfg/internal/services"
+	"github.com/jcserv/rivalslfg/internal/transport/http/middleware"
 )
 
 const (
@@ -47,6 +49,11 @@ func (a *API) RegisterRoutes(r *mux.Router) {
 	r.HandleFunc(groupMember, a.JoinGroup()).Methods(http.MethodPost)
 
 	r.HandleFunc(players, a.CreatePlayer()).Methods(http.MethodPost)
+	r.HandleFunc(groupMember,
+		middleware.RequireRight(auth.RightLeaveGroup)(
+			a.RemovePlayer(),
+		),
+	)
 
 	// r.HandleFunc(groups,
 	// 	middleware.RequireRight(auth.RightDeleteGroup)(

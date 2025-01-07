@@ -66,9 +66,12 @@ export function useProfileForm({
       }
 
       setProfile({
-        id: playerId,
         ...values,
+        id: playerId,
       } as Profile);
+
+      // Set profile and wait for a tick to ensure state updates
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       toast({
         title: formMessages[profileFormType].success,

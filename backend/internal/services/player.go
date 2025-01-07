@@ -25,6 +25,7 @@ func (s *Player) JoinGroup(ctx context.Context, arg repository.JoinGroupParams) 
 
 	switch result.Status {
 	case "200":
+		// Emit event to notify other players in group
 		return result.PlayerID, nil
 	case "400a":
 		return 0, NewError(http.StatusBadRequest, "Player is already in a group.", nil)
@@ -36,5 +37,25 @@ func (s *Player) JoinGroup(ctx context.Context, arg repository.JoinGroupParams) 
 		return 0, NewError(http.StatusBadRequest, "Group requirements not met.", nil)
 	default:
 		return 0, NewError(http.StatusInternalServerError, "An unexpected error occurred.", nil)
+	}
+}
+
+func (s *Player) RemovePlayer(ctx context.Context, arg repository.RemovePlayerParams) (string, error) {
+	result, err := s.repo.RemovePlayer(ctx, arg)
+	if err != nil {
+		return "", err
+	}
+
+	switch result.Status {
+	case "200":
+		// TODO: Emit event to notify player left to other players in group
+		return result.Status, nil
+	case "204":
+		// TODO: Emit event to notify users on group page that group is deleted
+		return result.Status, nil
+	case "404":
+		return "", NewError(http.StatusNotFound, "Player not found.", nil)
+	default:
+		return "", NewError(http.StatusInternalServerError, "An unexpected error occurred.", nil)
 	}
 }

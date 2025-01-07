@@ -187,3 +187,107 @@ func (q *Queries) JoinGroup(ctx context.Context, arg JoinGroupParams) (JoinGroup
 	err := row.Scan(&i.Status, &i.PlayerID)
 	return i, err
 }
+
+const removePlayer = `-- name: RemovePlayer :one
+WITH group_check AS (
+    -- Check if group exists and player is in it
+    SELECT group_id, player_id, leader
+    FROM GroupMembers gm
+    WHERE gm.group_id = $1
+    AND gm.player_id = $2
+    LIMIT 1
+),
+group_size AS (
+    -- Get total members in group
+    SELECT COUNT(*) as member_count
+    FROM GroupMembers
+    WHERE group_id = $1
+),
+is_last_member AS (
+    -- Check if this is the last member
+    SELECT (SELECT member_count FROM group_size) = 1 as is_last
+),
+next_leader AS (
+    -- Find next leader if current leader is leaving and not last member
+    SELECT gm.player_id
+    FROM GroupMembers gm
+    JOIN group_check gc ON gm.group_id = gc.group_id
+    WHERE gm.player_id != $2
+    AND NOT EXISTS (SELECT 1 FROM is_last_member WHERE is_last)
+    ORDER BY gm.leader DESC, RANDOM()
+    LIMIT 1
+),
+promote_leader AS (
+    -- Promote next leader if current leader is leaving and not last member
+    UPDATE Groups
+    SET owner = (
+        SELECT name
+        FROM Players
+        WHERE id = (SELECT player_id FROM next_leader)
+    )
+    WHERE id = $1
+    AND EXISTS (
+        SELECT 1 FROM group_check
+        WHERE leader = true
+    )
+    AND EXISTS (SELECT 1 FROM next_leader)
+    RETURNING id
+),
+promote_member AS (
+    -- Update group membership for new leader if not last member
+    UPDATE GroupMembers
+    SET leader = true
+    WHERE group_id = $1
+    AND player_id = (SELECT player_id FROM next_leader)
+    AND EXISTS (
+        SELECT 1 FROM group_check
+        WHERE leader = true
+    )
+    RETURNING player_id
+),
+remove_member AS (
+    -- Remove the player from the group
+    DELETE FROM GroupMembers
+    WHERE group_id = $1
+    AND player_id = $2
+    AND EXISTS (SELECT 1 FROM group_check)
+    RETURNING group_id
+),
+delete_empty_group AS (
+    -- Delete group if this was the last member
+    DELETE FROM Groups g
+    WHERE g.id = $1
+    AND EXISTS (SELECT 1 FROM is_last_member WHERE is_last)
+    RETURNING id
+)
+SELECT 
+    CASE
+        WHEN NOT EXISTS (SELECT 1 FROM group_check) THEN
+            '404'::TEXT  -- Group not found or player not in group
+        WHEN EXISTS (SELECT 1 FROM is_last_member WHERE is_last) THEN
+            '204'::TEXT  -- Last member left, group will be deleted
+        ELSE
+            '200'::TEXT  -- Successfully removed player
+    END as status,
+    COALESCE(
+        (SELECT player_id FROM next_leader)::INTEGER,
+        0
+    ) as new_leader_id
+`
+
+type RemovePlayerParams struct {
+	GroupID  string `json:"group_id"`
+	PlayerID int32  `json:"player_id"`
+}
+
+type RemovePlayerRow struct {
+	Status      string      `json:"status"`
+	NewLeaderID interface{} `json:"new_leader_id"`
+}
+
+func (q *Queries) RemovePlayer(ctx context.Context, arg RemovePlayerParams) (RemovePlayerRow, error) {
+	row := q.db.QueryRow(ctx, removePlayer, arg.GroupID, arg.PlayerID)
+	var i RemovePlayerRow
+	err := row.Scan(&i.Status, &i.NewLeaderID)
+	return i, err
+}

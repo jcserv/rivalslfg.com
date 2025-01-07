@@ -91,11 +91,15 @@ export const joinGroup = async (
 
 export const removePlayer = async (
   groupId: string,
-  requesterId: number,
+  playerId: number,
 ): Promise<StatusCode> => {
-  const result = await rivalslfgAPIClient.removePlayer(groupId, requesterId);
-  // if (result === StatusCodes.OK) {
-  //   rivalsStoreActions.removePlayerFromGroup(playerId);
-  // }
+  const result = await rivalslfgAPIClient.removePlayer(groupId, playerId);
+  if (result === StatusCodes.NoContent) {
+    rivalsStoreActions.removeGroup(groupId);
+    return result;
+  }
+  if (result === StatusCodes.OK) {
+    rivalsStoreActions.removePlayerFromGroup(groupId, playerId);
+  }
   return result;
 };

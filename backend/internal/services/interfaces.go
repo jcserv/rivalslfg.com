@@ -16,4 +16,5 @@ type IGroup interface {
 
 type IPlayer interface {
 	JoinGroup(ctx context.Context, arg repository.JoinGroupParams) (int32, error)
+	RemovePlayer(ctx context.Context, arg repository.RemovePlayerParams) (string, error)
 }

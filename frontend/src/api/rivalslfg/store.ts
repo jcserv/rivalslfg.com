@@ -39,6 +39,25 @@ export const rivalsStoreActions = {
         : [group, ...prev.groups],
     }));
   },
+  removeGroup(groupId: string) {
+    rivalslfgStore.setState((prev) => ({
+      ...prev,
+      groups: prev.groups.filter((g) => g.id !== groupId),
+    }));
+  },
+  removePlayerFromGroup(groupId: string, playerId: number) {
+    rivalslfgStore.setState((prev) => ({
+      ...prev,
+      groups: prev.groups.map((g) =>
+        g.id === groupId
+          ? {
+              ...g,
+              players: g.players.filter((p) => p.id !== playerId),
+            }
+          : g,
+      ),
+    }));
+  },
   clearStore() {
     rivalslfgStore.setState(() => initialState);
     queryClient.removeQueries({ queryKey: rivalsStoreKeys.all });

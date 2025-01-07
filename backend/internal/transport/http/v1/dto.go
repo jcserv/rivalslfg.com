@@ -268,3 +268,28 @@ func (c *JoinGroup) Parse() (*repository.JoinGroupParams, error) {
 	params.Strategists = int32(c.Strategists)
 	return params, nil
 }
+
+type RemovePlayer struct {
+	GroupID          string `json:"groupId"`
+	PlayerToRemoveID int    `json:"playerToRemoveId"`
+}
+
+func (c *RemovePlayer) validate() error {
+	if c.GroupID == "" {
+		return fmt.Errorf("groupId is required")
+	}
+	if c.PlayerToRemoveID <= 0 {
+		return fmt.Errorf("playerId is required")
+	}
+	return nil
+}
+
+func (c *RemovePlayer) Parse() (*repository.RemovePlayerParams, error) {
+	if err := c.validate(); err != nil {
+		return nil, err
+	}
+	params := &repository.RemovePlayerParams{}
+	params.GroupID = c.GroupID
+	params.PlayerID = int32(c.PlayerToRemoveID)
+	return params, nil
+}

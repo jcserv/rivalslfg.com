@@ -127,3 +127,89 @@ SELECT
         (SELECT player_id FROM group_member_creation),
         0
     )::integer as player_id;
+
+-- name: RemovePlayer :one
+WITH group_check AS (
+    -- Check if group exists and player is in it
+    SELECT *
+    FROM GroupMembers gm
+    WHERE gm.group_id = @group_id
+    AND gm.player_id = @player_id
+    LIMIT 1
+),
+group_size AS (
+    -- Get total members in group
+    SELECT COUNT(*) as member_count
+    FROM GroupMembers
+    WHERE group_id = @group_id
+),
+is_last_member AS (
+    -- Check if this is the last member
+    SELECT (SELECT member_count FROM group_size) = 1 as is_last
+),
+next_leader AS (
+    -- Find next leader if current leader is leaving and not last member
+    SELECT gm.player_id
+    FROM GroupMembers gm
+    JOIN group_check gc ON gm.group_id = gc.group_id
+    WHERE gm.player_id != @player_id
+    AND NOT EXISTS (SELECT 1 FROM is_last_member WHERE is_last)
+    ORDER BY gm.leader DESC, RANDOM()
+    LIMIT 1
+),
+promote_leader AS (
+    -- Promote next leader if current leader is leaving and not last member
+    UPDATE Groups
+    SET owner = (
+        SELECT name
+        FROM Players
+        WHERE id = (SELECT player_id FROM next_leader)
+    )
+    WHERE id = @group_id
+    AND EXISTS (
+        SELECT 1 FROM group_check
+        WHERE leader = true
+    )
+    AND EXISTS (SELECT 1 FROM next_leader)
+    RETURNING id
+),
+promote_member AS (
+    -- Update group membership for new leader if not last member
+    UPDATE GroupMembers
+    SET leader = true
+    WHERE group_id = @group_id
+    AND player_id = (SELECT player_id FROM next_leader)
+    AND EXISTS (
+        SELECT 1 FROM group_check
+        WHERE leader = true
+    )
+    RETURNING player_id
+),
+remove_member AS (
+    -- Remove the player from the group
+    DELETE FROM GroupMembers
+    WHERE group_id = @group_id
+    AND player_id = @player_id
+    AND EXISTS (SELECT 1 FROM group_check)
+    RETURNING group_id
+),
+delete_empty_group AS (
+    -- Delete group if this was the last member
+    DELETE FROM Groups g
+    WHERE g.id = @group_id
+    AND EXISTS (SELECT 1 FROM is_last_member WHERE is_last)
+    RETURNING id
+)
+SELECT 
+    CASE
+        WHEN NOT EXISTS (SELECT 1 FROM group_check) THEN
+            '404'::TEXT  -- Group not found or player not in group
+        WHEN EXISTS (SELECT 1 FROM is_last_member WHERE is_last) THEN
+            '204'::TEXT  -- Last member left, group will be deleted
+        ELSE
+            '200'::TEXT  -- Successfully removed player
+    END as status,
+    COALESCE(
+        (SELECT player_id FROM next_leader)::INTEGER,
+        0
+    ) as new_leader_id;

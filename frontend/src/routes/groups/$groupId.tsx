@@ -4,6 +4,7 @@ import {
   createFileRoute,
   notFound,
   SearchSchemaInput,
+  useRouter,
 } from "@tanstack/react-router";
 
 import { fetchGroup, joinGroup } from "@/api";
@@ -14,6 +15,7 @@ import {
   ChatBox,
   GroupControls,
   GroupDisplay,
+  TooltipItem,
 } from "@/components";
 import { Button } from "@/components/ui";
 import {
@@ -75,10 +77,11 @@ export const Route = createFileRoute("/groups/$groupId")({
 function GroupPage() {
   const { groupId } = Route.useParams();
   const { toast } = useToast();
+  const router = useRouter();
 
   const isAuthed = useIsAuthed(groupId);
   const [g, isLoading, error] = useGroup(groupId);
-  const [profile] = useProfile();
+  const [profile, , isProfileConfigured] = useProfile();
 
   const joinGroup = useJoinGroup();
   const removePlayer = useRemovePlayer();
@@ -155,43 +158,14 @@ function GroupPage() {
     ],
   );
 
-  async function onRemove(playerToRemoveId: number) {
+  async function onRemove(playerId: number) {
     if (!group) return;
-    const isPlayerLeavingGroup = playerToRemoveId === profile.id;
+    const isPlayerLeavingGroup = playerId === profile.id;
     try {
       const status = await removePlayer({
         groupId,
-        playerId: playerToRemoveId,
+        playerId,
       });
-      if (status !== StatusCodes.OK) {
-        throw new Error(`${status}`);
-      }
-
-      if (isPlayerInGroup) {
-        const updatedPlayers = group.players.filter(
-          (p) => p.id !== playerToRemoveId,
-        );
-
-        let newGroup = {
-          ...group,
-          players: updatedPlayers,
-        };
-
-        if (group.ownerId === playerToRemoveId) {
-          const newOwner = updatedPlayers[0];
-
-          newGroup = {
-            ...newGroup,
-            owner: newOwner.name,
-            name: `${newOwner.name}'s group`,
-            players: updatedPlayers.map((p) =>
-              p.name === newOwner.name ? { ...p, leader: true } : p,
-            ),
-          };
-        }
-
-        setGroup(newGroup);
-      }
 
       toast({
         title: isPlayerLeavingGroup
@@ -199,6 +173,18 @@ function GroupPage() {
           : "Removed player from group",
         variant: "success",
       });
+
+      // Group was deleted
+      if (status === StatusCodes.NoContent) {
+        router.navigate({ to: "/groups" });
+        return;
+      }
+
+      const newGroup = {
+        ...group,
+        players: group.players ? group.players.filter((p) => p.id !== playerId) : [],
+      };
+      setGroup(newGroup);
     } catch {
       toast({
         title: isPlayerLeavingGroup
@@ -237,15 +223,21 @@ function GroupPage() {
                     </Button>
                   )}
                   {!isPlayerInGroup && (
-                    <Button
-                      variant="success"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        onJoin(profile);
-                      }}
+                    <TooltipItem
+                      content="You must configure your profile before joining a group"
+                      enabled={!isProfileConfigured}
                     >
-                      Join
-                    </Button>
+                      <Button
+                        variant="success"
+                        disabled={!isProfileConfigured}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onJoin(profile);
+                        }}
+                      >
+                        Join
+                      </Button>
+                    </TooltipItem>
                   )}
                 </div>
               )}
@@ -258,7 +250,7 @@ function GroupPage() {
                   isGroupOpen={group?.open ?? false}
                   canUserAccessGroup={canUserAccessGroup}
                   passcode={group?.passcode ?? ""}
-                  />
+                />
               )}
               <ChatBox
                 canUserAccessGroup={canUserAccessGroup}

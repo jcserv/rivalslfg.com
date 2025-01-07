@@ -65,6 +65,10 @@ func OK(w http.ResponseWriter, response any) {
 	writeResponse(w, response)
 }
 
+func NoContent(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func EmbedTokenInResponse(ctx context.Context, w http.ResponseWriter, authInfo *reqCtx.AuthInfo, rights []auth.Right) {
 	pID := utils.IntToString(authInfo.PlayerID)
 	newToken, err := auth.GenerateToken(pID, map[string]string{

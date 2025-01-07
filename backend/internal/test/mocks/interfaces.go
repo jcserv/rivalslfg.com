@@ -125,3 +125,18 @@ func (mr *MockIPlayerMockRecorder) JoinGroup(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JoinGroup", reflect.TypeOf((*MockIPlayer)(nil).JoinGroup), ctx, arg)
 }
+
+// RemovePlayer mocks base method.
+func (m *MockIPlayer) RemovePlayer(ctx context.Context, arg repository.RemovePlayerParams) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemovePlayer", ctx, arg)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemovePlayer indicates an expected call of RemovePlayer.
+func (mr *MockIPlayerMockRecorder) RemovePlayer(ctx, arg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemovePlayer", reflect.TypeOf((*MockIPlayer)(nil).RemovePlayer), ctx, arg)
+}

@@ -77,6 +77,22 @@ func IsGroupOwner(ctx context.Context, groupID string) bool {
 	return auth.HasRight(claims, auth.RightDeleteGroup)
 }
 
+func IsGroupMember(ctx context.Context, groupID string) bool {
+	if GetGroupID(ctx) != groupID {
+		return false
+	}
+
+	token := GetToken(ctx)
+	if token == "" {
+		return false
+	}
+	claims, err := auth.ValidateToken(token)
+	if err != nil {
+		return false
+	}
+	return auth.HasRight(claims, auth.RightLeaveGroup)
+}
+
 func ctxWithAuthInfo(ctx context.Context, info *AuthInfo) context.Context {
 	return context.WithValue(ctx, authInfoKey, info)
 }
