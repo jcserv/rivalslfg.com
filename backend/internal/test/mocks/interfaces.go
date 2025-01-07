@@ -57,18 +57,18 @@ func (mr *MockIGroupMockRecorder) CreateGroup(ctx, arg any) *gomock.Call {
 }
 
 // GetGroupByID mocks base method.
-func (m *MockIGroup) GetGroupByID(ctx context.Context, id string) (*repository.GroupWithPlayers, error) {
+func (m *MockIGroup) GetGroupByID(ctx context.Context, id string, isGroupOwner bool) (*repository.GroupWithPlayers, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetGroupByID", ctx, id)
+	ret := m.ctrl.Call(m, "GetGroupByID", ctx, id, isGroupOwner)
 	ret0, _ := ret[0].(*repository.GroupWithPlayers)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetGroupByID indicates an expected call of GetGroupByID.
-func (mr *MockIGroupMockRecorder) GetGroupByID(ctx, id any) *gomock.Call {
+func (mr *MockIGroupMockRecorder) GetGroupByID(ctx, id, isGroupOwner any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupByID", reflect.TypeOf((*MockIGroup)(nil).GetGroupByID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupByID", reflect.TypeOf((*MockIGroup)(nil).GetGroupByID), ctx, id, isGroupOwner)
 }
 
 // GetGroups mocks base method.

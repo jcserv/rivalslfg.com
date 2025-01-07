@@ -249,6 +249,7 @@ export type Group = {
   region: Region;
   gamemode: Gamemode;
   open: boolean;
+  passcode?: string;
   players: Player[];
   groupSettings: GroupSettings;
   roleQueue?: RoleQueue;

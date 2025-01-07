@@ -62,7 +62,7 @@ func (a *API) GetGroupByID() http.HandlerFunc {
 			return
 		}
 
-		group, err := a.groupService.GetGroupByID(ctx, groupID)
+		group, err := a.groupService.GetGroupByID(ctx, groupID, reqCtx.IsGroupOwner(ctx, groupID))
 		if err != nil {
 			httputil.InternalServerError(ctx, w, err)
 			return

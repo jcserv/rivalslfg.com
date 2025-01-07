@@ -32,10 +32,15 @@ func (s *Group) GetGroups(ctx context.Context, arg repository.GetGroupsParams) (
 	return result.Groups, result.TotalCount, nil
 }
 
-func (s *Group) GetGroupByID(ctx context.Context, id string) (*repository.GroupWithPlayers, error) {
+func (s *Group) GetGroupByID(ctx context.Context, id string, isGroupOwner bool) (*repository.GroupWithPlayers, error) {
 	group, err := s.repo.GetGroupByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
+
+	if !isGroupOwner {
+		group.Passcode = ""
+	}
+
 	return group, nil
 }

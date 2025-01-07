@@ -73,9 +73,6 @@ export const Route = createFileRoute("/groups/$groupId")({
 });
 
 function GroupPage() {
-  // TODO: Get passcode from backend
-  const passcode = "abcd";
-
   const { groupId } = Route.useParams();
   const { toast } = useToast();
 
@@ -224,7 +221,7 @@ function GroupPage() {
                 group={group}
                 canUserAccessGroup={canUserAccessGroup}
                 isOwner={isOwner}
-                passcode={passcode}
+                passcode={group?.passcode ?? ""}
                 onRemove={onRemove}
               />
             )}
@@ -260,8 +257,8 @@ function GroupPage() {
                 <GroupControls
                   isGroupOpen={group?.open ?? false}
                   canUserAccessGroup={canUserAccessGroup}
-                  passcode={passcode}
-                />
+                  passcode={group?.passcode ?? ""}
+                  />
               )}
               <ChatBox
                 canUserAccessGroup={canUserAccessGroup}

@@ -75,7 +75,7 @@ func TestIntegration_GetGroupByID(t *testing.T) {
 	a.RegisterRoutes(r)
 	t.Parallel()
 	t.Run("Should return group if exists and is open", func(t *testing.T) {
-		mockGroupService.EXPECT().GetGroupByID(gomock.Any(), "AAAA").Return(&repository.GroupWithPlayers{
+		mockGroupService.EXPECT().GetGroupByID(gomock.Any(), "AAAA", false).Return(&repository.GroupWithPlayers{
 			GroupDTO: repository.GroupDTO{
 				ID:            "AAAA",
 				CommunityID:   1,
@@ -103,7 +103,7 @@ func TestIntegration_GetGroupByID(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	})
 	t.Run("Should return 500 if unexpected error", func(t *testing.T) {
-		mockGroupService.EXPECT().GetGroupByID(gomock.Any(), "AAAA").Return(nil, fmt.Errorf("unexpected err"))
+		mockGroupService.EXPECT().GetGroupByID(gomock.Any(), "AAAA", false).Return(nil, fmt.Errorf("unexpected err"))
 		req := httptest.NewRequest(http.MethodGet, "/api/v1/groups/AAAA", test.GetBody(
 			map[string]interface{}{
 				"id": "AAAA",
@@ -115,7 +115,7 @@ func TestIntegration_GetGroupByID(t *testing.T) {
 		assert.Equal(t, http.StatusInternalServerError, rec.Code)
 	})
 	t.Run("Should return 404 if null is returned from service", func(t *testing.T) {
-		mockGroupService.EXPECT().GetGroupByID(gomock.Any(), "AAAA").Return(nil, nil)
+		mockGroupService.EXPECT().GetGroupByID(gomock.Any(), "AAAA", false).Return(nil, nil)
 		req := httptest.NewRequest(http.MethodGet, "/api/v1/groups/AAAA", test.GetBody(
 			map[string]interface{}{
 				"id": "AAAA",
@@ -127,7 +127,7 @@ func TestIntegration_GetGroupByID(t *testing.T) {
 		assert.Equal(t, http.StatusNotFound, rec.Code)
 	})
 	t.Run("Should return 200 if group is not open and user is authorized to view", func(t *testing.T) {
-		mockGroupService.EXPECT().GetGroupByID(gomock.Any(), "AAAA").Return(&repository.GroupWithPlayers{
+		mockGroupService.EXPECT().GetGroupByID(gomock.Any(), "AAAA", false).Return(&repository.GroupWithPlayers{
 			GroupDTO: repository.GroupDTO{
 				ID:            "AAAA",
 				CommunityID:   1,
@@ -158,7 +158,7 @@ func TestIntegration_GetGroupByID(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	})
 	t.Run("Should return 403 if group is not open and user is not authorized to view", func(t *testing.T) {
-		mockGroupService.EXPECT().GetGroupByID(gomock.Any(), "AAAA").Return(&repository.GroupWithPlayers{
+		mockGroupService.EXPECT().GetGroupByID(gomock.Any(), "AAAA", false).Return(&repository.GroupWithPlayers{
 			GroupDTO: repository.GroupDTO{
 				ID:            "AAAA",
 				CommunityID:   1,

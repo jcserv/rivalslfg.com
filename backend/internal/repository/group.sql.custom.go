@@ -172,6 +172,7 @@ SELECT
 	g.region,
 	g.gamemode,
 	open,
+	g.passcode,
 	jsonb_build_object(
 		'vanguards', g.vanguards,
 		'duelists', g.duelists,
@@ -217,6 +218,7 @@ func (q *Queries) GetGroupByID(ctx context.Context, id string) (*GroupWithPlayer
 		&g.Region,
 		&g.Gamemode,
 		&g.Open,
+		&g.Passcode,
 		&g.RoleQueue,
 		&g.GroupSettings,
 		&g.Players,

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/jcserv/rivalslfg/internal/utils"
 )
 
@@ -52,11 +53,6 @@ func GetGroupID(ctx context.Context) string {
 	return info.GroupID
 }
 
-func IsGroupOwner(ctx context.Context, groupID string) bool {
-	claimGroupID := GetGroupID(ctx)
-	return claimGroupID == groupID
-}
-
 func GetToken(ctx context.Context) string {
 	info, ok := GetAuthInfo(ctx)
 	if !ok {
@@ -65,22 +61,35 @@ func GetToken(ctx context.Context) string {
 	return info.Token
 }
 
+func IsGroupOwner(ctx context.Context, groupID string) bool {
+	if GetGroupID(ctx) != groupID {
+		return false
+	}
+
+	token := GetToken(ctx)
+	if token == "" {
+		return false
+	}
+	claims, err := auth.ValidateToken(token)
+	if err != nil {
+		return false
+	}
+	return auth.HasRight(claims, auth.RightDeleteGroup)
+}
+
 func ctxWithAuthInfo(ctx context.Context, info *AuthInfo) context.Context {
 	return context.WithValue(ctx, authInfoKey, info)
 }
 
-func WithClaims(r *http.Request, claims jwt.MapClaims) *http.Request {
+func WithClaims(r *http.Request, claims jwt.MapClaims, token string) *http.Request {
 	ctx := r.Context()
 
-	playerID, groupID, token := 0, "", ""
+	playerID, groupID := 0, ""
 	if playerIDVal, ok := claims["playerId"]; ok {
 		playerID = utils.StringToInt(playerIDVal.(string))
 	}
 	if groupIDVal, ok := claims["groupId"]; ok {
 		groupID = groupIDVal.(string)
-	}
-	if tokenVal, ok := claims["token"]; ok {
-		token = tokenVal.(string)
 	}
 
 	info := &AuthInfo{

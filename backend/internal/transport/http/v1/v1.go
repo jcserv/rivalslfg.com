@@ -4,9 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/jcserv/rivalslfg/internal/services"
-	"github.com/jcserv/rivalslfg/internal/transport/http/middleware"
 )
 
 const (
@@ -14,14 +12,14 @@ const (
 	byId         = "/{id}"
 	byPlayerID   = "/{playerId}"
 
-	groups = APIV1URLPath + "groups"
-	group  = groups + byId
+	groups       = APIV1URLPath + "groups"
+	group        = groups + byId
+	groupDetails = group + "/details"
 
-	// todo
-	playaz = APIV1URLPath + "players"
+	players = APIV1URLPath + "players"
 
-	players = group + "/players"
-	player  = players + byPlayerID
+	groupMembers = group + "/players"
+	groupMember  = groupMembers + byPlayerID
 )
 
 type API struct {
@@ -46,17 +44,18 @@ func (a *API) RegisterRoutes(r *mux.Router) {
 	r.HandleFunc(groups, a.CreateGroup()).Methods(http.MethodPost)
 	r.HandleFunc(group, a.GetGroupByID()).Methods(http.MethodGet)
 	r.HandleFunc(groups, a.GetGroups()).Methods(http.MethodGet)
-	r.HandleFunc(player, a.JoinGroup()).Methods(http.MethodPost)
-	r.HandleFunc(playaz, a.CreatePlayer()).Methods(http.MethodPost)
+	r.HandleFunc(groupMember, a.JoinGroup()).Methods(http.MethodPost)
 
-	r.HandleFunc(groups,
-		middleware.RequireRight(auth.RightDeleteGroup)(
-			a.DeleteGroup(),
-		),
-	).Methods(http.MethodDelete)
-	r.HandleFunc(player,
-		middleware.RequireRight(
-			auth.RightLeaveGroup,
-		)(a.RemovePlayer()),
-	).Methods(http.MethodDelete)
+	r.HandleFunc(players, a.CreatePlayer()).Methods(http.MethodPost)
+
+	// r.HandleFunc(groups,
+	// 	middleware.RequireRight(auth.RightDeleteGroup)(
+	// 		a.DeleteGroup(),
+	// 	),
+	// ).Methods(http.MethodDelete)
+	// r.HandleFunc(player,
+	// 	middleware.RequireRight(
+	// 		auth.RightLeaveGroup,
+	// 	)(a.RemovePlayer()),
+	// ).Methods(http.MethodDelete)
 }
