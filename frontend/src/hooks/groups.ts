@@ -1,6 +1,13 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { createGroup, fetchGroup, fetchGroups, HTTPError, rivalsStoreKeys, StatusCodes } from "@/api";
+import {
+  createGroup,
+  fetchGroup,
+  fetchGroups,
+  HTTPError,
+  rivalsStoreKeys,
+  StatusCodes,
+} from "@/api";
 import { Group, Profile } from "@/types";
 
 import { usePagination } from "./paginate";
@@ -26,11 +33,14 @@ export function useGroup(
     queryFn: () => fetchGroup(id),
     staleTime: 10000,
     retry: (failureCount, error) => {
-      if (error instanceof HTTPError && error.statusCode === StatusCodes.Forbidden) {
+      if (
+        error instanceof HTTPError &&
+        error.statusCode === StatusCodes.Forbidden
+      ) {
         return false; // Don't retry on 403
       }
       return failureCount < 3;
-    }
+    },
   });
 
   return [query.data, query.isLoading, query.error];

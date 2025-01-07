@@ -32,7 +32,7 @@ export class RivalsLFGClient extends HTTPClient {
     try {
       const params = query ? toURLSearchParams(query) : new URLSearchParams();
       const response = await this.fetchWithRetry(
-        `${this.baseURL}/api/v1/groups?${params.toString()}`
+        `${this.baseURL}/api/v1/groups?${params.toString()}`,
       );
       const totalCount = parseInt(response.headers.get("X-Total-Count") ?? "0");
       const data = await response.json();
@@ -52,7 +52,7 @@ export class RivalsLFGClient extends HTTPClient {
 
   async getGroup(id: string): Promise<Group | undefined> {
     const response = await this.fetchWithRetry(
-      `${this.baseURL}/api/v1/groups/${id}`
+      `${this.baseURL}/api/v1/groups/${id}`,
     );
     const data = await response.json();
     return data;
@@ -61,7 +61,7 @@ export class RivalsLFGClient extends HTTPClient {
   async joinGroup(
     groupId: string,
     player: Profile,
-    passcode: string
+    passcode: string,
   ): Promise<StatusCode> {
     const response = await this.fetchWithAuth(
       `${this.baseURL}/api/v1/groups/${groupId}/players/${player.id}`,
@@ -82,21 +82,21 @@ export class RivalsLFGClient extends HTTPClient {
           duelists: player.roleQueue?.duelists ?? 0,
           strategists: player.roleQueue?.strategists ?? 0,
         }),
-      }
+      },
     );
     return response.status as StatusCode;
   }
 
   async removePlayer(
     groupId: string,
-    playerToRemoveId: number
+    playerToRemoveId: number,
   ): Promise<StatusCode> {
     try {
       const response = await this.fetchWithAuth(
         `${this.baseURL}/api/v1/groups/${groupId}/players/${playerToRemoveId}`,
         {
           method: "DELETE",
-        }
+        },
       );
       return response.status as StatusCode;
     } catch {

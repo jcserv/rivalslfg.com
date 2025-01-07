@@ -71,11 +71,10 @@ export const fetchGroup = async (id: string): Promise<Group | undefined> => {
       groupSettings: {
         platforms: [],
         voiceChat: false,
-        mic: false
-      }
+        mic: false,
+      },
     };
   }
-  
 };
 
 export const joinGroup = async (

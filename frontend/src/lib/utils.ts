@@ -21,7 +21,7 @@ export function strArrayToTitleCase(strArray: string[]) {
 
 export const safeJsonParse = async (response: Response) => {
   try {
-    const text = await response.text(); 
+    const text = await response.text();
     return text ? JSON.parse(text) : {};
   } catch {
     throw new Error("Invalid JSON response");

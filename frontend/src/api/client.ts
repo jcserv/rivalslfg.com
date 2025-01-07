@@ -57,7 +57,7 @@ export class HTTPClient {
       headers,
     });
 
-    if ((response.status >= 400 && response.status < 500) || (!response.ok)) {
+    if ((response.status >= 400 && response.status < 500) || !response.ok) {
       const respBody = await safeJsonParse(response);
       throw new HTTPError(response.status, response.statusText, respBody);
     }
@@ -87,7 +87,7 @@ export class HTTPClient {
           continue;
         }
 
-        if ((response.status >= 400 && response.status < 500) || (!response.ok)) {
+        if ((response.status >= 400 && response.status < 500) || !response.ok) {
           const respBody = await safeJsonParse(response);
           throw new HTTPError(response.status, response.statusText, respBody);
         }

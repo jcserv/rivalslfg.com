@@ -146,7 +146,6 @@ function GroupPage() {
           description: error.message,
           variant: "destructive",
         });
-        
       }
     },
     [
