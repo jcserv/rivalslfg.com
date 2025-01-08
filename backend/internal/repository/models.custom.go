@@ -5,6 +5,7 @@ import "time"
 type GroupDTO struct {
 	ID            string         `json:"id"`
 	CommunityID   int32          `json:"communityId"`
+	OwnerID       int32          `json:"ownerId"`
 	Owner         string         `json:"owner"`
 	Region        string         `json:"region"`
 	Gamemode      string         `json:"gamemode"`

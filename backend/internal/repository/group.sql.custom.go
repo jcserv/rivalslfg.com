@@ -8,17 +8,47 @@ import (
 )
 
 const getGroups = `
-WITH group_sizes AS (
+WITH group_members_base AS (
+    SELECT 
+        gm.group_id,
+        p.id as player_id,
+        p.name,
+        gm.leader,
+        p.platform,
+        p.role,
+        rank_value_to_id(p.rank) as rank,
+        p.characters,
+        p.voice_chat,
+        p.mic
+    FROM GroupMembers gm
+    JOIN Players p ON p.id = gm.player_id
+),
+group_details AS (
     SELECT 
         group_id,
-        COUNT(*) as member_count
-    FROM GroupMembers
+        COUNT(*) as member_count,
+        MAX(CASE WHEN leader = true THEN player_id END) as owner_id,
+        jsonb_agg(
+            jsonb_build_object(
+                'id', player_id,
+                'name', name,
+                'leader', leader,
+                'platform', platform,
+                'role', role,
+                'rank', rank,
+                'characters', characters,
+                'voiceChat', voice_chat,
+                'mic', mic
+            )
+        ) as players
+    FROM group_members_base
     GROUP BY group_id
 )
 
 SELECT 
     g.id,
     community_id,
+	COALESCE(gd.owner_id, 0) as owner_id,
     owner,
     g.region,
     g.gamemode,
@@ -33,29 +63,9 @@ SELECT
         'voiceChat', g.voice_chat,
         'mic', g.mic
     ) AS group_settings,
-    COALESCE(
-        (
-            SELECT jsonb_agg(
-                jsonb_build_object(
-                    'id', p.id,
-                    'name', p.name,
-                    'leader', gm.leader,
-                    'platform', p.platform,
-                    'role', p.role,
-                    'rank', rank_value_to_id(p.rank),
-                    'characters', p.characters,
-                    'voiceChat', p.voice_chat,
-                    'mic', p.mic
-                )
-            )
-            FROM GroupMembers gm
-            JOIN Players p ON p.id = gm.player_id
-            WHERE gm.group_id = g.id
-        ),
-        '[]'::jsonb
-    ) as players,
-    COALESCE(gs.member_count, 0) as size,
-	CASE WHEN $7 = true THEN (
+    COALESCE(gd.players, '[]'::jsonb) as players,
+    COALESCE(gd.member_count, 0) as size,
+    CASE WHEN $7 = true THEN (
         SELECT COUNT(*)
         FROM Groups g2
         WHERE ($1 = '' OR g2.region = $1)
@@ -68,21 +78,21 @@ SELECT
             END
           )
     ) ELSE 0 END as total_count,
-	g.last_active_at
+    g.last_active_at
 FROM Groups g
-LEFT JOIN group_sizes gs ON g.id = gs.group_id
+LEFT JOIN group_details gd ON g.id = gd.group_id
 WHERE ($1 = '' OR g.region = $1)
   AND ($2 = '' OR g.gamemode = $2)
   AND ($3 = '' OR
     CASE 
         WHEN LOWER($3) = 'true' THEN g.open = true
         WHEN LOWER($3) = 'false' THEN g.open = false
-        ELSE TRUE -- Ignore invalid values and don't filter
+        ELSE TRUE
     END
   )
 ORDER BY 
-    CASE WHEN $4 = 'asc' THEN gs.member_count END ASC,
-    CASE WHEN $4 = 'desc' THEN gs.member_count END DESC
+    CASE WHEN $4 = 'asc' THEN gd.member_count END ASC,
+    CASE WHEN $4 = 'desc' THEN gd.member_count END DESC
 LIMIT $5 OFFSET $6;
 `
 
@@ -106,6 +116,7 @@ func (g *GetGroupsRow) ToGroupWithPlayers() GroupWithPlayers {
 		GroupDTO: GroupDTO{
 			ID:            g.ID,
 			CommunityID:   g.CommunityID,
+			OwnerID:       g.OwnerID,
 			Owner:         g.Owner,
 			Region:        g.Region,
 			Gamemode:      g.Gamemode,
@@ -144,6 +155,7 @@ func (q *Queries) GetGroups(ctx context.Context, arg GetGroupsParams) (*GetGroup
 		if err := rows.Scan(
 			&g.ID,
 			&g.CommunityID,
+			&g.OwnerID,
 			&g.Owner,
 			&g.Region,
 			&g.Gamemode,
@@ -165,55 +177,75 @@ func (q *Queries) GetGroups(ctx context.Context, arg GetGroupsParams) (*GetGroup
 }
 
 const getGroupByID = `
+WITH group_members AS (
+    SELECT 
+        gm.group_id,
+        gm.leader,
+        p.id as player_id,
+        p.name,
+        p.platform,
+        p.role,
+        rank_value_to_id(p.rank) as rank,
+        p.characters,
+        p.voice_chat,
+        p.mic
+    FROM GroupMembers gm
+    JOIN Players p ON p.id = gm.player_id
+    WHERE gm.group_id = $1
+)
 SELECT 
-	g.id,
-	community_id,
-	owner,
-	g.region,
-	g.gamemode,
-	open,
-	g.passcode,
-	jsonb_build_object(
-		'vanguards', g.vanguards,
-		'duelists', g.duelists,
-		'strategists', g.strategists
-	) AS role_queue,
-	 jsonb_build_object(
-		'platforms', g.platforms,
-		'voiceChat', g.voice_chat,
-		'mic', g.mic
-	) AS group_settings,
-	COALESCE(
-        (
-            SELECT jsonb_agg(
-                jsonb_build_object(
-                    'id', p.id,
-                    'name', p.name,
-                    'leader', gm.leader,
-                    'platform', p.platform,
-                    'role', p.role,
-                    'rank', rank_value_to_id(p.rank),
-                    'characters', p.characters,
-                    'voiceChat', p.voice_chat,
-                    'mic', p.mic
-                )
+    g.id,
+    community_id,
+	(
+        SELECT gm2.player_id 
+        FROM group_members gm2 
+        WHERE gm2.leader = true 
+        LIMIT 1
+    ) as owner_id,
+    owner,
+    g.region,
+    g.gamemode,
+    open,
+    g.passcode,
+    jsonb_build_object(
+        'vanguards', g.vanguards,
+        'duelists', g.duelists,
+        'strategists', g.strategists
+    ) AS role_queue,
+    jsonb_build_object(
+        'platforms', g.platforms,
+        'voiceChat', g.voice_chat,
+        'mic', g.mic
+    ) AS group_settings,
+    COALESCE(
+        jsonb_agg(
+            jsonb_build_object(
+                'id', gm.player_id,
+                'name', gm.name,
+                'leader', gm.leader,
+                'platform', gm.platform,
+                'role', gm.role,
+                'rank', gm.rank,
+                'characters', gm.characters,
+                'voiceChat', gm.voice_chat,
+                'mic', gm.mic
             )
-            FROM GroupMembers gm
-            JOIN Players p ON p.id = gm.player_id
-            WHERE gm.group_id = g.id
         ),
         '[]'::jsonb
     ) as players,
-	(SELECT COUNT(*) FROM GroupMembers WHERE group_id = g.id) AS size,
-	last_active_at
+    COUNT(gm.player_id) AS size,
+    g.last_active_at
 FROM Groups g
-WHERE g.id = $1`
+LEFT JOIN group_members gm ON g.id = gm.group_id
+WHERE g.id = $1
+GROUP BY g.id`
 
 func (q *Queries) GetGroupByID(ctx context.Context, id string) (*GroupWithPlayers, error) {
 	var g GroupWithPlayers
 	err := q.db.QueryRow(ctx, getGroupByID, id).Scan(
 		&g.ID,
 		&g.CommunityID,
+		&g.OwnerID,
 		&g.Owner,
 		&g.Region,
 		&g.Gamemode,
