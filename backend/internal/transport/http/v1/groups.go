@@ -78,6 +78,13 @@ func (a *API) GetGroupByID() http.HandlerFunc {
 			return
 		}
 
+		// Users may be promoted to group owner if the previous owner left
+		if reqCtx.GetPlayerID(ctx) == int(group.OwnerID) {
+			httputil.EmbedTokenInResponse(ctx, w, &reqCtx.AuthInfo{
+				PlayerID: int(group.OwnerID),
+				GroupID:  group.ID,
+			}, auth.GroupOwnerRights)
+		}
 		httputil.OK(w, group)
 	}
 }
