@@ -26,6 +26,9 @@ func GetAuthInfo(ctx context.Context) (*AuthInfo, bool) {
 	}
 
 	info, ok := val.(*AuthInfo)
+	if !ok || info == nil {
+		return nil, false
+	}
 	return info, ok
 }
 
@@ -90,7 +93,7 @@ func IsGroupMember(ctx context.Context, groupID string) bool {
 	if err != nil {
 		return false
 	}
-	return auth.HasRight(claims, auth.RightLeaveGroup)
+	return auth.HasRight(claims, auth.RightDeleteGroup)
 }
 
 func ctxWithAuthInfo(ctx context.Context, info *AuthInfo) context.Context {

@@ -38,6 +38,10 @@ func (s *Group) GetGroupByID(ctx context.Context, id string, isGroupOwner bool) 
 		return nil, err
 	}
 
+	if group == nil {
+		return nil, nil
+	}
+
 	if !isGroupOwner {
 		group.Passcode = ""
 	}
