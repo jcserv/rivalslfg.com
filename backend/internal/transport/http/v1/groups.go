@@ -52,6 +52,38 @@ func (a *API) CreateGroup() http.HandlerFunc {
 	}
 }
 
+func (a *API) GetGroups() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		queryParams, err := httputil.ParseQueryParams(r)
+		if err != nil {
+			log.Debug(ctx, fmt.Sprintf("error parsing query params: %v", err))
+			httputil.BadRequest(w, err)
+			return
+		}
+
+		args, err := Parse(queryParams)
+		if err != nil {
+			log.Debug(ctx, fmt.Sprintf("error parsing query params: %v", err))
+			httputil.BadRequest(w, err)
+			return
+		}
+
+		groups, totalCount, err := a.groupService.GetGroups(ctx, *args)
+		if err != nil {
+			httputil.InternalServerError(ctx, w, err)
+			return
+		}
+
+		if queryParams != nil && queryParams.PaginateBy.Count {
+			w.Header().Set("X-Total-Count", strconv.FormatInt(int64(totalCount), 10))
+		}
+
+		httputil.OK(w, groups)
+	}
+}
+
 func (a *API) GetGroupByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -86,38 +118,6 @@ func (a *API) GetGroupByID() http.HandlerFunc {
 			}, auth.GroupOwnerRights)
 		}
 		httputil.OK(w, group)
-	}
-}
-
-func (a *API) GetGroups() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-
-		queryParams, err := httputil.ParseQueryParams(r)
-		if err != nil {
-			log.Debug(ctx, fmt.Sprintf("error parsing query params: %v", err))
-			httputil.BadRequest(w, err)
-			return
-		}
-
-		args, err := Parse(queryParams)
-		if err != nil {
-			log.Debug(ctx, fmt.Sprintf("error parsing query params: %v", err))
-			httputil.BadRequest(w, err)
-			return
-		}
-
-		groups, totalCount, err := a.groupService.GetGroups(ctx, *args)
-		if err != nil {
-			httputil.InternalServerError(ctx, w, err)
-			return
-		}
-
-		if queryParams != nil && queryParams.PaginateBy.Count {
-			w.Header().Set("X-Total-Count", strconv.FormatInt(int64(totalCount), 10))
-		}
-
-		httputil.OK(w, groups)
 	}
 }
 

@@ -32,7 +32,7 @@ func TestIntegration_JoinGroup(t *testing.T) {
 	t.Parallel()
 	t.Run("Should allow unauthenticated users to join a group", func(t *testing.T) {
 		mockPlayerService.EXPECT().JoinGroup(gomock.Any(), gomock.Any()).Return(int32(1), nil)
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/groups/AAAA/players/1", test.GetBody(
+		req := httptest.NewRequest(http.MethodPost, "/api/v1/groups/AAAA/players", test.GetBody(
 			map[string]interface{}{
 				"name":     "imphungky",
 				"passcode": "abcd",
@@ -57,7 +57,7 @@ func TestIntegration_JoinGroup(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	})
 	t.Run("Should return 400 if required field is missing/empty", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/groups/AAAA/players/1", test.GetBody(
+		req := httptest.NewRequest(http.MethodPost, "/api/v1/groups/AAAA/players", test.GetBody(
 			map[string]interface{}{
 				"name":     "imphungky",
 				"passcode": "abcd",
@@ -83,7 +83,7 @@ func TestIntegration_JoinGroup(t *testing.T) {
 	})
 	t.Run("Should return 400 if serviceErr.BadRequest returned", func(t *testing.T) {
 		mockPlayerService.EXPECT().JoinGroup(gomock.Any(), gomock.Any()).Return(int32(0), services.NewError(http.StatusBadRequest, "bad request", nil))
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/groups/AAAA/players/1", test.GetBody(
+		req := httptest.NewRequest(http.MethodPost, "/api/v1/groups/AAAA/players", test.GetBody(
 			map[string]interface{}{
 				"name":     "imphungky",
 				"passcode": "abcd",
@@ -109,7 +109,7 @@ func TestIntegration_JoinGroup(t *testing.T) {
 	})
 	t.Run("Should return 403 if serviceErr.Forbidden returned", func(t *testing.T) {
 		mockPlayerService.EXPECT().JoinGroup(gomock.Any(), gomock.Any()).Return(int32(0), services.NewError(http.StatusForbidden, "forbidden", nil))
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/groups/AAAA/players/1", test.GetBody(
+		req := httptest.NewRequest(http.MethodPost, "/api/v1/groups/AAAA/players", test.GetBody(
 			map[string]interface{}{
 				"name":     "imphungky",
 				"passcode": "abcd",
@@ -135,7 +135,7 @@ func TestIntegration_JoinGroup(t *testing.T) {
 	})
 	t.Run("Should return 404 if serviceErr.NotFound returned", func(t *testing.T) {
 		mockPlayerService.EXPECT().JoinGroup(gomock.Any(), gomock.Any()).Return(int32(0), services.NewError(http.StatusNotFound, "not found", nil))
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/groups/AAAA/players/1", test.GetBody(
+		req := httptest.NewRequest(http.MethodPost, "/api/v1/groups/AAAA/players", test.GetBody(
 			map[string]interface{}{
 				"name":     "imphungky",
 				"passcode": "abcd",
@@ -161,7 +161,7 @@ func TestIntegration_JoinGroup(t *testing.T) {
 	})
 	t.Run("Should return 500 if unexpected error", func(t *testing.T) {
 		mockPlayerService.EXPECT().JoinGroup(gomock.Any(), gomock.Any()).Return(int32(0), fmt.Errorf("unexpected error"))
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/groups/AAAA/players/1", test.GetBody(
+		req := httptest.NewRequest(http.MethodPost, "/api/v1/groups/AAAA/players", test.GetBody(
 			map[string]interface{}{
 				"name":     "imphungky",
 				"passcode": "abcd",

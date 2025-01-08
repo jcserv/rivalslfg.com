@@ -15,6 +15,7 @@ const (
 	byPlayerID   = "/{playerId}"
 
 	groups       = APIV1URLPath + "groups"
+	findGroup    = groups + "/find"
 	group        = groups + byId
 	groupDetails = group + "/details"
 
@@ -44,8 +45,8 @@ func NewAPI(deps *Dependencies) *API {
 // RegisterRoutes registers the routes for the V1 API.
 func (a *API) RegisterRoutes(r *mux.Router) {
 	r.HandleFunc(groups, a.CreateGroup()).Methods(http.MethodPost)
-	r.HandleFunc(group, a.GetGroupByID()).Methods(http.MethodGet)
 	r.HandleFunc(groups, a.GetGroups()).Methods(http.MethodGet)
+	r.HandleFunc(group, a.GetGroupByID()).Methods(http.MethodGet)
 	r.HandleFunc(groupMembers, a.JoinGroup()).Methods(http.MethodPost)
 
 	r.HandleFunc(groupMember,
@@ -53,15 +54,4 @@ func (a *API) RegisterRoutes(r *mux.Router) {
 			a.RemovePlayer(),
 		),
 	).Methods(http.MethodDelete)
-
-	// r.HandleFunc(groups,
-	// 	middleware.RequireRight(auth.RightDeleteGroup)(
-	// 		a.DeleteGroup(),
-	// 	),
-	// ).Methods(http.MethodDelete)
-	// r.HandleFunc(player,
-	// 	middleware.RequireRight(
-	// 		auth.RightLeaveGroup,
-	// 	)(a.RemovePlayer()),
-	// ).Methods(http.MethodDelete)
 }

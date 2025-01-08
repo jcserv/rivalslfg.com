@@ -1,5 +1,9 @@
 # TODO
 
+- [ ] Update platforms to PC/Console
+- [ ] Add new rank "celestial" inbetween gm and eternity
+- [ ] Add new characters Mr. Fantastic (Duelist) and Invisible Woman (Strategist)
+
 ## frontend
 
 FE-Only:
