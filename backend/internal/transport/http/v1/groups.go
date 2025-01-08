@@ -121,8 +121,6 @@ func (a *API) GetGroups() http.HandlerFunc {
 	}
 }
 
-// GetGroupDetails: TODO
-
 // DeleteGroup: TODO
 func (a *API) DeleteGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

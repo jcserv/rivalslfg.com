@@ -2,7 +2,6 @@ package v1
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 
@@ -14,40 +13,6 @@ import (
 	"github.com/jcserv/rivalslfg/internal/utils"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
-
-// CreatePlayer: TODO
-func (a *API) CreatePlayer() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		err := errors.New("test error")
-		httputil.InternalServerError(ctx, w, err)
-		return
-
-		// TODO: Generate token
-
-		// ctx := r.Context()
-		// token, err := a.authService.CreateAuth(ctx, "1")
-		// if err != nil {
-		// 	httputil.InternalServerError(ctx, w, err)
-		// 	return
-		// }
-
-		// playerAuth, err := a.authService.ValidateToken(ctx, token)
-		// if err != nil {
-		// 	httputil.InternalServerError(ctx, w, err)
-		// 	return
-		// }
-
-		// httputil.OK(w, map[string]any{
-		// 	"token": string(token),
-		// 	"playerAuth": map[string]string{
-		// 		"playerId": playerAuth.PlayerID,
-		// 		"token":    playerAuth.Token,
-		// 		"lastSeen": playerAuth.LastSeen.String(),
-		// 	},
-		// })
-	}
-}
 
 func (a *API) JoinGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
