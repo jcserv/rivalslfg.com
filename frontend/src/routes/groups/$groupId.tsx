@@ -182,7 +182,9 @@ function GroupPage() {
 
       const newGroup = {
         ...group,
-        players: group.players ? group.players.filter((p) => p.id !== playerId) : [],
+        players: group.players
+          ? group.players.filter((p) => p.id !== playerId)
+          : [],
       };
       setGroup(newGroup);
     } catch {

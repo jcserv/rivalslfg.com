@@ -338,7 +338,7 @@ export function RoleQueueField({ form, role, label }: RoleQueueFieldProps) {
 
 export function RoleQueueFields({ form }: FormFieldProps) {
   return (
-    <div className="flex flex-row gap-4">
+    <div className="flex flex-row gap-4 m-2">
       <RoleQueueField form={form} role="vanguards" label="Vanguards" />
       <RoleQueueField form={form} role="duelists" label="Duelists" />
       <RoleQueueField form={form} role="strategists" label="Strategists" />
