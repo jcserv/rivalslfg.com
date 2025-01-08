@@ -97,6 +97,71 @@ func parsePagination(args *repository.GetGroupsParams, paginateBy *httputil.Offs
 	return nil
 }
 
+type PlayerRequirements struct {
+	Platform  string `json:"platform,omitempty"`
+	Role      string `json:"role,omitempty"`
+	RankID    string `json:"rankId,omitempty"`
+	VoiceChat bool   `json:"voiceChat,omitempty"`
+	Mic       bool   `json:"mic,omitempty"`
+}
+
+func (p *PlayerRequirements) Validate() error {
+	if p == nil {
+		return nil
+	}
+
+	if p.Platform != "" {
+		if err := types.ValidatePlatform(p.Platform); err != nil {
+			return err
+		}
+	}
+
+	if p.Role != "" {
+		if err := types.ValidateRole(p.Role); err != nil {
+			return err
+		}
+	}
+
+	if p.RankID != "" && !types.IsValidRankID(p.RankID) {
+		return fmt.Errorf("invalid rank %s", p.RankID)
+	}
+
+	return nil
+}
+
+func (p *PlayerRequirements) ToParams() (*repository.GetGroupsParams, error) {
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
+
+	var rankVal *int32
+	if p.RankID != "" {
+		val := int32(types.RankIDToRankVal[p.RankID])
+		rankVal = &val
+	}
+
+	var platform *string
+	if p.Platform != "" {
+		platform = &p.Platform
+	}
+
+	var role *string
+	if p.Role != "" {
+		role = &p.Role
+	}
+
+	voiceChat := &p.VoiceChat
+	mic := &p.Mic
+
+	return &repository.GetGroupsParams{
+		Platform:  platform,
+		Role:      role,
+		RankVal:   rankVal,
+		VoiceChat: voiceChat,
+		Mic:       mic,
+	}, nil
+}
+
 type CreateGroup struct {
 	PlayerID int    `json:"player_id"`
 	GroupID  string `json:"group_id"`
