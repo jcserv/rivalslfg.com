@@ -11,14 +11,22 @@ import {
 import { Group, Profile } from "@/types";
 
 import { usePagination } from "./paginate";
+import { useProfile } from "./profile";
 
 export function useGroups() {
+  const [profile] = useProfile();
+
   return usePagination({
     queryKey: rivalsStoreKeys.groups,
     queryFn: async ({ paginateBy, filterBy }) => {
+      const requirementsFilter = filterBy?.find(
+        (f) => f.field === "areRequirementsMet"
+      );
+
       return await fetchGroups({
         paginateBy,
         filterBy,
+        playerRequirements: requirementsFilter ? profile : undefined,
       });
     },
     initialState: { pageSize: 10 },

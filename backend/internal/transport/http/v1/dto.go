@@ -98,9 +98,11 @@ func parsePagination(args *repository.GetGroupsParams, paginateBy *httputil.Offs
 }
 
 type PlayerRequirements struct {
+	Gamemode  string `json:"gamemode,omitempty"`
+	Region    string `json:"region,omitempty"`
 	Platform  string `json:"platform,omitempty"`
 	Role      string `json:"role,omitempty"`
-	RankID    string `json:"rankId,omitempty"`
+	RankID    string `json:"rank,omitempty"`
 	VoiceChat bool   `json:"voiceChat,omitempty"`
 	Mic       bool   `json:"mic,omitempty"`
 }
@@ -108,6 +110,18 @@ type PlayerRequirements struct {
 func (p *PlayerRequirements) Validate() error {
 	if p == nil {
 		return nil
+	}
+
+	if p.Gamemode != "" {
+		if err := types.ValidateGamemode(p.Gamemode); err != nil {
+			return err
+		}
+	}
+
+	if p.Region != "" {
+		if err := types.ValidateRegion(p.Region); err != nil {
+			return err
+		}
 	}
 
 	if p.Platform != "" {
@@ -134,6 +148,16 @@ func (p *PlayerRequirements) ToParams() (*repository.GetGroupsParams, error) {
 		return nil, err
 	}
 
+	var gamemode string
+	if p.Gamemode != "" {
+		gamemode = p.Gamemode
+	}
+
+	var region string
+	if p.Region != "" {
+		region = p.Region
+	}
+
 	var rankVal *int32
 	if p.RankID != "" {
 		val := int32(types.RankIDToRankVal[p.RankID])
@@ -147,18 +171,21 @@ func (p *PlayerRequirements) ToParams() (*repository.GetGroupsParams, error) {
 
 	var role *string
 	if p.Role != "" {
-		role = &p.Role
+		r := strings.ToLower(p.Role)
+		role = &r
 	}
 
 	voiceChat := &p.VoiceChat
 	mic := &p.Mic
 
 	return &repository.GetGroupsParams{
-		Platform:  platform,
-		Role:      role,
-		RankVal:   rankVal,
-		VoiceChat: voiceChat,
-		Mic:       mic,
+		GamemodeFilter: gamemode,
+		RegionFilter:   region,
+		Platform:       platform,
+		Role:           role,
+		RankVal:        rankVal,
+		VoiceChat:      voiceChat,
+		Mic:            mic,
 	}, nil
 }
 

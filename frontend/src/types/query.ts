@@ -1,9 +1,11 @@
 import { buildFilterQuery, Filter } from "./filter";
 import { OffsetPagination } from "./paginate";
+import { Profile } from "./types";
 
 export interface QueryParams {
   filterBy?: Filter[];
   paginateBy?: OffsetPagination;
+  playerRequirements?: Profile;
 }
 
 export function toURLSearchParams(q: QueryParams): URLSearchParams {

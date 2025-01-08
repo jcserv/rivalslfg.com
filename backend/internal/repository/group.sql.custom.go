@@ -15,8 +15,9 @@ WITH group_members_base AS (
         p.name,
         gm.leader,
         p.platform,
-        p.role,
-        rank_value_to_id(p.rank) as rank,
+        LOWER(p.role) as role,
+        p.rank as rank_val,
+        rank_value_to_id(p.rank) as rank_id,
         p.characters,
         p.voice_chat,
         p.mic
@@ -35,19 +36,24 @@ group_details AS (
                 'leader', leader,
                 'platform', platform,
                 'role', role,
-                'rank', rank,
+                'rank', rank_id,
                 'characters', characters,
                 'voiceChat', voice_chat,
                 'mic', mic
             )
-        ) as players
+        ) as players,
+        MIN(rank_val) as min_rank,
+        MAX(rank_val) as max_rank,
+        COUNT(CASE WHEN role = 'vanguard' THEN 1 END) as curr_vanguards,
+        COUNT(CASE WHEN role = 'duelist' THEN 1 END) as curr_duelists,
+        COUNT(CASE WHEN role = 'strategist' THEN 1 END) as curr_strategists
     FROM group_members_base
     GROUP BY group_id
 ),
 requirements_check AS (
     SELECT g.id AS group_id
     FROM Groups g
-    LEFT JOIN group_details gd ON g.id = gd.group_id
+    JOIN group_details gd ON g.id = gd.group_id
     WHERE
         -- Base requirements
         ($1 = '' OR g.region = $1)
@@ -59,55 +65,38 @@ requirements_check AS (
                 ELSE TRUE
             END
         )
-        -- Player requirements when provided
+        -- Player requirements check
         AND CASE 
-            -- Only apply player requirements if player_id is provided
-            WHEN $8::INTEGER IS NULL THEN TRUE
-            ELSE (
-                -- Platform check
+            -- If rank value is provided, use it as a trigger for all player requirements
+            WHEN $8::INTEGER IS NOT NULL THEN (
+                -- Platform check (if platforms specified)
                 (
                     ARRAY_LENGTH(g.platforms, 1) IS NULL 
                     OR ARRAY_LENGTH(g.platforms, 1) = 0 
-                    OR $9::TEXT IS NULL
-                    OR $9::TEXT = ANY(g.platforms)
+                    OR $4::TEXT = ANY(g.platforms)
                 )
                 -- Role queue check
                 AND (
-                    (g.vanguards + g.duelists + g.strategists = 0)
-                    OR
-                    ($10::TEXT IS NULL)
-                    OR
-                    (
-                        ($10::TEXT = 'vanguard' AND (
-                            SELECT COUNT(*)
-                            FROM group_members_base gmb
-                            WHERE gmb.group_id = g.id AND gmb.role = 'vanguard'
-                        ) < g.vanguards)
-                        OR ($10::TEXT = 'duelist' AND (
-                            SELECT COUNT(*)
-                            FROM group_members_base gmb
-                            WHERE gmb.group_id = g.id AND gmb.role = 'duelist'
-                        ) < g.duelists)
-                        OR ($10::TEXT = 'strategist' AND (
-                            SELECT COUNT(*)
-                            FROM group_members_base gmb
-                            WHERE gmb.group_id = g.id AND gmb.role = 'strategist'
-                        ) < g.strategists)
+                    g.vanguards + g.duelists + g.strategists = 0
+                    OR (
+                        CASE $5::TEXT
+                            WHEN 'vanguard' THEN gd.curr_vanguards < g.vanguards 
+                            WHEN 'duelist' THEN gd.curr_duelists < g.duelists
+                            WHEN 'strategist' THEN gd.curr_strategists < g.strategists
+                            ELSE FALSE
+                        END
                     )
                 )
-                -- Rank check (ensure current group members are within range)
-                AND ($11::INTEGER IS NULL OR EXISTS (
-                    SELECT 1
-                    FROM group_members_base gmb
-                    WHERE gmb.group_id = g.id
-                    AND ABS(
-                        (SELECT rank FROM Players WHERE id = gmb.player_id) - $11::INTEGER
-                    ) <= 10
-                ))
-                -- Voice chat and mic requirements
-                AND (NOT g.voice_chat OR $12::BOOLEAN IS NULL OR $12::BOOLEAN)
-                AND (NOT g.mic OR $13::BOOLEAN IS NULL OR $13::BOOLEAN)
+                -- Rank check
+                AND (
+                    ABS(gd.min_rank - $8::INTEGER) <= 10 
+                    AND ABS(gd.max_rank - $8::INTEGER) <= 10
+                )
+                -- Voice chat and mic
+                AND (NOT g.voice_chat OR $6::BOOLEAN)
+                AND (NOT g.mic OR $7::BOOLEAN)
             )
+            ELSE TRUE
         END
 )
 SELECT 
@@ -130,19 +119,19 @@ SELECT
     ) AS group_settings,
     COALESCE(gd.players, '[]'::jsonb) as players,
     COALESCE(gd.member_count, 0) as size,
-    CASE WHEN $7 = true THEN (
+    CASE WHEN $9 = true THEN (
         SELECT COUNT(*)
         FROM Groups g2
         WHERE g2.id IN (SELECT group_id FROM requirements_check)
     ) ELSE 0 END as total_count,
     g.last_active_at
 FROM Groups g
-LEFT JOIN group_details gd ON g.id = gd.group_id
+JOIN group_details gd ON g.id = gd.group_id
 WHERE g.id IN (SELECT group_id FROM requirements_check)
 ORDER BY 
-    CASE WHEN $4 = 'asc' THEN gd.member_count END ASC,
-    CASE WHEN $4 = 'desc' THEN gd.member_count END DESC
-LIMIT $5 OFFSET $6;
+    CASE WHEN $10 = 'asc' THEN gd.member_count END ASC,
+    CASE WHEN $10 = 'desc' THEN gd.member_count END DESC
+LIMIT $11 OFFSET $12;
 `
 
 type GetGroupsParams struct {
@@ -157,7 +146,6 @@ type GetGroupsParams struct {
 	Count      bool   `json:"count"`
 
 	// Player requirements (all optional)
-	PlayerID  *int32  `json:"playerId"`
 	Platform  *string `json:"platform"`
 	Role      *string `json:"role"`
 	RankVal   *int32  `json:"rankVal"`
@@ -201,16 +189,15 @@ func (q *Queries) GetGroups(ctx context.Context, arg GetGroupsParams) (*GetGroup
 		arg.RegionFilter,
 		arg.GamemodeFilter,
 		arg.OpenFilter,
+		arg.Platform,
+		arg.Role,
+		arg.VoiceChat,
+		arg.Mic,
+		arg.RankVal,
+		arg.Count,
 		arg.SizeSort,
 		arg.Limit,
 		arg.Offset,
-		arg.Count,
-		arg.PlayerID,
-		arg.Platform,
-		arg.Role,
-		arg.RankVal,
-		arg.VoiceChat,
-		arg.Mic,
 	)
 	if err != nil {
 		return nil, err

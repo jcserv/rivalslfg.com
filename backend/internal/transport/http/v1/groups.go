@@ -64,11 +64,13 @@ func (a *API) GetGroups() http.HandlerFunc {
 		}
 
 		var playerReqs PlayerRequirements
+		hasPlayerReqs := false
 		if r.Body != nil && r.ContentLength > 0 {
 			if err := json.NewDecoder(r.Body).Decode(&playerReqs); err != nil {
 				httputil.BadRequest(w, fmt.Errorf("invalid player requirements: %v", err))
 				return
 			}
+			hasPlayerReqs = true
 		}
 
 		args, err := Parse(queryParams)
@@ -81,7 +83,10 @@ func (a *API) GetGroups() http.HandlerFunc {
 		if playerReqParams, err := playerReqs.ToParams(); err != nil {
 			httputil.BadRequest(w, err)
 			return
-		} else if playerReqParams != nil {
+		} else if hasPlayerReqs {
+			args.RegionFilter = playerReqParams.RegionFilter
+			args.GamemodeFilter = playerReqParams.GamemodeFilter
+
 			args.Platform = playerReqParams.Platform
 			args.Role = playerReqParams.Role
 			args.RankVal = playerReqParams.RankVal

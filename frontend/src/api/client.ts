@@ -68,10 +68,10 @@ export class HTTPClient {
 
   public async fetchWithRetry(
     url: string,
+    requestInit?: RequestInit,
     retries: number = 3,
   ): Promise<Response> {
     await this.waitForRateLimit();
-
     let headers = new Headers({
       Accept: "application/json;q=0.9,*/*;q=0.8",
     });
@@ -79,7 +79,7 @@ export class HTTPClient {
 
     for (let attempt = 0; attempt < retries; attempt++) {
       try {
-        const response = await fetch(url, { headers });
+        const response = await fetch(url, { headers, ...requestInit });
         if (response.status === 429) {
           const retryAfter = response.headers.get("Retry-After");
           const delayMs = retryAfter ? parseInt(retryAfter) * 1000 : 1000;

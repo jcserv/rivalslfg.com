@@ -32,8 +32,16 @@ export class RivalsLFGClient extends HTTPClient {
   async getGroups(query?: QueryParams): Promise<PaginatedGroupsResponse> {
     try {
       const params = query ? toURLSearchParams(query) : new URLSearchParams();
+      const hasBody: boolean = query?.playerRequirements !== undefined;
+
+      const requestInit: RequestInit = {
+        method: hasBody ? "POST" : "GET",
+        ...(hasBody && { body: JSON.stringify(query?.playerRequirements) }),
+      };
+
       const response = await this.fetchWithRetry(
         `${this.baseURL}/api/v1/groups?${params.toString()}`,
+        requestInit,
       );
       const totalCount = parseInt(response.headers.get("X-Total-Count") ?? "0");
       const data = await response.json();

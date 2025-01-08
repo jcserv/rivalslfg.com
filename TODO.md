@@ -22,6 +22,7 @@ FE-Only:
 - [ ] Set default filters based on user profile (region=, gamemode=, canjoin=) (\*)
 - [x] Remove player from group
 - [X] Replace hard-coded player IDs
+- [ ] Fix responsiveness of multi-select & dark mode
 
 API Integration:
 
