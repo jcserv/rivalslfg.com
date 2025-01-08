@@ -11,6 +11,7 @@ import {
   Gamemode,
   getGroupFromProfile,
   Group,
+  JoinGroupResponse,
   PaginatedQueryFnResponse,
   Profile,
   QueryParams,
@@ -81,12 +82,16 @@ export const joinGroup = async (
   groupId: string,
   player: Profile,
   passcode: string,
-): Promise<StatusCode> => {
-  const result = await rivalslfgAPIClient.joinGroup(groupId, player, passcode);
-  if (result === StatusCodes.OK) {
+): Promise<JoinGroupResponse> => {
+  const response = await rivalslfgAPIClient.joinGroup(
+    groupId,
+    player,
+    passcode,
+  );
+  if (response.status === StatusCodes.OK) {
     rivalsStoreActions.setAuthedGroup(groupId);
   }
-  return result;
+  return response;
 };
 
 export const removePlayer = async (

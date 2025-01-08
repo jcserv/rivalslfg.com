@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui";
 import {
   getStorageValue,
+  setStorageValue,
   useGroup,
   useIsAuthed,
   useJoinGroup,
@@ -59,8 +60,19 @@ export const Route = createFileRoute("/groups/$groupId")({
       }
       if (error.statusCode === StatusCodes.Forbidden) {
         if (!join) return;
-        const profile: Profile = getStorageValue("profile", {});
-        await joinGroup(groupId.toUpperCase(), profile, passcode ?? "");
+        const profile: Profile = getStorageValue(
+          "profile",
+          {} as Profile,
+        ).value;
+        const { playerId } = await joinGroup(
+          groupId.toUpperCase(),
+          profile,
+          passcode ?? "",
+        );
+        setStorageValue("profile", {
+          ...profile,
+          id: playerId,
+        });
       }
     }
   },
@@ -81,7 +93,7 @@ function GroupPage() {
 
   const isAuthed = useIsAuthed(groupId);
   const [g, isLoading, error] = useGroup(groupId);
-  const [profile, , isProfileConfigured] = useProfile();
+  const [profile, setProfile, isProfileConfigured] = useProfile();
 
   const joinGroup = useJoinGroup();
   const removePlayer = useRemovePlayer();
@@ -113,11 +125,17 @@ function GroupPage() {
     async (p: Profile, passcode: string = "") => {
       if (!group) return;
       try {
-        await joinGroup({
+        const { playerId } = await joinGroup({
           groupId,
           player: p,
           passcode,
         });
+
+        setProfile({
+          ...profile,
+          id: playerId,
+        });
+
         if (!isPlayerInGroup) {
           setGroup({
             ...group,

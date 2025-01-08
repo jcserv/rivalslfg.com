@@ -82,6 +82,18 @@ Bugs:
 - supported filters/sorters for ParseQueryParams
 - Unable to leave your own group if you are the only member
   - v1/players.go:124	can't scan into dest[0]: cannot scan NULL into *int32
+- Can get into a state where you can't leave a group
+
+Repro:
+- Create group [X]
+- Have someone join [X]
+- Kick them [X]
+- Join back [X]
+- Leave, should promote them [X]
+- Join back [X]
+- Can't leave
+- They also can't leave 
+- You can kick the other person in this scenario, but can't leave yourself
 
 Before release:
 - [ ] Squash migrations into one, remove seed data

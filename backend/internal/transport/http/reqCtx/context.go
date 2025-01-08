@@ -93,7 +93,7 @@ func IsGroupMember(ctx context.Context, groupID string) bool {
 	if err != nil {
 		return false
 	}
-	return auth.HasRight(claims, auth.RightDeleteGroup)
+	return auth.HasRight(claims, auth.RightLeaveGroup)
 }
 
 func ctxWithAuthInfo(ctx context.Context, info *AuthInfo) context.Context {

@@ -8,10 +8,10 @@ export const useProfile = (): readonly [
 ] => {
   const [profile, setProfile] = useLocalStorage(
     "profile",
-    {},
+    {} as Profile,
     FOURTEEN_DAYS_FROM_TODAY,
   );
-  const isProfileConfigured = Object.keys(profile).length > 0;
+  const isProfileConfigured = Object.keys(profile || {}).length > 0;
 
   return [profile, setProfile, isProfileConfigured];
 };

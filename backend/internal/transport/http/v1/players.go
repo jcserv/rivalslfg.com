@@ -97,7 +97,9 @@ func (a *API) JoinGroup() http.HandlerFunc {
 			GroupID:  input.GroupID,
 		}, auth.GroupMemberRights)
 
-		httputil.OK(w, nil)
+		httputil.OK(w, map[string]int32{
+			"id": playerID,
+		})
 	}
 }
 
@@ -147,10 +149,13 @@ func (a *API) RemovePlayer() http.HandlerFunc {
 			return
 		}
 
-		httputil.EmbedTokenInResponse(ctx, w, &reqCtx.AuthInfo{
-			PlayerID: 0,
-			GroupID:  "",
-		}, []auth.Right{})
+		// Revoke access if the player being removed is the requester
+		if requesterID == input.PlayerToRemoveID {
+			httputil.EmbedTokenInResponse(ctx, w, &reqCtx.AuthInfo{
+				PlayerID: 0,
+				GroupID:  "",
+			}, []auth.Right{})
+		}
 
 		if status == "204" {
 			httputil.NoContent(w)

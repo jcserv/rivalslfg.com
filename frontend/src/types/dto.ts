@@ -1,3 +1,5 @@
+import { StatusCode } from "@/api";
+
 import { Group, Profile } from "./types";
 
 export interface PaginatedGroupsResponse {
@@ -54,5 +56,10 @@ export function getCreateGroupFromProfile(profile: Profile): CreateGroup {
 
 export type CreateGroupResponse = {
   groupId: string;
+  playerId: number;
+};
+
+export type JoinGroupResponse = {
+  status: StatusCode;
   playerId: number;
 };

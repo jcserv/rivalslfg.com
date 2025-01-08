@@ -3,6 +3,7 @@ import {
   CreateGroupResponse,
   getCreateGroupFromProfile,
   Group,
+  JoinGroupResponse,
   PaginatedGroupsResponse,
   Profile,
   QueryParams,
@@ -62,9 +63,9 @@ export class RivalsLFGClient extends HTTPClient {
     groupId: string,
     player: Profile,
     passcode: string,
-  ): Promise<StatusCode> {
+  ): Promise<JoinGroupResponse> {
     const response = await this.fetchWithAuth(
-      `${this.baseURL}/api/v1/groups/${groupId}/players/${player.id ?? 0}`,
+      `${this.baseURL}/api/v1/groups/${groupId}/players`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -84,7 +85,11 @@ export class RivalsLFGClient extends HTTPClient {
         }),
       },
     );
-    return response.status as StatusCode;
+    const data = await response.json();
+    return {
+      status: response.status as StatusCode,
+      playerId: data.id,
+    };
   }
 
   async removePlayer(groupId: string, playerId: number): Promise<StatusCode> {
