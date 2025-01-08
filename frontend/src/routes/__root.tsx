@@ -26,6 +26,7 @@ export const Route = createRootRoute({
   ),
   notFoundComponent: () => (
     <>
+      <Header />
       <hr />
       <div className="flex w-full h-[80vh] justify-center align-middle">
         <ErrorBanner
@@ -35,6 +36,7 @@ export const Route = createRootRoute({
           <BackButton link className="p-2" />
         </ErrorBanner>
       </div>
+      <Footer />
     </>
   ),
   errorComponent: ({ error }) => (

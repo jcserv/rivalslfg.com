@@ -215,9 +215,9 @@ export function getGroupFromProfile(owner: Profile, id: string): Group {
   };
 }
 
-export function getPlayerFromProfile(profile: Profile): Player {
+export function getPlayerFromProfile(profile: Profile, id?: number): Player {
   return {
-    id: profile.id ?? 0,
+    id: id ?? profile.id ?? 0,
     name: profile.name,
     leader: false,
     platform: profile.platform,

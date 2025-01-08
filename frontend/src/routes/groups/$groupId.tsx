@@ -11,7 +11,6 @@ import { fetchGroup, joinGroup } from "@/api";
 import { HTTPError, StatusCodes } from "@/api/types";
 import {
   AccessGroupDialog,
-  BackButton,
   ChatBox,
   GroupControls,
   GroupDisplay,
@@ -76,14 +75,6 @@ export const Route = createFileRoute("/groups/$groupId")({
       }
     }
   },
-  notFoundComponent: () => (
-    <section className="p-2 md:p-4 h-[80vh]">
-      <div className="h-full w-full flex flex-col items-center justify-center space-y-2">
-        <p>This group doesn&apos;t exist!</p>
-        <BackButton />
-      </div>
-    </section>
-  ),
 });
 
 function GroupPage() {
@@ -139,7 +130,7 @@ function GroupPage() {
         if (!isPlayerInGroup) {
           setGroup({
             ...group,
-            players: [...group.players, getPlayerFromProfile(p)],
+            players: [...group.players, getPlayerFromProfile(p, playerId)],
           });
         }
 

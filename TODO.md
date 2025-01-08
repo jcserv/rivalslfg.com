@@ -62,9 +62,9 @@ Bugs:
 2. [X] Upsert Group
 3. [ ] Delete Group
 4. [X] Join Group (if private, authenticate provided passcode)
-5. [ ] Remove Player from Group
-6. [ ] Leave Group
-7. [ ] Get Group Passcode
+5. [X] Remove Player from Group
+6. [X] Leave Group
+7. [X] Get Group Passcode
 
 8. Chat
 
@@ -77,23 +77,12 @@ Bugs:
    - If no groups are found, create a new group with as many queued players as possible?
 
 Bugs:
-- No auth right now, so users can modify other users' info if they know their id
-- prevent group creation if user already has group
+- [X] No auth right now, so users can modify other users' info if they know their id
+- [X] prevent group creation if user already has group
 - supported filters/sorters for ParseQueryParams
-- Unable to leave your own group if you are the only member
+- [X] Unable to leave your own group if you are the only member
   - v1/players.go:124	can't scan into dest[0]: cannot scan NULL into *int32
-- Can get into a state where you can't leave a group
-
-Repro:
-- Create group [X]
-- Have someone join [X]
-- Kick them [X]
-- Join back [X]
-- Leave, should promote them [X]
-- Join back [X]
-- Can't leave
-- They also can't leave 
-- You can kick the other person in this scenario, but can't leave yourself
+- [X] Can get into a state where you can't leave a group
 
 Before release:
 - [ ] Squash migrations into one, remove seed data
