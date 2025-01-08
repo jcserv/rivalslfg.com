@@ -39,6 +39,7 @@ type GroupSettings struct {
 }
 
 type PlayerInGroup struct {
+	ID         int      `json:"id"`
 	Name       string   `json:"name"`
 	Leader     bool     `json:"leader"`
 	Platform   string   `json:"platform"`
