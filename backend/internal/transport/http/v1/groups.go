@@ -63,11 +63,35 @@ func (a *API) GetGroups() http.HandlerFunc {
 			return
 		}
 
+		var playerReqs PlayerRequirements
+		hasPlayerReqs := false
+		if r.Body != nil && r.ContentLength > 0 {
+			if err := json.NewDecoder(r.Body).Decode(&playerReqs); err != nil {
+				httputil.BadRequest(w, fmt.Errorf("invalid player requirements: %v", err))
+				return
+			}
+			hasPlayerReqs = true
+		}
+
 		args, err := Parse(queryParams)
 		if err != nil {
 			log.Debug(ctx, fmt.Sprintf("error parsing query params: %v", err))
 			httputil.BadRequest(w, err)
 			return
+		}
+
+		if playerReqParams, err := playerReqs.ToParams(); err != nil {
+			httputil.BadRequest(w, err)
+			return
+		} else if hasPlayerReqs {
+			args.RegionFilter = playerReqParams.RegionFilter
+			args.GamemodeFilter = playerReqParams.GamemodeFilter
+
+			args.Platform = playerReqParams.Platform
+			args.Role = playerReqParams.Role
+			args.RankVal = playerReqParams.RankVal
+			args.VoiceChat = playerReqParams.VoiceChat
+			args.Mic = playerReqParams.Mic
 		}
 
 		groups, totalCount, err := a.groupService.GetGroups(ctx, *args)

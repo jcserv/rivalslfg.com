@@ -37,9 +37,4 @@ export const areRequirementsMet = [
     label: "Yes",
     icon: "✅",
   },
-  {
-    value: "false",
-    label: "No",
-    icon: "❌",
-  },
 ];
