@@ -20,7 +20,7 @@ export function useGroups() {
     queryKey: rivalsStoreKeys.groups,
     queryFn: async ({ paginateBy, filterBy }) => {
       const requirementsFilter = filterBy?.find(
-        (f) => f.field === "areRequirementsMet"
+        (f) => f.field === "areRequirementsMet",
       );
 
       return await fetchGroups({

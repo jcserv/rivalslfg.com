@@ -44,10 +44,10 @@ func NewAPI(deps *Dependencies) *API {
 
 // RegisterRoutes registers the routes for the V1 API.
 func (a *API) RegisterRoutes(r *mux.Router) {
-	// r.HandleFunc(groups, a.CreateGroup()).Methods(http.MethodPost)
+	r.HandleFunc(groups, a.CreateGroup()).Methods(http.MethodPost)
 
 	r.HandleFunc(groups, a.GetGroups()).Methods(http.MethodGet)
-	r.HandleFunc(groups, a.GetGroups()).Methods(http.MethodPost)
+	r.HandleFunc(findGroup, a.GetGroups()).Methods(http.MethodPost)
 
 	r.HandleFunc(group, a.GetGroupByID()).Methods(http.MethodGet)
 	r.HandleFunc(groupMembers, a.JoinGroup()).Methods(http.MethodPost)

@@ -36,9 +36,9 @@ API Integration:
 - [x] Integrate remove player from group
 - [ ] Chat
 - [ ] Matchmaking
-- [ ] Pagination: Server-side filtering
+- [X] Pagination: Server-side filtering
   - [X] open
-  - [ ] requirements met
+  - [X] requirements met
 
 Bugs:
 
