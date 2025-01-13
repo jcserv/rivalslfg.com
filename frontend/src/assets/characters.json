@@ -104,6 +104,10 @@
     "value": "Wolverine"
   },
   {
+    "label": "Mr. Fantastic - Duelist",
+    "value": "Mr. Fantastic"
+  },
+  {
     "label": "Adam Warlock - Strategist",
     "value": "Adam Warlock"
   },
@@ -130,5 +134,9 @@
   {
     "label": "Rocket Raccoon - Strategist",
     "value": "Rocket Raccoon"
+  },
+  {
+    "label": "Invisible Man - Strategist",
+    "value": "Invisible Man"
   }
 ]
