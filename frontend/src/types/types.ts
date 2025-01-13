@@ -82,6 +82,9 @@ export enum Rank {
   gm3 = "Grandmaster III",
   gm2 = "Grandmaster II",
   gm1 = "Grandmaster I",
+  c3 = "Celestial III",
+  c2 = "Celestial II",
+  c1 = "Celestial I",
   e = "Eternity",
   oa = "One Above All",
 }
@@ -108,6 +111,9 @@ const Ranks = {
   gm3: Rank.gm3,
   gm2: Rank.gm2,
   gm1: Rank.gm1,
+  c3: Rank.c3,
+  c2: Rank.c2,
+  c1: Rank.c1,
   e: Rank.e,
   oa: Rank.oa,
 } as const;
@@ -139,8 +145,11 @@ const RankVals: Record<RankKey, number> = {
   gm3: 50,
   gm2: 51,
   gm1: 52,
-  e: 60,
-  oa: 70,
+  c3: 60,
+  c2: 61,
+  c1: 62,
+  e: 70,
+  oa: 80,
 } as const;
 
 export const getRankFromRankVal = (rankVal: number): Rank => {

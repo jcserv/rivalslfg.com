@@ -4,7 +4,13 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { areRequirementsMet, gamemodes, open, platforms, regions } from "./data";
+import {
+  areRequirementsMet,
+  gamemodes,
+  open,
+  platforms,
+  regions,
+} from "./data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {

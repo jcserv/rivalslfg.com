@@ -88,8 +88,11 @@ var RankIDToRankVal = map[string]int{
 	"gm3": 50,
 	"gm2": 51,
 	"gm1": 52,
-	"e":   60,
-	"oa":  70,
+	"c3":  60,
+	"c2":  61,
+	"c1":  62,
+	"e":   70,
+	"oa":  80,
 }
 
 var RankValToRankID = map[int]string{
@@ -111,8 +114,11 @@ var RankValToRankID = map[int]string{
 	50: "gm3",
 	51: "gm2",
 	52: "gm1",
-	60: "e",
-	70: "oa",
+	60: "c3",
+	61: "c2",
+	62: "c1",
+	70: "e",
+	80: "oa",
 }
 
 func IsValidRankID(value string) bool {

@@ -85,7 +85,7 @@ CREATE TABLE Ranks (
     id VARCHAR(4) PRIMARY KEY,  
     name VARCHAR(20) NOT NULL, 
     value INTEGER NOT NULL UNIQUE,
-    CONSTRAINT valid_rank_id CHECK (id ~ '^(b[1-3]|s[1-3]|g[1-3]|p[1-3]|d[1-3]|gm[1-3]|e|oa)$')
+    CONSTRAINT valid_rank_id CHECK (id ~ '^(b[1-3]|s[1-3]|g[1-3]|p[1-3]|d[1-3]|gm[1-3]|c[1-3]|e|oa)$')
 );
 
 INSERT INTO Ranks (id, name, value) VALUES
@@ -107,8 +107,11 @@ INSERT INTO Ranks (id, name, value) VALUES
     ('gm3', 'Grandmaster III', 50),
     ('gm2', 'Grandmaster II', 51),
     ('gm1', 'Grandmaster I', 52),
-    ('e', 'Eternity', 60),
-    ('oa', 'One Above All', 70);
+    ('c3', 'Celestial III', 60),
+    ('c2', 'Celestial II', 61),
+    ('c1', 'Celestial I', 62),
+    ('e', 'Eternity', 70),
+    ('oa', 'One Above All', 80);
 
 CREATE OR REPLACE FUNCTION rank_id_to_value(rank_id VARCHAR) 
 RETURNS INTEGER AS $$

@@ -1,8 +1,9 @@
 # TODO
 
-- [ ] Update platforms to PC/Console
+- [X] Update platforms to PC/Console
 - [ ] Add new rank "celestial" inbetween gm and eternity
 - [ ] Add new characters Mr. Fantastic (Duelist) and Invisible Woman (Strategist)
+- [ ] Allow ranks bronze-gold to group up with each other
 
 ## frontend
 
