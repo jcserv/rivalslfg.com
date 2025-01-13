@@ -72,7 +72,7 @@ CREATE TABLE Groups (
     strategists INTEGER NOT NULL DEFAULT 0,
 
     -- group_settings
-    platforms CHAR(2)[],
+    platform CHAR(2) NOT NULL DEFAULT 'pc',
     voice_chat BOOLEAN,
     mic BOOLEAN,
     
@@ -123,7 +123,7 @@ $$ LANGUAGE SQL IMMUTABLE;
 CREATE TABLE Players (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR(14) NOT NULL,
-    platform CHAR(2) NOT NULL,
+    platform CHAR(2) NOT NULL DEFAULT 'pc',
     role TEXT NOT NULL,
     rank INTEGER NOT NULL,
     characters TEXT[] NOT NULL,

@@ -7,12 +7,14 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui";
 import { DataTableColumnHeader } from "@/components/ui/data-table";
 import { toTitleCase } from "@/lib/utils";
 import {
+  formatPlatform,
   Gamemode,
   gamemodeEmojis,
   getRankFromRankVal,
   getRegion,
   Group,
   GroupRequirements,
+  Platform,
   Player,
   TEAM_SIZE,
 } from "@/types";
@@ -118,6 +120,24 @@ export const columns = (
       return (
         <div className="flex w-[100px] items-center">
           <span>{`${gamemodeEmojis[gamemode]} ${toTitleCase(gamemode)}`}</span>
+        </div>
+      );
+    },
+    filterFn: defaultFilterFn,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "platform",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Platform" />
+    ),
+    cell: ({ row }) => {
+      const platform: Platform = row.getValue("platform");
+
+      if (!platform) return null;
+      return (
+        <div className="flex w-[100px] items-center">
+          <span>{`${formatPlatform(platform)}`}</span>
         </div>
       );
     },

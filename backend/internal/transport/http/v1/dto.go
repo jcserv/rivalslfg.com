@@ -208,9 +208,9 @@ type CreateGroup struct {
 	Duelists    int `json:"duelists"`
 	Strategists int `json:"strategists"`
 
-	Platforms      []string `json:"platforms"`
-	GroupVoiceChat bool     `json:"groupVoiceChat"`
-	GroupMic       bool     `json:"groupMic"`
+	GroupPlatform  string `json:"groupPlatform"`
+	GroupVoiceChat bool   `json:"groupVoiceChat"`
+	GroupMic       bool   `json:"groupMic"`
 }
 
 type CreateGroupResult struct {
@@ -247,8 +247,10 @@ func (c *CreateGroup) validate() error {
 		return err
 	}
 
-	if err := types.ValidatePlatforms(c.Platforms); err != nil {
-		return err
+	if c.GroupPlatform != "" {
+		if err := types.ValidatePlatform(c.GroupPlatform); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -277,7 +279,7 @@ func (c *CreateGroup) Parse() (*repository.CreateGroupParams, error) {
 	params.Duelists = int32(c.Duelists)
 	params.Strategists = int32(c.Strategists)
 
-	params.Platforms = c.Platforms
+	params.Platform = c.Platform
 	params.GroupVoiceChat = pgtype.Bool{Bool: c.GroupVoiceChat, Valid: true}
 	params.GroupMic = pgtype.Bool{Bool: c.GroupMic, Valid: true}
 

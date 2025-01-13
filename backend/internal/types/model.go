@@ -20,7 +20,7 @@ func ValidateGamemode(gamemode string) error {
 	return nil
 }
 
-var Platforms = NewSet("xb", "ps", "pc")
+var Platforms = NewSet("pc", "co")
 
 func ValidatePlatform(platform string) error {
 	if platform == "" {

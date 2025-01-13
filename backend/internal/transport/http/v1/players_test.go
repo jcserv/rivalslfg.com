@@ -38,7 +38,7 @@ func TestIntegration_JoinGroup(t *testing.T) {
 				"passcode": "abcd",
 				"gamemode": "competitive",
 				"region":   "na",
-				"platform": "xb",
+				"platform": "co",
 				"role":     "vanguard",
 				"rankId":   "d3",
 				"characters": []string{
@@ -63,7 +63,7 @@ func TestIntegration_JoinGroup(t *testing.T) {
 				"passcode": "abcd",
 				"gamemode": "",
 				"region":   "na",
-				"platform": "xb",
+				"platform": "co",
 				"role":     "vanguard",
 				"rankId":   "d3",
 				"characters": []string{
@@ -89,7 +89,7 @@ func TestIntegration_JoinGroup(t *testing.T) {
 				"passcode": "abcd",
 				"gamemode": "competitive",
 				"region":   "na",
-				"platform": "xb",
+				"platform": "co",
 				"role":     "vanguard",
 				"rankId":   "d3",
 				"characters": []string{
@@ -115,7 +115,7 @@ func TestIntegration_JoinGroup(t *testing.T) {
 				"passcode": "abcd",
 				"gamemode": "competitive",
 				"region":   "na",
-				"platform": "xb",
+				"platform": "co",
 				"role":     "vanguard",
 				"rankId":   "d3",
 				"characters": []string{
@@ -141,7 +141,7 @@ func TestIntegration_JoinGroup(t *testing.T) {
 				"passcode": "abcd",
 				"gamemode": "competitive",
 				"region":   "na",
-				"platform": "xb",
+				"platform": "co",
 				"role":     "vanguard",
 				"rankId":   "d3",
 				"characters": []string{
@@ -167,7 +167,7 @@ func TestIntegration_JoinGroup(t *testing.T) {
 				"passcode": "abcd",
 				"gamemode": "competitive",
 				"region":   "na",
-				"platform": "xb",
+				"platform": "co",
 				"role":     "vanguard",
 				"rankId":   "d3",
 				"characters": []string{

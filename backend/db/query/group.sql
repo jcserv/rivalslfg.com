@@ -65,7 +65,7 @@ new_group AS (
         vanguards,
         duelists,
         strategists,
-        platforms,
+        platform,
         voice_chat,
         mic
     )
@@ -77,7 +77,7 @@ new_group AS (
         @vanguards,
         @duelists,
         @strategists,
-        @platforms,
+        @platform,
         @group_voice_chat,
         @group_mic
     WHERE 

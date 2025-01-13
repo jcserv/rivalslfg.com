@@ -13,6 +13,7 @@ import {
   Group,
   JoinGroupResponse,
   PaginatedQueryFnResponse,
+  Platform,
   Profile,
   QueryParams,
   Region,
@@ -70,7 +71,7 @@ export const fetchGroup = async (id: string): Promise<Group | undefined> => {
       gamemode: "" as Gamemode,
       players: [],
       groupSettings: {
-        platforms: [],
+        platform: Platform.PC,
         voiceChat: false,
         mic: false,
       },

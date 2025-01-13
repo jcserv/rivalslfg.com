@@ -9,7 +9,7 @@ def generate_id(existing_ids):
 
 PLAYERS = [f"Player {i}" for i in range(1, 500)]
 REGIONS = ["na", "eu", "ap", "sa"]
-PLATFORMS = ["pc", "ps", "xb"]
+PLATFORMS = ["pc", "co"]
 ROLES = ["vanguard", "duelist", "strategist"]
 CHARACTERS = {
     "vanguard": ["Doctor Strange", "Captain America", "Groot", "Hulk", "Magneto", "Peni Parker", "Thor"],
@@ -65,7 +65,7 @@ def generate_player(name, rank_val=None):
     )
 
 def generate_group(group_id, owner_name):
-    platforms = random.choices(PLATFORMS, k=random.randint(1, 3))
+    platform = random.choice(PLATFORMS)
     gamemode = random.choice(["competitive", "quickplay"])
     vanguards = random.randint(1, 3)
     duelists = random.randint(1, 3)
@@ -75,7 +75,7 @@ def generate_group(group_id, owner_name):
         f"    ('{group_id}', '{owner_name}', '{random.choice(REGIONS)}', "
         f"'{gamemode}', {str(random.choice([True, False])).lower()}, "
         f"DEFAULT, {vanguards}, {duelists}, {strategists}, "
-        f"ARRAY{platforms}, {str(random.choice([True, False])).lower()}, "
+        f"'{platform}', {str(random.choice([True, False])).lower()}, "
         f"{str(random.choice([True, False])).lower()}, "
         f"DEFAULT, DEFAULT, DEFAULT)"
     )
@@ -142,7 +142,7 @@ def generate_sql(num_groups=20):
         "INSERT INTO Players (name, platform, role, rank, characters, voice_chat, mic, vanguards, duelists, strategists) VALUES",
         ",\n".join(players_sql) + ";",
         "\n-- Groups",
-        "INSERT INTO Groups (id, owner, region, gamemode, open, passcode, vanguards, duelists, strategists, platforms, voice_chat, mic, created_at, updated_at, last_active_at) VALUES",
+        "INSERT INTO Groups (id, owner, region, gamemode, open, passcode, vanguards, duelists, strategists, platform, voice_chat, mic, created_at, updated_at, last_active_at) VALUES",
         ",\n".join(groups_sql) + ";",
         "\n-- GroupMembers",
         "INSERT INTO GroupMembers (group_id, player_id, leader) VALUES",

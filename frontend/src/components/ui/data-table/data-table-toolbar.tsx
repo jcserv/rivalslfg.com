@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { areRequirementsMet, gamemodes, open, regions } from "./data";
+import { areRequirementsMet, gamemodes, open, platforms, regions } from "./data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {
@@ -28,6 +28,13 @@ export function DataTableToolbar<TData>({
           }
           className="h-8 w-[150px] lg:w-[175px]"
         />
+        {table.getColumn("open") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("open")}
+            title="Visibility"
+            options={open}
+          />
+        )}
         {table.getColumn("region") && (
           <DataTableFacetedFilter
             column={table.getColumn("region")}
@@ -42,13 +49,13 @@ export function DataTableToolbar<TData>({
             options={gamemodes}
           />
         )}
-        {table.getColumn("open") && (
+        {/* {table.getColumn("platform") && (
           <DataTableFacetedFilter
-            column={table.getColumn("open")}
-            title="Visibility"
-            options={open}
+            column={table.getColumn("platform")}
+            title="Platform"
+            options={platforms}
           />
-        )}
+        )} */}
         {table.getColumn("areRequirementsMet") && (
           <DataTableFacetedFilter
             column={table.getColumn("areRequirementsMet")}

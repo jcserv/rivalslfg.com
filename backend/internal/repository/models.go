@@ -28,7 +28,7 @@ type Group struct {
 	Vanguards    int32       `json:"vanguards"`
 	Duelists     int32       `json:"duelists"`
 	Strategists  int32       `json:"strategists"`
-	Platforms    []string    `json:"platforms"`
+	Platform     string      `json:"platform"`
 	VoiceChat    pgtype.Bool `json:"voice_chat"`
 	Mic          pgtype.Bool `json:"mic"`
 	CreatedAt    time.Time   `json:"created_at"`
