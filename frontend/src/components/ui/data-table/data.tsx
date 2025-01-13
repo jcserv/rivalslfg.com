@@ -41,8 +41,8 @@ export const platforms = [
     value: Platform.Console,
     label: "Console",
     icon: "🎮",
-  }
-]
+  },
+];
 
 export const areRequirementsMet = [
   {

@@ -72,6 +72,18 @@
     "value": "gm1"
   },
   {
+    "label": "Celestial III",
+    "value": "c3"
+  },
+  {
+    "label": "Celestial II",
+    "value": "c2"
+  },
+  {
+    "label": "Celestial I",
+    "value": "c1"
+  },
+  {
     "label": "Eternity",
     "value": "e"
   },
