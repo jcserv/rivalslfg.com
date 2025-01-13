@@ -1,4 +1,4 @@
-import { Region } from "@/types";
+import { Platform, Region } from "@/types";
 
 export const regions = Object.entries(Region).map(([key, value]) => ({
   value: key,
@@ -30,6 +30,19 @@ export const gamemodes = [
     icon: "⚡",
   },
 ];
+
+export const platforms = [
+  {
+    value: Platform.PC,
+    label: "PC",
+    icon: "🖥️",
+  },
+  {
+    value: Platform.Console,
+    label: "Console",
+    icon: "🎮",
+  }
+]
 
 export const areRequirementsMet = [
   {
