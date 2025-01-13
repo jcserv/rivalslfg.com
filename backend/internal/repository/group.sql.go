@@ -73,7 +73,7 @@ new_group AS (
         vanguards,
         duelists,
         strategists,
-        platforms,
+        platform,
         voice_chat,
         mic
     )
@@ -85,9 +85,9 @@ new_group AS (
         $13,
         $14,
         $15,
+        $4,
         $16,
-        $17,
-        $18
+        $17
     WHERE 
         NOT EXISTS (SELECT 1 FROM existing_membership) AND
         ($1 = '' OR NOT EXISTS (SELECT 1 FROM Groups WHERE id = $1))
@@ -143,7 +143,6 @@ type CreateGroupParams struct {
 	Vanguards      int32       `json:"vanguards"`
 	Duelists       int32       `json:"duelists"`
 	Strategists    int32       `json:"strategists"`
-	Platforms      []string    `json:"platforms"`
 	GroupVoiceChat pgtype.Bool `json:"group_voice_chat"`
 	GroupMic       pgtype.Bool `json:"group_mic"`
 }
@@ -178,7 +177,6 @@ func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (Creat
 		arg.Vanguards,
 		arg.Duelists,
 		arg.Strategists,
-		arg.Platforms,
 		arg.GroupVoiceChat,
 		arg.GroupMic,
 	)

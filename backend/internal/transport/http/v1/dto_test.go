@@ -19,13 +19,13 @@ func TestCreateGroup_Validate(t *testing.T) {
 			Characters: []string{
 				"Doctor Strange",
 			},
-			Vanguards:   2,
-			Duelists:    2,
-			Strategists: 2,
-			VoiceChat:   true,
-			Mic:         true,
-			Open:        true,
-			Platforms:   []string{"pc", "ps"},
+			Vanguards:     2,
+			Duelists:      2,
+			Strategists:   2,
+			VoiceChat:     true,
+			Mic:           true,
+			Open:          true,
+			GroupPlatform: "pc",
 		}
 		err := input.validate()
 		assert.NoError(t, err)
@@ -153,7 +153,7 @@ func TestCreateGroup_Validate(t *testing.T) {
 		assert.Contains(t, err.Error(), "must be between 0 and 6")
 	})
 
-	t.Run("Should validate platforms", func(t *testing.T) {
+	t.Run("Should validate group platform", func(t *testing.T) {
 		input := CreateGroup{
 			Owner:    "imphungky",
 			Region:   "na",
@@ -164,11 +164,11 @@ func TestCreateGroup_Validate(t *testing.T) {
 			Characters: []string{
 				"Doctor Strange",
 			},
-			Platforms: []string{"invalid"},
+			GroupPlatform: "invalid",
 		}
 		err := input.validate()
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "one or more provided platforms")
+		assert.Contains(t, err.Error(), "platform invalid is not supported")
 	})
 }
 

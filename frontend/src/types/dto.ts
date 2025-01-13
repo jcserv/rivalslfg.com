@@ -25,7 +25,7 @@ export type CreateGroup = {
   duelists: number;
   strategists: number;
 
-  platforms: string[];
+  groupPlatform: string;
   groupVoiceChat: boolean;
   groupMic: boolean;
 };
@@ -48,7 +48,8 @@ export function getCreateGroupFromProfile(profile: Profile): CreateGroup {
     duelists: profile.roleQueue?.duelists ?? 0,
     strategists: profile.roleQueue?.strategists ?? 0,
 
-    platforms: [],
+    groupPlatform: profile.platform,
+    // TODO?
     groupVoiceChat: false,
     groupMic: false,
   };

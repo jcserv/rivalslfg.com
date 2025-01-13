@@ -33,12 +33,8 @@ valid_group AS (
     WHERE g.id = $1
     AND g.gamemode = $5
     AND g.region = $6
-    -- Platform check (only if platforms specified)
-    AND (
-        ARRAY_LENGTH(g.platforms, 1) IS NULL 
-        OR ARRAY_LENGTH(g.platforms, 1) = 0 
-        OR $7::TEXT = ANY(g.platforms)
-    )
+    -- Platform check
+    AND g.platform = $7
     -- Role queue check (only if enabled)
     AND (
         (g.vanguards + g.duelists + g.strategists = 0)

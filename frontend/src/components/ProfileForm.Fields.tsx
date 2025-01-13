@@ -1,4 +1,4 @@
-import { UseFormReturn } from "react-hook-form";
+import { Path, UseFormReturn } from "react-hook-form";
 
 import { Check, ChevronsUpDown } from "lucide-react";
 import { z } from "zod";
@@ -43,6 +43,7 @@ import roles from "@/assets/roles.json";
 
 interface FormFieldProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
+  fieldName?: Path<z.infer<typeof formSchema>>;
 }
 
 export function UsernameField({ form }: FormFieldProps) {
@@ -93,11 +94,11 @@ export function RegionField({ form }: FormFieldProps) {
   );
 }
 
-export function PlatformField({ form }: FormFieldProps) {
+export function PlatformField({ form, fieldName }: FormFieldProps) {
   return (
     <FormField
       control={form.control}
-      name="platform"
+      name={fieldName ?? "platform"}
       render={({ field }) => (
         <FormItem className="m-2">
           <FormLabel>Platform</FormLabel>

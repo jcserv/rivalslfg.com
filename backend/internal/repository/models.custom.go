@@ -33,9 +33,9 @@ type RoleQueue struct {
 }
 
 type GroupSettings struct {
-	Platforms []string `json:"platforms"`
-	VoiceChat bool     `json:"voiceChat"`
-	Mic       bool     `json:"mic"`
+	Platform  string `json:"platform"`
+	VoiceChat bool   `json:"voiceChat"`
+	Mic       bool   `json:"mic"`
 }
 
 type PlayerInGroup struct {

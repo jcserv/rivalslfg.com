@@ -4,11 +4,7 @@
     "value": "pc"
   },
   {
-    "label": "🎮 PlayStation",
-    "value": "ps"
-  },
-  {
-    "label": "❎ Xbox",
-    "value": "xb"
+    "label": "🎮 Console",
+    "value": "co"
   }
 ]

@@ -34,9 +34,8 @@ export const gamemodeEmojis: Record<Gamemode, string> = {
 };
 
 export enum Platform {
-  PC = "PC",
-  PS = "PlayStation",
-  XB = "Xbox",
+  PC = "pc",
+  Console = "co",
 }
 
 const Platforms = {
@@ -44,13 +43,9 @@ const Platforms = {
     emoji: "🖥️",
     label: Platform.PC,
   },
-  ps: {
+  co: {
     emoji: "🎮",
-    label: Platform.PS,
-  },
-  xb: {
-    emoji: "❎",
-    label: Platform.XB,
+    label: Platform.Console,
   },
 };
 
@@ -183,7 +178,7 @@ export type Profile = {
 
 export function getGroupFromProfile(owner: Profile, id: string): Group {
   const groupSettings = owner.groupSettings ?? {
-    platforms: [],
+    platform: Platform.PC,
     voiceChat: false,
     mic: false,
   };
@@ -236,7 +231,7 @@ export type RoleQueue = {
 };
 
 export type GroupSettings = {
-  platforms: Platform[];
+  platform: Platform;
   voiceChat: boolean;
   mic: boolean;
 };
@@ -324,7 +319,7 @@ export type GroupRequirements = {
   };
   voiceChat: boolean;
   mic: boolean;
-  platforms: Platform[];
+  platform: Platform;
 };
 
 export function getRequirements(group: Group): GroupRequirements {
@@ -347,7 +342,7 @@ export function getRequirements(group: Group): GroupRequirements {
         max: group.roleQueue?.strategists ?? 0,
       },
     },
-    platforms: group.groupSettings.platforms,
+    platform: group.groupSettings.platform,
     mic: group.groupSettings.mic,
     voiceChat: group.groupSettings.voiceChat,
   };
@@ -358,7 +353,7 @@ export function areRequirementsMet(
   requirements: GroupRequirements,
   profile: Profile | undefined,
 ): boolean {
-  const { minRank, maxRank, mic, voiceChat, platforms } = requirements;
+  const { minRank, maxRank, mic, voiceChat, platform: groupPlatform } = requirements;
   if (!profile) return false;
   if (!Object.keys(profile).length) return false;
   const { rank, gamemode, region, platform } = profile;
@@ -367,7 +362,7 @@ export function areRequirementsMet(
   const basicRequirementsMet =
     gamemode === group.gamemode &&
     region === group.region &&
-    (platforms.length > 0 ? platforms.includes(platform) : true) &&
+    groupPlatform === platform &&
     (mic ? profile.mic : true) &&
     (voiceChat ? profile.voiceChat : true);
 

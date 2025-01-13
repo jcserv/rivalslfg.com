@@ -69,12 +69,8 @@ requirements_check AS (
         AND CASE 
             -- If rank value is provided, use it as a trigger for all player requirements
             WHEN $8::INTEGER IS NOT NULL THEN (
-                -- Platform check (if platforms specified)
-                (
-                    ARRAY_LENGTH(g.platforms, 1) IS NULL 
-                    OR ARRAY_LENGTH(g.platforms, 1) = 0 
-                    OR $4::TEXT = ANY(g.platforms)
-                )
+                -- Platform check
+                g.platform = $4
                 -- Role queue check
                 AND (
                     g.vanguards + g.duelists + g.strategists = 0
@@ -113,7 +109,7 @@ SELECT
         'strategists', g.strategists
     ) AS role_queue,
     jsonb_build_object(
-        'platforms', g.platforms,
+        'platform', g.platform,
         'voiceChat', g.voice_chat,
         'mic', g.mic
     ) AS group_settings,
@@ -272,7 +268,7 @@ SELECT
         'strategists', g.strategists
     ) AS role_queue,
     jsonb_build_object(
-        'platforms', g.platforms,
+        'platform', g.platform,
         'voiceChat', g.voice_chat,
         'mic', g.mic
     ) AS group_settings,
