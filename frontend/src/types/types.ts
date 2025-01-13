@@ -49,6 +49,10 @@ const Platforms = {
   },
 };
 
+export function formatPlatform(platform: Platform): string {
+  return `${Platforms[platform].emoji} ${platform === Platform.Console ? "Console" : "PC"}`;
+}
+
 export function getPlatform(platform: string): string {
   const platformObj = Object.entries(Platforms).find(
     (entry) => entry[0] === platform,
@@ -353,7 +357,13 @@ export function areRequirementsMet(
   requirements: GroupRequirements,
   profile: Profile | undefined,
 ): boolean {
-  const { minRank, maxRank, mic, voiceChat, platform: groupPlatform } = requirements;
+  const {
+    minRank,
+    maxRank,
+    mic,
+    voiceChat,
+    platform: groupPlatform,
+  } = requirements;
   if (!profile) return false;
   if (!Object.keys(profile).length) return false;
   const { rank, gamemode, region, platform } = profile;

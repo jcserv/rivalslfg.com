@@ -20,6 +20,7 @@ export function GroupTable({ profile, isProfileEmpty }: GroupTableProps) {
       const areReqsMet = areRequirementsMet(group, requirements, profile);
       return {
         ...group,
+        platform: group.groupSettings.platform,
         requirements,
         areRequirementsMet: areReqsMet,
       };
