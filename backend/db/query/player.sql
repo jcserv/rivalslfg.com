@@ -7,21 +7,38 @@ player_check AS (
     LIMIT 1
 ),
 
--- Get current role counts for the group
-role_counts AS (
+group_members_base AS (
     SELECT 
-        COUNT(CASE WHEN p.role = 'vanguard' THEN 1 END) as curr_vanguards,
-        COUNT(CASE WHEN p.role = 'duelist' THEN 1 END) as curr_duelists,
-        COUNT(CASE WHEN p.role = 'strategist' THEN 1 END) as curr_strategists
+        gm.group_id,
+        p.id as player_id,
+        p.name,
+        gm.leader,
+        p.platform,
+        LOWER(p.role) as role,
+        p.rank as rank_val,
+        p.characters,
+        p.voice_chat,
+        p.mic
     FROM GroupMembers gm
     JOIN Players p ON p.id = gm.player_id
-    WHERE gm.group_id = @group_id
+),
+
+group_details AS (
+    SELECT 
+        group_id,
+        COUNT(CASE WHEN role = 'vanguard' THEN 1 END) as curr_vanguards,
+        COUNT(CASE WHEN role = 'duelist' THEN 1 END) as curr_duelists,
+        COUNT(CASE WHEN role = 'strategist' THEN 1 END) as curr_strategists,
+        MIN(rank_val) as min_rank,
+        MAX(rank_val) as max_rank
+    FROM group_members_base
+    GROUP BY group_id
 ),
 
 -- Check all requirements in a single query
 valid_group AS (
     SELECT g.id
-    FROM Groups g, role_counts rc
+    FROM Groups g, group_details gd
     WHERE g.id = @group_id
     AND g.gamemode = @gamemode
     AND g.region = @region
@@ -33,28 +50,18 @@ valid_group AS (
         OR
         (
             -- Can fill at least one role
-            (@role = 'vanguard' AND rc.curr_vanguards < g.vanguards)
-            OR (@role = 'duelist' AND rc.curr_duelists < g.duelists)
-            OR (@role = 'strategist' AND rc.curr_strategists < g.strategists)
+            (@role = 'vanguard' AND gd.curr_vanguards < g.vanguards)
+            OR (@role = 'duelist' AND gd.curr_duelists < g.duelists)
+            OR (@role = 'strategist' AND gd.curr_strategists < g.strategists)
         )
     )
     -- Rank check
     AND (
         -- Allow Bronze-Gold players to group with each other
-        (
-            @rank_val BETWEEN 0 AND 22 AND
-            EXISTS (
-                SELECT 1
-                FROM Players p2
-                WHERE p2.id IN (SELECT player_id FROM GroupMembers WHERE group_id = g.id)
-                AND p2.rank BETWEEN 0 AND 22
-            )
-        )
-        OR EXISTS (
-            SELECT 1
-            FROM Players p2
-            WHERE p2.id IN (SELECT player_id FROM GroupMembers WHERE group_id = g.id)
-            AND ABS(p2.rank - @rank_val) <= 10
+        @rank_val BETWEEN 0 AND 22 AND gd.min_rank BETWEEN 0 AND 22
+        OR (
+            ABS(gd.min_rank - @rank_val) <= 10
+            AND ABS(gd.max_rank - @rank_val) <= 10
         )
     )
     -- If group is not open, check if passcode is correct
@@ -124,7 +131,7 @@ SELECT
         WHEN EXISTS (SELECT 1 FROM group_member_creation) THEN '200'
         WHEN EXISTS (
             SELECT 1 FROM Groups g 
-            WHERE g.id = @id 
+            WHERE g.id = @group_id
             AND NOT g.open 
             AND g.passcode != @passcode
         ) THEN '403'

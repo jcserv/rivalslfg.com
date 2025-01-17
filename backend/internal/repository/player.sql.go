@@ -13,62 +13,70 @@ const joinGroup = `-- name: JoinGroup :one
 WITH 
 player_check AS (
     SELECT 1 FROM GroupMembers gm
-    WHERE gm.player_id = $4
+    WHERE gm.player_id = $3
     LIMIT 1
 ),
 
-role_counts AS (
+group_members_base AS (
     SELECT 
-        COUNT(CASE WHEN p.role = 'vanguard' THEN 1 END) as curr_vanguards,
-        COUNT(CASE WHEN p.role = 'duelist' THEN 1 END) as curr_duelists,
-        COUNT(CASE WHEN p.role = 'strategist' THEN 1 END) as curr_strategists
+        gm.group_id,
+        p.id as player_id,
+        p.name,
+        gm.leader,
+        p.platform,
+        LOWER(p.role) as role,
+        p.rank as rank_val,
+        p.characters,
+        p.voice_chat,
+        p.mic
     FROM GroupMembers gm
     JOIN Players p ON p.id = gm.player_id
-    WHERE gm.group_id = $1
+),
+
+group_details AS (
+    SELECT 
+        group_id,
+        COUNT(CASE WHEN role = 'vanguard' THEN 1 END) as curr_vanguards,
+        COUNT(CASE WHEN role = 'duelist' THEN 1 END) as curr_duelists,
+        COUNT(CASE WHEN role = 'strategist' THEN 1 END) as curr_strategists,
+        MIN(rank_val) as min_rank,
+        MAX(rank_val) as max_rank
+    FROM group_members_base
+    GROUP BY group_id
 ),
 
 valid_group AS (
     SELECT g.id
-    FROM Groups g, role_counts rc
+    FROM Groups g, group_details gd
     WHERE g.id = $1
-    AND g.gamemode = $5
-    AND g.region = $6
+    AND g.gamemode = $4
+    AND g.region = $5
     -- Platform check
-    AND g.platform = $7
+    AND g.platform = $6
     -- Role queue check (only if enabled)
     AND (
         (g.vanguards + g.duelists + g.strategists = 0)
         OR
         (
             -- Can fill at least one role
-            ($8 = 'vanguard' AND rc.curr_vanguards < g.vanguards)
-            OR ($8 = 'duelist' AND rc.curr_duelists < g.duelists)
-            OR ($8 = 'strategist' AND rc.curr_strategists < g.strategists)
+            ($7 = 'vanguard' AND gd.curr_vanguards < g.vanguards)
+            OR ($7 = 'duelist' AND gd.curr_duelists < g.duelists)
+            OR ($7 = 'strategist' AND gd.curr_strategists < g.strategists)
         )
     )
     -- Rank check
     AND (
         -- Allow Bronze-Gold players to group with each other
-        (
-            $9 BETWEEN 0 AND 22 AND
-            EXISTS (
-                SELECT 1
-                FROM Players p2
-                WHERE p2.id IN (SELECT player_id FROM GroupMembers WHERE group_id = g.id)
-                AND p2.rank BETWEEN 0 AND 22
-            )
-        )
-        OR EXISTS (
-            SELECT 1
-            FROM Players p2
-            WHERE p2.id IN (SELECT player_id FROM GroupMembers WHERE group_id = g.id)
-            AND ABS(p2.rank - $9) <= 10
+        $8 BETWEEN 0 AND 22 AND gd.min_rank BETWEEN 0 AND 22
+        OR (
+            ABS(gd.min_rank - $8) <= 10
+            AND ABS(gd.max_rank - $8) <= 10
         )
     )
     -- If group is not open, check if passcode is correct
     AND (
         g.open 
-        OR (NOT g.open AND g.passcode = $3)
+        OR (NOT g.open AND g.passcode = $2)
     )
     LIMIT 1
 ),
@@ -87,20 +95,20 @@ player_creation AS (
         strategists
     )
     SELECT 
-        $10,
-        $7::TEXT,
-        $8,
         $9,
+        $6::TEXT,
+        $7,
+        $8,
+        $10,
         $11,
         $12,
         $13,
         $14,
-        $15,
-        $16
+        $15
     WHERE 
         NOT EXISTS (SELECT 1 FROM player_check)
         AND EXISTS (SELECT 1 FROM valid_group)
-        AND NOT EXISTS (SELECT 1 FROM Players WHERE id = $4)
+        AND NOT EXISTS (SELECT 1 FROM Players WHERE id = $3)
     RETURNING id
 ),
 
@@ -114,7 +122,7 @@ group_member_creation AS (
         $1,
         COALESCE(
             (SELECT id FROM player_creation),
-            $4
+            $3
         ),
         false
     WHERE EXISTS (SELECT 1 FROM valid_group)
@@ -129,9 +137,9 @@ SELECT
         WHEN EXISTS (SELECT 1 FROM group_member_creation) THEN '200'
         WHEN EXISTS (
             SELECT 1 FROM Groups g 
-            WHERE g.id = $2 
+            WHERE g.id = $1
             AND NOT g.open 
-            AND g.passcode != $3
+            AND g.passcode != $2
         ) THEN '403'
         WHEN NOT EXISTS (SELECT 1 FROM valid_group) THEN '400e'
         ELSE '500'
@@ -144,7 +152,6 @@ SELECT
 
 type JoinGroupParams struct {
 	GroupID     string      `json:"group_id"`
-	ID          string      `json:"id"`
 	Passcode    string      `json:"passcode"`
 	PlayerID    int32       `json:"player_id"`
 	Gamemode    string      `json:"gamemode"`
@@ -167,7 +174,6 @@ type JoinGroupRow struct {
 }
 
 // First check if player is already in a group
-// Get current role counts for the group
 // Check all requirements in a single query
 // Insert player if they don't exist and group is valid
 // Create group membership if everything valid
@@ -175,7 +181,6 @@ type JoinGroupRow struct {
 func (q *Queries) JoinGroup(ctx context.Context, arg JoinGroupParams) (JoinGroupRow, error) {
 	row := q.db.QueryRow(ctx, joinGroup,
 		arg.GroupID,
-		arg.ID,
 		arg.Passcode,
 		arg.PlayerID,
 		arg.Gamemode,
