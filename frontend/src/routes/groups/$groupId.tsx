@@ -106,11 +106,12 @@ function GroupPage() {
   useEffect(() => {
     if (g) {
       setGroup(g);
-      const hasAccess = g.open || isAuthed;
+      const hasAccess =
+        g.open || isAuthed || g.players.some((p) => p.id === profile.id);
       setCanUserAccessGroup(hasAccess);
       setShowAccessDialog(!isLoading && g && !hasAccess);
     }
-  }, [g, isLoading, isAuthed]);
+  }, [g, isLoading, isAuthed, profile.id]);
 
   const onJoin = useCallback(
     async (p: Profile, passcode: string = "") => {

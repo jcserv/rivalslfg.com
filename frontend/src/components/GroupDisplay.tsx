@@ -22,7 +22,14 @@ import {
 } from "@/components/ui/table";
 import { useProfile, useToast } from "@/hooks";
 import { toTitleCase } from "@/lib";
-import { getGroupInfo, getPlatform, getRank, getRegion, Group } from "@/types";
+import {
+  formatPlatform,
+  getGroupInfo,
+  getRank,
+  getRegion,
+  Group,
+  Platform,
+} from "@/types";
 
 import teamUps from "@/assets/teamups.json";
 
@@ -186,7 +193,9 @@ export function GroupDisplay({
                 <TableCell>{getRank(player.rank)}</TableCell>
                 <TableCell>{toTitleCase(player.role)}</TableCell>
                 <TableCell>{player.characters.join(", ")}</TableCell>
-                <TableCell>{getPlatform(player.platform)}</TableCell>
+                <TableCell>
+                  {formatPlatform(player.platform as Platform)}
+                </TableCell>
                 {isOwner && (
                   <TableCell>
                     {player.name !== profile.name && (
