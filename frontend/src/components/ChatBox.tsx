@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+import { useParams } from "@tanstack/react-router";
 import { Send } from "lucide-react";
 
 import {
@@ -17,23 +18,8 @@ import {
   ChatInput,
   ChatMessageList,
 } from "@/components/ui/chat";
-import { useProfile } from "@/hooks";
-
-interface Message {
-  id: string;
-  sender: string;
-  content: string;
-  timestamp: string;
-}
-
-function getTimeString() {
-  const now = new Date();
-  return now.toLocaleTimeString("en-US", {
-    hour12: false,
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+import { useGroupChat, useProfile } from "@/hooks";
+import { formatTimestamp } from "@/lib";
 
 const userColors = [
   "text-blue-500 dark:text-blue-400",
@@ -61,8 +47,10 @@ interface ChatBoxProps {
 }
 
 export function ChatBox({ canUserAccessGroup, isPlayerInGroup }: ChatBoxProps) {
+  const { groupId } = useParams({ from: "/groups/$groupId" });
   const [profile] = useProfile();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { messages, sendMessage, connectionStatus } = useGroupChat(groupId);
+
   const [newMessage, setNewMessage] = useState("");
   const messagesRef = useRef<HTMLDivElement>(null);
 
@@ -75,13 +63,7 @@ export function ChatBox({ canUserAccessGroup, isPlayerInGroup }: ChatBoxProps) {
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (newMessage.trim()) {
-      const message: Message = {
-        id: crypto.randomUUID(),
-        sender: profile.name,
-        content: newMessage.trim(),
-        timestamp: getTimeString(),
-      };
-      setMessages([...messages, message]);
+      sendMessage(newMessage.trim());
       setNewMessage("");
     }
   };
@@ -95,10 +77,19 @@ export function ChatBox({ canUserAccessGroup, isPlayerInGroup }: ChatBoxProps) {
     }
   };
 
+  const isConnected = connectionStatus === "connected";
+
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>Chat</CardTitle>
+        <CardTitle className="flex items-center">
+          <span>Chat</span>
+          <span
+            className={`ml-2 text-sm ${isConnected ? "text-green-500" : "text-red-500"}`}
+          >
+            ●
+          </span>
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-0 h-[400px]">
         {" "}
@@ -117,7 +108,7 @@ export function ChatBox({ canUserAccessGroup, isPlayerInGroup }: ChatBoxProps) {
                       {message.sender}
                     </span>
                     <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                      {message.timestamp}
+                      {formatTimestamp(message.timestamp)}
                     </span>
                   </div>
                   <p className="text-sm break-words">{message.content}</p>
@@ -138,9 +129,13 @@ export function ChatBox({ canUserAccessGroup, isPlayerInGroup }: ChatBoxProps) {
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Send message"
             className="flex-1 w-full"
-            disabled={!isPlayerInGroup}
+            disabled={!isPlayerInGroup || !isConnected}
           />
-          <Button type="submit" size="icon">
+          <Button
+            type="submit"
+            size="icon"
+            disabled={!isPlayerInGroup || !isConnected}
+          >
             <Send className="h-4 w-4" />
           </Button>
         </form>

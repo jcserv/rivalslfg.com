@@ -72,10 +72,15 @@ Bugs:
 5. [X] Remove Player from Group
 6. [X] Leave Group
 7. [X] Get Group Passcode
-
 8. Chat
+- [ ] Middleware to log events
+- [ ] Manage state in Redis to make ws server stateless
+- [ ] Refactor code so its similar to http handlers
+- [ ] Group updates
+- [ ] Authentication
+- [ ] Redis messaging between servers
 
-9. Matchmaking
+1.  Matchmaking
    - Find groups the user can join
      - Prioritize groups that are close to completion
    - Acquire lock on group

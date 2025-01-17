@@ -15,6 +15,7 @@ import (
 	"github.com/jcserv/rivalslfg/internal/services"
 	_http "github.com/jcserv/rivalslfg/internal/transport/http"
 	v1 "github.com/jcserv/rivalslfg/internal/transport/http/v1"
+	"github.com/jcserv/rivalslfg/internal/transport/ws"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
@@ -68,6 +69,11 @@ func (s *Service) Run() error {
 	go func(ctx context.Context) {
 		defer wg.Done()
 		s.StartHTTP(ctx)
+	}(ctx)
+	wg.Add(1)
+	go func(ctx context.Context) {
+		defer wg.Done()
+		s.StartWS(ctx)
 	}(ctx)
 
 	wg.Wait()
@@ -128,4 +134,10 @@ func (s *Service) StartHTTP(ctx context.Context) error {
 
 	http.ListenAndServe(fmt.Sprintf(":%s", s.cfg.HTTPPort), handlers.CORS(origins, headers, methods, exposedHeaders)(r))
 	return nil
+}
+
+func (s *Service) StartWS(ctx context.Context) error {
+	log.Info(ctx, fmt.Sprintf("Starting WebSocket server on port %s", s.cfg.WSPort))
+	wsServer := ws.NewServer(s.cfg.WSPort, []string{os.Getenv("ORIGIN_ALLOWED")})
+	return wsServer.Start(ctx)
 }
