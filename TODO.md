@@ -3,7 +3,8 @@
 - [X] Update platforms to PC/Console
 - [X] Add new rank "celestial" inbetween gm and eternity
 - [X] Add new characters Mr. Fantastic (Duelist) and Invisible Woman (Strategist)
-- [ ] Allow ranks bronze-gold to group up with each other
+- [X] Allow ranks bronze-gold to group up with each other
+- [ ] Fix bug where, after joining a group, you're asked to re-auth. Can't re-join since you're already in a group
 
 ## frontend
 

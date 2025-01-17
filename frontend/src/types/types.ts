@@ -158,10 +158,24 @@ export const getRankFromRankVal = (rankVal: number): Rank => {
   return getRank(rankKey);
 };
 
+function isRankInRange(rank: number, min: number, max: number): boolean {
+  return rank >= min && rank <= max;
+}
+
 export function isAdjacentRank(
   userRank: RankKey,
   comparisonRank: number,
 ): boolean {
+  const userRankVal = RankVals[userRank];
+  const comparisonRankVal = comparisonRank;
+
+  // Players in Bronze-Gold can group with each other with no restrictions
+  if (
+    isRankInRange(userRankVal, RankVals["b3"], RankVals["g1"]) &&
+    isRankInRange(comparisonRankVal, RankVals["b3"], RankVals["g1"])
+  )
+    return true;
+
   return Math.abs(RankVals[userRank] - comparisonRank) <= 10;
 }
 

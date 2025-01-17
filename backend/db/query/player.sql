@@ -39,11 +39,23 @@ valid_group AS (
         )
     )
     -- Rank check
-    AND EXISTS (
-        SELECT 1
-        FROM Players p2
-        WHERE p2.id IN (SELECT player_id FROM GroupMembers WHERE group_id = g.id)
-        AND ABS(p2.rank - @rank_val) <= 10
+    AND (
+        -- Allow Bronze-Gold players to group with each other
+        (
+            @rank_val BETWEEN 0 AND 22 AND
+            EXISTS (
+                SELECT 1
+                FROM Players p2
+                WHERE p2.id IN (SELECT player_id FROM GroupMembers WHERE group_id = g.id)
+                AND p2.rank BETWEEN 0 AND 22
+            )
+        )
+        OR EXISTS (
+            SELECT 1
+            FROM Players p2
+            WHERE p2.id IN (SELECT player_id FROM GroupMembers WHERE group_id = g.id)
+            AND ABS(p2.rank - @rank_val) <= 10
+        )
     )
     -- If group is not open, check if passcode is correct
     AND (

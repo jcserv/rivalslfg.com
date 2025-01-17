@@ -47,11 +47,23 @@ valid_group AS (
         )
     )
     -- Rank check
-    AND EXISTS (
-        SELECT 1
-        FROM Players p2
-        WHERE p2.id IN (SELECT player_id FROM GroupMembers WHERE group_id = g.id)
-        AND ABS(p2.rank - $9) <= 10
+    AND (
+        -- Allow Bronze-Gold players to group with each other
+        (
+            $9 BETWEEN 0 AND 22 AND
+            EXISTS (
+                SELECT 1
+                FROM Players p2
+                WHERE p2.id IN (SELECT player_id FROM GroupMembers WHERE group_id = g.id)
+                AND p2.rank BETWEEN 0 AND 22
+            )
+        )
+        OR EXISTS (
+            SELECT 1
+            FROM Players p2
+            WHERE p2.id IN (SELECT player_id FROM GroupMembers WHERE group_id = g.id)
+            AND ABS(p2.rank - $9) <= 10
+        )
     )
     -- If group is not open, check if passcode is correct
     AND (
@@ -139,7 +151,7 @@ type JoinGroupParams struct {
 	Region      string      `json:"region"`
 	Platform    string      `json:"platform"`
 	Role        interface{} `json:"role"`
-	RankVal     int32       `json:"rank_val"`
+	RankVal     interface{} `json:"rank_val"`
 	Name        string      `json:"name"`
 	Characters  []string    `json:"characters"`
 	VoiceChat   bool        `json:"voice_chat"`

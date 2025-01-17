@@ -85,8 +85,12 @@ requirements_check AS (
                 )
                 -- Rank check
                 AND (
-                    ABS(gd.min_rank - $8::INTEGER) <= 10 
-                    AND ABS(gd.max_rank - $8::INTEGER) <= 10
+                    -- Allow Bronze-Gold players to group with each other
+                    ($8::INTEGER BETWEEN 0 AND 22 AND gd.min_rank BETWEEN 0 AND 22)
+                    OR (
+                        ABS(gd.min_rank - $8::INTEGER) <= 10 
+                        AND ABS(gd.max_rank - $8::INTEGER) <= 10
+                    )
                 )
                 -- Voice chat and mic
                 AND (NOT g.voice_chat OR $6::BOOLEAN)
