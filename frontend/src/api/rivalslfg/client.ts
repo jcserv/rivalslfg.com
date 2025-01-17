@@ -39,8 +39,10 @@ export class RivalsLFGClient extends HTTPClient {
         ...(hasBody && { body: JSON.stringify(query?.playerRequirements) }),
       };
 
+      const route = hasBody ? "groups/find" : "groups";
+
       const response = await this.fetchWithRetry(
-        `${this.baseURL}/api/v1/groups?${params.toString()}`,
+        `${this.baseURL}/api/v1/${route}?${params.toString()}`,
         requestInit,
       );
       const totalCount = parseInt(response.headers.get("X-Total-Count") ?? "0");
