@@ -10,7 +10,6 @@ type Configuration struct {
 	Region       string
 	Environment  string
 	HTTPPort     string
-	WSPort       string
 	DatabaseURL  string
 	CacheURL     string
 	JWTSecretKey string
@@ -21,7 +20,6 @@ func NewConfiguration() (*Configuration, error) {
 	cfg.Region = env.GetString("REGION", "us-east-1")
 	cfg.Environment = env.GetString("ENVIRONMENT", "dev")
 	cfg.HTTPPort = env.GetString("HTTP_PORT", "8080")
-	cfg.WSPort = env.GetString("WS_PORT", "8081")
 	cfg.DatabaseURL = env.GetString("DATABASE_URL", "")
 	cfg.CacheURL = env.GetString("CACHE_URL", "")
 	cfg.JWTSecretKey = env.GetString("JWT_SECRET_KEY", "")
