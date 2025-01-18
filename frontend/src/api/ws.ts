@@ -29,7 +29,7 @@ export class WebSocketClient {
 
   constructor(
     private groupId: string,
-    private baseUrl: string,
+    private baseUrl?: string,
     onMessage?: MessageHandler,
   ) {
     if (onMessage) {
@@ -37,7 +37,7 @@ export class WebSocketClient {
     }
 
     // Convert http(s) to ws(s)
-    this.baseUrl = this.baseUrl.replace(/^http/, "ws");
+    this.baseUrl = import.meta.env.VITE_API_URL.replace(/^http/, "ws");
   }
 
   connect() {
@@ -114,7 +114,7 @@ export class WebSocketClient {
     try {
       this.ws.send(JSON.stringify(message));
     } catch {
-      // console.error("Error sending WebSocket message:", error);
+      //console.error("Error sending WebSocket message:", error);
     }
   }
 

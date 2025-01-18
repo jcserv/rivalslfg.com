@@ -71,10 +71,6 @@ func (s *Service) Run() error {
 		s.StartHTTP(ctx)
 	}(ctx)
 	wg.Add(1)
-	go func(ctx context.Context) {
-		defer wg.Done()
-		s.StartWS(ctx)
-	}(ctx)
 
 	wg.Wait()
 	return nil
@@ -125,19 +121,33 @@ func (s *Service) ConnectCache(ctx context.Context) (*redis.Client, error) {
 
 func (s *Service) StartHTTP(ctx context.Context) error {
 	log.Info(ctx, fmt.Sprintf("Starting HTTP server on port %s", s.cfg.HTTPPort))
+
+	wsServer := ws.NewServer([]string{os.Getenv("ORIGIN_ALLOWED")})
+	wsServer.Start(ctx)
+
+	mainMux := http.NewServeMux()
 	r := s.api.RegisterRoutes()
+	mainMux.Handle("/", r)
+	wsServer.RegisterHandlers(mainMux)
+
 	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	origins := handlers.AllowedOrigins([]string{os.Getenv("ORIGIN_ALLOWED")})
 	methods := handlers.AllowedMethods([]string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions})
 
 	exposedHeaders := handlers.ExposedHeaders([]string{"X-Requested-With", "Content-Type", "X-Total-Count", "X-Token"})
 
-	http.ListenAndServe(fmt.Sprintf(":%s", s.cfg.HTTPPort), handlers.CORS(origins, headers, methods, exposedHeaders)(r))
-	return nil
-}
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%s", s.cfg.HTTPPort),
+		Handler: handlers.CORS(origins, headers, methods, exposedHeaders)(mainMux),
+	}
 
-func (s *Service) StartWS(ctx context.Context) error {
-	log.Info(ctx, fmt.Sprintf("Starting WebSocket server on port %s", s.cfg.WSPort))
-	wsServer := ws.NewServer(s.cfg.WSPort, []string{os.Getenv("ORIGIN_ALLOWED")})
-	return wsServer.Start(ctx)
+	go func() {
+		<-ctx.Done()
+		if err := srv.Shutdown(context.Background()); err != nil {
+			log.Error(ctx, fmt.Sprintf("Error shutting down HTTP server: %v", err))
+		}
+	}()
+
+	srv.ListenAndServe()
+	return nil
 }

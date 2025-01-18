@@ -17,10 +17,7 @@ export function useWebSocket(groupId: string) {
   useEffect(() => {
     if (!groupId || !profile.name) return;
 
-    const wsClient = new WebSocketClient(
-      groupId,
-      import.meta.env.VITE_WS_API_URL,
-    );
+    const wsClient = new WebSocketClient(groupId);
 
     clientRef.current = wsClient;
     setClient(wsClient);
