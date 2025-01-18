@@ -8,17 +8,10 @@ import (
 	"github.com/lxzan/gws"
 )
 
-const (
-	OpGroupChat = iota + 1
-	OpGroupJoin
-	OpGroupLeave
-	OpGroupPromotion
-)
-
 type Message struct {
-	GroupID string      `json:"groupId"`
-	Op      int         `json:"op"`
-	Payload interface{} `json:"payload"`
+	GroupID string             `json:"groupId"`
+	Op      WebSocketEventType `json:"op"`
+	Payload interface{}        `json:"payload"`
 }
 
 type Hub struct {

@@ -14,8 +14,22 @@ const (
 )
 
 type Client struct {
-	hub  *Hub
-	conn *gws.Conn
+	hub           *Hub
+	conn          *gws.Conn
+	eventHandlers map[WebSocketEventType]EventHandler
+}
+
+func NewClient(hub *Hub, conn *gws.Conn) *Client {
+	client := &Client{
+		hub:           hub,
+		conn:          conn,
+		eventHandlers: make(map[WebSocketEventType]EventHandler),
+	}
+
+	// Register default handlers
+	client.eventHandlers[OpGroupChat] = NewChatHandler(hub)
+
+	return client
 }
 
 type ClientHandler struct {
@@ -25,6 +39,7 @@ type ClientHandler struct {
 
 func (h *ClientHandler) OnOpen(socket *gws.Conn) {
 	_ = socket.SetDeadline(time.Now().Add(PingInterval + PingWait))
+	h.client = NewClient(h.hub, socket)
 }
 
 func (h *ClientHandler) OnClose(socket *gws.Conn, err error) {
@@ -52,7 +67,10 @@ func (h *ClientHandler) OnMessage(socket *gws.Conn, message *gws.Message) {
 		return
 	}
 
-	if err := h.hub.Broadcast(msg); err != nil {
+	if handler, exists := h.client.eventHandlers[msg.Op]; exists {
+		if err := handler.Handle(h.client, message.Bytes()); err != nil {
+			return
+		}
 	}
 }
 
@@ -71,7 +89,9 @@ func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		client: client,
 	}
 
-	upgrader := gws.NewUpgrader(handler, &gws.ServerOption{
+	loggingHandler := NewLoggingMiddleware(handler)
+
+	upgrader := gws.NewUpgrader(loggingHandler, &gws.ServerOption{
 		ParallelEnabled:   true,
 		Recovery:          gws.Recovery,
 		PermessageDeflate: gws.PermessageDeflate{Enabled: true},
