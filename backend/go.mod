@@ -10,6 +10,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/derekparker/trie v0.0.0-20230829180723-39f4de51ef7d // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/dolthub/maphash v0.1.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/getsentry/sentry-go v0.31.0 // indirect
 	github.com/go-delve/delve v1.24.0 // indirect
@@ -28,6 +29,8 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.7.2 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/klauspost/compress v1.17.5 // indirect
+	github.com/lxzan/gws v1.8.8 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect

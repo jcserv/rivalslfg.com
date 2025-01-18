@@ -15,6 +15,7 @@ import (
 	"github.com/jcserv/rivalslfg/internal/services"
 	_http "github.com/jcserv/rivalslfg/internal/transport/http"
 	v1 "github.com/jcserv/rivalslfg/internal/transport/http/v1"
+	"github.com/jcserv/rivalslfg/internal/transport/ws"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
@@ -69,6 +70,7 @@ func (s *Service) Run() error {
 		defer wg.Done()
 		s.StartHTTP(ctx)
 	}(ctx)
+	wg.Add(1)
 
 	wg.Wait()
 	return nil
@@ -119,13 +121,33 @@ func (s *Service) ConnectCache(ctx context.Context) (*redis.Client, error) {
 
 func (s *Service) StartHTTP(ctx context.Context) error {
 	log.Info(ctx, fmt.Sprintf("Starting HTTP server on port %s", s.cfg.HTTPPort))
+
+	wsServer := ws.NewServer([]string{os.Getenv("ORIGIN_ALLOWED")})
+	wsServer.Start(ctx)
+
+	mainMux := http.NewServeMux()
 	r := s.api.RegisterRoutes()
+	mainMux.Handle("/", r)
+	wsServer.RegisterHandlers(mainMux)
+
 	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	origins := handlers.AllowedOrigins([]string{os.Getenv("ORIGIN_ALLOWED")})
 	methods := handlers.AllowedMethods([]string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions})
 
 	exposedHeaders := handlers.ExposedHeaders([]string{"X-Requested-With", "Content-Type", "X-Total-Count", "X-Token"})
 
-	http.ListenAndServe(fmt.Sprintf(":%s", s.cfg.HTTPPort), handlers.CORS(origins, headers, methods, exposedHeaders)(r))
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%s", s.cfg.HTTPPort),
+		Handler: handlers.CORS(origins, headers, methods, exposedHeaders)(mainMux),
+	}
+
+	go func() {
+		<-ctx.Done()
+		if err := srv.Shutdown(context.Background()); err != nil {
+			log.Error(ctx, fmt.Sprintf("Error shutting down HTTP server: %v", err))
+		}
+	}()
+
+	srv.ListenAndServe()
 	return nil
 }
