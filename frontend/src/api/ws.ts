@@ -40,13 +40,17 @@ export class WebSocketClient {
     this.baseUrl = import.meta.env.VITE_API_URL.replace(/^http/, "ws");
   }
 
+  private getToken(): string | null {
+    return localStorage.getItem("token");
+  }
+
   connect() {
     if (this.ws?.readyState === WebSocket.OPEN) {
       return;
     }
 
     try {
-      const wsUrl = `${this.baseUrl}/ws?groupId=${this.groupId}`;
+      const wsUrl = `${this.baseUrl}/ws?groupId=${this.groupId}&access_token=${this.getToken()}`;
 
       this.ws = new WebSocket(wsUrl);
 

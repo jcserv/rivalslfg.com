@@ -56,6 +56,10 @@ func HasOwnership(claims jwt.MapClaims, resourceType string, resourceID string) 
 	return false
 }
 
+func IsGroupMember(claims jwt.MapClaims, groupID string) bool {
+	return claims["groupId"] == groupID
+}
+
 func HasNotCreatedGroup(claims jwt.MapClaims) bool {
 	return claims["groupId"] == ""
 }

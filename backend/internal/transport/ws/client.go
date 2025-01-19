@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/lxzan/gws"
 )
 
@@ -78,11 +79,6 @@ func (h *ClientHandler) OnMessage(socket *gws.Conn, message *gws.Message) {
 }
 
 func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
-	groupID := r.URL.Query().Get("groupId")
-	if groupID == "" {
-		return
-	}
-
 	client := &Client{
 		hub: hub,
 	}
@@ -95,9 +91,35 @@ func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	loggingHandler := NewLoggingMiddleware(handler)
 
 	upgrader := gws.NewUpgrader(loggingHandler, &gws.ServerOption{
-		ParallelEnabled:   true,
-		Recovery:          gws.Recovery,
-		PermessageDeflate: gws.PermessageDeflate{Enabled: true},
+		ParallelEnabled: true,
+		Recovery:        gws.Recovery,
+		PermessageDeflate: gws.PermessageDeflate{
+			Enabled:               true,
+			ServerContextTakeover: true,
+			ClientContextTakeover: true,
+		},
+		Authorize: func(r *http.Request, session gws.SessionStorage) bool {
+			groupId := r.URL.Query().Get("groupId")
+			token := r.URL.Query().Get("access_token")
+
+			if groupId == "" || token == "" {
+				return false
+			}
+
+			claims, err := auth.ValidateToken(token)
+			if err != nil {
+				return false
+			}
+
+			if !auth.IsGroupMember(claims, groupId) {
+				return false
+			}
+
+			session.Store("groupId", groupId)
+			session.Store("playerId", claims["playerId"])
+			session.Store("websocketKey", r.Header.Get("Sec-WebSocket-Key"))
+			return true
+		},
 	})
 
 	conn, err := upgrader.Upgrade(w, r)
@@ -106,7 +128,12 @@ func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	}
 
 	client.conn = conn
-	hub.RegisterClient(groupID, client)
+	groupID, exists := conn.Session().Load("groupId")
+	if !exists {
+		return
+	}
+
+	hub.RegisterClient(groupID.(string), client)
 
 	go func() {
 		conn.ReadLoop() // Blocking prevents the context from being GC
