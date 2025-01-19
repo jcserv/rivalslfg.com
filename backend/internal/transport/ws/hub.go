@@ -45,14 +45,9 @@ func NewHub(exchange message.Exchange) *Hub {
 }
 
 func (h *Hub) Run(ctx context.Context) {
-	pubsub, err := h.exchange.Subscribe(ctx)
-	if err != nil {
-		log.Error(ctx, fmt.Sprintf("Error subscribing to group updates: %v", err))
-	} else {
-		log.Info(ctx, "Subscribed to group updates channel")
-		defer pubsub.Close()
-		go h.handleRedisMessages(ctx, pubsub.Channel())
-	}
+	pubsub := h.exchange.Subscribe(ctx)
+	defer pubsub.Close()
+	go h.handleRedisMessages(ctx, pubsub.Channel())
 
 	<-ctx.Done()
 	h.Lock()

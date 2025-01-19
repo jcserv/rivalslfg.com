@@ -30,11 +30,7 @@ func (e *RedisExchange) Publish(ctx context.Context, msg *Message) error {
 	return err
 }
 
-func (e *RedisExchange) Subscribe(ctx context.Context) (*redis.PubSub, error) {
+func (e *RedisExchange) Subscribe(ctx context.Context) *redis.PubSub {
 	pubsub := e.conn.Subscribe(ctx, GroupUpdateChannel)
-	_, err := pubsub.ReceiveMessage(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return pubsub, nil
+	return pubsub
 }

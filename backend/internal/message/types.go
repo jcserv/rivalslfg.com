@@ -55,5 +55,5 @@ func (m *Message) UnmarshalBinary(data []byte) error {
 
 type Exchange interface {
 	Publish(ctx context.Context, msg *Message) error
-	Subscribe(ctx context.Context) (*redis.PubSub, error) // TODO: this should be more generic
+	Subscribe(ctx context.Context) *redis.PubSub // TODO: this should be more generic
 }
