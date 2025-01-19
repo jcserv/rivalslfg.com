@@ -26,7 +26,3 @@ func (s *Server) RegisterHandlers(mux *http.ServeMux) {
 func (s *Server) Start(ctx context.Context) {
 	go s.hub.Run(ctx)
 }
-
-func (s *Server) Broadcast(msg Message) error {
-	return s.hub.Broadcast(msg)
-}

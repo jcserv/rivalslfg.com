@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"context"
 	"encoding/json"
 )
 
@@ -19,7 +20,7 @@ func NewChatHandler(hub *Hub) *ChatHandler {
 	return &ChatHandler{hub: hub}
 }
 
-func (h *ChatHandler) Handle(client *Client, payload json.RawMessage) error {
+func (h *ChatHandler) Handle(ctx context.Context, client *Client, payload json.RawMessage) error {
 	var msg Message
 	if err := json.Unmarshal(payload, &msg); err != nil {
 		return err

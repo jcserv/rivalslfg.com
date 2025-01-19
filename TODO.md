@@ -73,9 +73,9 @@ Bugs:
 6. [X] Leave Group
 7. [X] Get Group Passcode
 8. Chat
-- [ ] Middleware to log events
+- [X] Middleware to log events
 - [ ] Manage state in Redis to make ws server stateless
-- [ ] Refactor code so its similar to http handlers
+- [X] Refactor code so its similar to http handlers
 - [ ] Group updates
 - [ ] Authentication
 - [ ] Redis messaging between servers

@@ -1,6 +1,9 @@
 package ws
 
-import "encoding/json"
+import (
+	"context"
+	"encoding/json"
+)
 
 type WebSocketEventType int
 
@@ -12,5 +15,5 @@ const (
 )
 
 type EventHandler interface {
-	Handle(client *Client, payload json.RawMessage) error
+	Handle(ctx context.Context, client *Client, payload json.RawMessage) error
 }

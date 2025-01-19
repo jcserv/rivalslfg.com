@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/jcserv/rivalslfg/internal/utils"
 )
@@ -100,8 +101,9 @@ func ctxWithAuthInfo(ctx context.Context, info *AuthInfo) context.Context {
 	return context.WithValue(ctx, authInfoKey, info)
 }
 
-func WithClaims(r *http.Request, claims jwt.MapClaims, token string) *http.Request {
+func Init(r *http.Request, claims jwt.MapClaims, token string) *http.Request {
 	ctx := r.Context()
+	ctx = context.WithValue(ctx, "request_id", uuid.New().String())
 
 	playerID, groupID := 0, ""
 	if playerIDVal, ok := claims["playerId"]; ok {

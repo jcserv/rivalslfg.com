@@ -1,10 +1,12 @@
 package ws
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/lxzan/gws"
 )
 
@@ -42,9 +44,7 @@ func (h *ClientHandler) OnOpen(socket *gws.Conn) {
 	h.client = NewClient(h.hub, socket)
 }
 
-func (h *ClientHandler) OnClose(socket *gws.Conn, err error) {
-	if err != nil {
-	}
+func (h *ClientHandler) OnClose(socket *gws.Conn, _ error) {
 	if h.client != nil {
 		h.hub.UnregisterClient(h.client)
 	}
@@ -62,13 +62,16 @@ func (h *ClientHandler) OnPong(socket *gws.Conn, payload []byte) {
 func (h *ClientHandler) OnMessage(socket *gws.Conn, message *gws.Message) {
 	defer message.Close()
 
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "request_id", uuid.New().String())
+
 	var msg Message
 	if err := json.Unmarshal(message.Bytes(), &msg); err != nil {
 		return
 	}
 
 	if handler, exists := h.client.eventHandlers[msg.Op]; exists {
-		if err := handler.Handle(h.client, message.Bytes()); err != nil {
+		if err := handler.Handle(ctx, h.client, message.Bytes()); err != nil {
 			return
 		}
 	}
