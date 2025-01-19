@@ -1,6 +1,3 @@
-INSERT INTO Community (name, description, link) VALUES
-    ('Rivals LFG', 'A site that helps Marvel Rivals players find groups to play with', 'https://rivalslfg.com');
-
 -- Players
 INSERT INTO Players (name, platform, role, rank, characters, voice_chat, mic, vanguards, duelists, strategists) VALUES
     ('Player 1', 'co', 'strategist', 60, ARRAY['Rocket Raccoon', 'Luna Snow'], false, true, 6, 0, 0),

@@ -4,16 +4,20 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/jcserv/rivalslfg/internal/message"
 	"github.com/jcserv/rivalslfg/internal/repository"
+	"github.com/jcserv/rivalslfg/internal/types"
 )
 
 type Player struct {
-	repo *repository.Queries
+	repo      *repository.Queries
+	publisher message.IPublisher
 }
 
-func NewPlayer(repo *repository.Queries) *Player {
+func NewPlayer(repo *repository.Queries, publisher message.IPublisher) *Player {
 	return &Player{
-		repo: repo,
+		repo:      repo,
+		publisher: publisher,
 	}
 }
 
@@ -25,7 +29,17 @@ func (s *Player) JoinGroup(ctx context.Context, arg repository.JoinGroupParams) 
 
 	switch result.Status {
 	case "200":
-		// Emit event to notify other players in group
+		s.publisher.JoinGroup(ctx, arg.GroupID, &repository.PlayerInGroup{
+			ID:         int(result.PlayerID),
+			Name:       arg.Name,
+			Leader:     false,
+			Platform:   arg.Platform,
+			Role:       arg.Role,
+			Rank:       types.RankValToRankID[int(arg.RankVal)],
+			Characters: arg.Characters,
+			VoiceChat:  arg.VoiceChat,
+			Mic:        arg.Mic,
+		})
 		return result.PlayerID, nil
 	case "400a":
 		return 0, NewError(http.StatusBadRequest, "Player is already in a group.", nil)

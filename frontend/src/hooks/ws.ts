@@ -15,7 +15,7 @@ export function useWebSocket(groupId: string) {
   const clientRef = useRef<WebSocketClient | null>(null);
 
   useEffect(() => {
-    if (!groupId || !profile.name) return;
+    if (!groupId || !profile.id) return;
 
     const wsClient = new WebSocketClient(groupId);
 
@@ -30,7 +30,7 @@ export function useWebSocket(groupId: string) {
       setClient(null);
       setConnectionStatus("disconnected");
     };
-  }, [groupId, profile.name]);
+  }, [groupId, profile.id]);
 
   const subscribe = useCallback((handler: WebSocketHandler) => {
     if (!clientRef.current) return () => {};
@@ -39,10 +39,10 @@ export function useWebSocket(groupId: string) {
 
   const send = useCallback(
     (op: number, payload: unknown) => {
-      if (!clientRef.current || !profile.name) return;
-      clientRef.current.sendMessage(op, payload);
+      if (!clientRef.current || !profile.id) return;
+      clientRef.current.sendMessage(profile.id, op, payload);
     },
-    [profile.name],
+    [profile.id],
   );
 
   return {

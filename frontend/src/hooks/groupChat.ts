@@ -1,9 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { ChatMessage, WebSocketMessage, WebSocketOp } from "@/api/ws";
+import { rivalsStoreActions } from "@/api";
+import { WebSocketMessage, WebSocketOp } from "@/api/ws";
 import { useProfile } from "@/hooks";
+import { Player } from "@/types";
 
 import { useWebSocket } from "./ws";
+
+type ChatMessage = {
+  id: string;
+  system?: boolean;
+  sender: string;
+  content: string;
+  timestamp: string;
+};
 
 export function useGroupChat(groupId: string) {
   const ws = useWebSocket(groupId);
@@ -17,9 +27,22 @@ export function useGroupChat(groupId: string) {
         setMessages((prev) => [...prev, chatMessage]);
         break;
       }
-      case WebSocketOp.GroupJoin:
-        // Handle member join
+      case WebSocketOp.GroupJoin: {
+        const player = message.payload as Player;
+
+        rivalsStoreActions.addPlayerToGroup(groupId, player);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            system: true,
+            sender: "System",
+            content: `<@${player.name}> has joined the group.`,
+            timestamp: new Date().toISOString(),
+          },
+        ]);
         break;
+      }
       case WebSocketOp.GroupLeave:
         // Handle member leave
         break;

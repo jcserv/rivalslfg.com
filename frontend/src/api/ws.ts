@@ -7,15 +7,9 @@ export const WebSocketOp = {
 
 export type WebSocketMessage = {
   groupId: string;
+  playerId: number;
   op: number;
   payload: unknown;
-};
-
-export type ChatMessage = {
-  id: string;
-  sender: string;
-  content: string;
-  timestamp: string;
 };
 
 type MessageHandler = (message: WebSocketMessage) => void;
@@ -98,19 +92,20 @@ export class WebSocketClient {
   }
 
   disconnect() {
-    if (this.ws) {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.close();
       this.ws = null;
     }
   }
 
-  sendMessage(op: number, payload: unknown) {
+  sendMessage(playerId: number, op: number, payload: unknown) {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
       return;
     }
 
     const message: WebSocketMessage = {
       groupId: this.groupId,
+      playerId,
       op,
       payload,
     };
@@ -122,8 +117,8 @@ export class WebSocketClient {
     }
   }
 
-  sendChatMessage(content: string, sender: string) {
-    this.sendMessage(WebSocketOp.GroupChat, {
+  sendChatMessage(playerId: number, content: string, sender: string) {
+    this.sendMessage(playerId, WebSocketOp.GroupChat, {
       id: crypto.randomUUID(),
       content,
       sender,

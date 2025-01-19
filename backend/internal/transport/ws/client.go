@@ -8,6 +8,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jcserv/rivalslfg/internal/auth"
+	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
+	"github.com/jcserv/rivalslfg/internal/utils"
 	"github.com/lxzan/gws"
 )
 
@@ -29,8 +31,8 @@ func NewClient(hub *Hub, conn *gws.Conn) *Client {
 		eventHandlers: make(map[WebSocketEventType]EventHandler),
 	}
 
-	// Register default handlers
 	client.eventHandlers[OpGroupChat] = NewChatHandler(hub)
+	client.eventHandlers[OpGroupJoin] = NewJoinHandler(hub)
 
 	return client
 }
@@ -116,7 +118,7 @@ func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 			}
 
 			session.Store("groupId", groupId)
-			session.Store("playerId", claims["playerId"])
+			session.Store("playerId", utils.StringToInt(claims["playerId"].(string)))
 			session.Store("websocketKey", r.Header.Get("Sec-WebSocket-Key"))
 			return true
 		},
@@ -128,14 +130,25 @@ func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	}
 
 	client.conn = conn
-	groupID, exists := conn.Session().Load("groupId")
-	if !exists {
+	authInfo, valid := getAuthInfo(conn)
+	if !valid {
 		return
 	}
 
-	hub.RegisterClient(groupID.(string), client)
+	hub.RegisterClient(authInfo, client)
 
 	go func() {
 		conn.ReadLoop() // Blocking prevents the context from being GC
 	}()
+}
+
+func getAuthInfo(conn *gws.Conn) (*reqCtx.AuthInfo, bool) {
+	info := &reqCtx.AuthInfo{}
+	if groupID, exists := conn.Session().Load("groupId"); exists {
+		info.GroupID = groupID.(string)
+	}
+	if playerID, exists := conn.Session().Load("playerId"); exists {
+		info.PlayerID = playerID.(int)
+	}
+	return info, true
 }
