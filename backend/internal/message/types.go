@@ -14,11 +14,13 @@ const (
 	EventTypeGroupChat EventType = iota + 1
 	EventTypeGroupJoin
 	EventTypeGroupLeave
-	EventTypeGroupPromotion
+	EventTypeGroupDelete
 )
 
 type Message struct {
-	GroupID  string    `json:"groupId"`
+	GroupID string `json:"groupId"`
+
+	// PlayerID is the ID of the player that caused the event
 	PlayerID int       `json:"playerId"`
 	Type     EventType `json:"type"`
 	Payload  any       `json:"payload"`

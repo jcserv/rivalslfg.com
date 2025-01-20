@@ -283,9 +283,9 @@ SELECT
             '200'::TEXT  -- Successfully removed player
     END as status,
     COALESCE(
-        (SELECT player_id FROM next_leader)::INTEGER,
+        (SELECT player_id FROM next_leader),
         0
-    ) as new_leader_id
+    )::INTEGER as new_leader_id
 `
 
 type RemovePlayerParams struct {
@@ -294,8 +294,8 @@ type RemovePlayerParams struct {
 }
 
 type RemovePlayerRow struct {
-	Status      string      `json:"status"`
-	NewLeaderID interface{} `json:"new_leader_id"`
+	Status      string `json:"status"`
+	NewLeaderID int32  `json:"new_leader_id"`
 }
 
 func (q *Queries) RemovePlayer(ctx context.Context, arg RemovePlayerParams) (RemovePlayerRow, error) {

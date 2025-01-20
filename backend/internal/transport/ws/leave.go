@@ -5,15 +5,15 @@ import (
 	"encoding/json"
 )
 
-type JoinHandler struct {
+type LeaveHandler struct {
 	hub *Hub
 }
 
-func NewJoinHandler(hub *Hub) *JoinHandler {
+func NewLeaveHandler(hub *Hub) *JoinHandler {
 	return &JoinHandler{hub: hub}
 }
 
-func (h *JoinHandler) Handle(ctx context.Context, client *Client, payload json.RawMessage) error {
+func (h *LeaveHandler) Handle(ctx context.Context, client *Client, payload json.RawMessage) error {
 	var msg Message
 	if err := json.Unmarshal(payload, &msg); err != nil {
 		return err

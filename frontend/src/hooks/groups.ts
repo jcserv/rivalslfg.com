@@ -68,6 +68,41 @@ export function addPlayerToGroup(groupId: string, player: Player) {
   );
 }
 
+export function removePlayerFromGroup(
+  groupId: string,
+  playerId: number,
+  newLeaderId: number,
+) {
+  queryClient.setQueryData<Group>(
+    rivalsStoreKeys.group(groupId),
+    (oldGroup) => {
+      if (!oldGroup) return;
+      const newPlayers = oldGroup.players.reduce(
+        (acc, player) => {
+          if (player.id === playerId) {
+            return acc;
+          }
+
+          return [
+            ...acc,
+            {
+              ...player,
+              leader: player.id === newLeaderId,
+            },
+          ];
+        },
+        [] as typeof oldGroup.players,
+      );
+
+      return {
+        ...oldGroup,
+        ownerId: newLeaderId,
+        players: newPlayers,
+      };
+    },
+  );
+}
+
 type createGroupArgs = {
   profile: Profile;
 };

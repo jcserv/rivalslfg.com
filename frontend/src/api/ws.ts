@@ -2,7 +2,7 @@ export const WebSocketOp = {
   GroupChat: 1,
   GroupJoin: 2,
   GroupLeave: 3,
-  GroupPromotion: 4,
+  GroupDelete: 4,
 } as const;
 
 export type WebSocketMessage = {

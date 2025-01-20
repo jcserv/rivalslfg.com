@@ -6,6 +6,7 @@ import (
 
 	"github.com/jcserv/rivalslfg/internal/message"
 	"github.com/jcserv/rivalslfg/internal/repository"
+	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 	"github.com/jcserv/rivalslfg/internal/types"
 )
 
@@ -29,7 +30,7 @@ func (s *Player) JoinGroup(ctx context.Context, arg repository.JoinGroupParams) 
 
 	switch result.Status {
 	case "200":
-		s.publisher.JoinGroup(ctx, arg.GroupID, &repository.PlayerInGroup{
+		s.publisher.PlayerJoined(ctx, arg.GroupID, &repository.PlayerInGroup{
 			ID:         int(result.PlayerID),
 			Name:       arg.Name,
 			Leader:     false,
@@ -62,7 +63,7 @@ func (s *Player) RemovePlayer(ctx context.Context, arg repository.RemovePlayerPa
 
 	switch result.Status {
 	case "200":
-		// TODO: Emit event to notify player left to other players in group
+		s.publisher.PlayerLeft(ctx, arg.GroupID, reqCtx.GetPlayerID(ctx), int(arg.PlayerID), int(result.NewLeaderID))
 		return result.Status, nil
 	case "204":
 		// TODO: Emit event to notify users on group page that group is deleted
