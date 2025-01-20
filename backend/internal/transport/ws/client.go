@@ -35,6 +35,7 @@ func NewClient(hub *Hub, conn *gws.Conn) *Client {
 	client.eventHandlers[OpGroupChat] = NewChatHandler(hub)
 	client.eventHandlers[OpGroupJoin] = NewJoinHandler(hub)
 	client.eventHandlers[OpGroupLeave] = NewLeaveHandler(hub)
+	client.eventHandlers[OpGroupDelete] = NewDeleteGroupHandler(hub)
 
 	return client
 }

@@ -31,8 +31,12 @@ export function DeleteGroupDialog({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex flex-row justify-between sm:justify-between">
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button variant="destructive" onClick={onDelete}>Confirm</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button variant="destructive" onClick={onDelete}>
+            Confirm
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

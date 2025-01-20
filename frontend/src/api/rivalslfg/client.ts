@@ -75,7 +75,7 @@ export class RivalsLFGClient extends HTTPClient {
       {
         method: "DELETE",
       },
-    )
+    );
     return response.status as StatusCode;
   }
 

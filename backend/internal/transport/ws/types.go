@@ -8,10 +8,10 @@ import (
 type WebSocketEventType int
 
 const (
-	OpGroupChat      WebSocketEventType = iota + 1
-	OpGroupJoin      WebSocketEventType = iota + 2
-	OpGroupLeave     WebSocketEventType = iota + 3
-	OpGroupPromotion WebSocketEventType = iota + 4
+	OpGroupChat   WebSocketEventType = iota + 1
+	OpGroupJoin   WebSocketEventType = iota + 2
+	OpGroupLeave  WebSocketEventType = iota + 3
+	OpGroupDelete WebSocketEventType = iota + 4
 )
 
 type EventHandler interface {

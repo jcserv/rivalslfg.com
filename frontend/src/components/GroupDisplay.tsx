@@ -69,7 +69,7 @@ export function GroupDisplay({
       (teamup) =>
         new Set(teamup.requirements.allOf)
           .union(new Set(teamup.requirements.oneOf))
-          .intersection(currCharacters).size > 0
+          .intersection(currCharacters).size > 0,
     );
   }, [teamUps, currCharacters]);
 

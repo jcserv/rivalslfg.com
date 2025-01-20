@@ -5,6 +5,7 @@ import (
 
 	"github.com/jcserv/rivalslfg/internal/message"
 	"github.com/jcserv/rivalslfg/internal/repository"
+	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 )
 
 type Group struct {
@@ -58,6 +59,6 @@ func (s *Group) DeleteGroup(ctx context.Context, id string) error {
 		return err
 	}
 
-	s.publisher.GroupDeleted(ctx, id, 0)
+	s.publisher.GroupDeleted(ctx, id, reqCtx.GetPlayerID(ctx))
 	return nil
 }
