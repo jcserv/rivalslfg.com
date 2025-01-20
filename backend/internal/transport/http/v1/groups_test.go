@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/jcserv/rivalslfg/internal/repository"
+	"github.com/jcserv/rivalslfg/internal/services"
 	"github.com/jcserv/rivalslfg/internal/test"
 	"github.com/jcserv/rivalslfg/internal/test/mocks"
 	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
@@ -327,6 +328,93 @@ func TestIntegration_GetGroupByID(t *testing.T) {
 
 		r.ServeHTTP(rec, req)
 		assert.Equal(t, http.StatusForbidden, rec.Code)
+	})
+}
+
+func TestIntegration_PatchGroup(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	r := mux.NewRouter()
+	mockGroupService := mocks.NewMockIGroup(ctrl)
+	mockPlayerService := mocks.NewMockIPlayer(ctrl)
+
+	a := NewAPI(
+		&Dependencies{
+			GroupService:  mockGroupService,
+			PlayerService: mockPlayerService,
+		},
+	)
+	a.RegisterRoutes(r)
+	t.Parallel()
+	t.Run("Should allow group owner to patch group", func(t *testing.T) {
+		mockGroupService.EXPECT().PatchGroup(gomock.Any(), gomock.Any()).Return("200", nil)
+		req := httptest.NewRequest(http.MethodPatch, "/api/v1/groups/AAAA", test.GetBody(
+			map[string]interface{}{
+				"open": true,
+			},
+		))
+		token, _ := auth.GenerateToken("1", map[string]string{
+			"playerId": "1",
+			"groupId":  "AAAA",
+		}, auth.GroupOwnerRights...)
+
+		req.Header.Set("Authorization", token)
+		claims := jwt.MapClaims{
+			"playerId": "1",
+			"groupId":  "AAAA",
+			"rights":   auth.GroupOwnerRights,
+		}
+		req = reqCtx.Init(req, claims, token)
+
+		rec := httptest.NewRecorder()
+
+		r.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusNoContent, rec.Code)
+	})
+
+	t.Run("Should return 404 if group not found", func(t *testing.T) {
+		mockGroupService.EXPECT().PatchGroup(gomock.Any(), gomock.Any()).Return("", services.NewError(http.StatusNotFound, "Group not found.", nil))
+
+		req := httptest.NewRequest(http.MethodPatch, "/api/v1/groups/AAAA", test.GetBody(
+			map[string]interface{}{
+				"open": true,
+			},
+		))
+		token, _ := auth.GenerateToken("1", map[string]string{
+			"playerId": "1",
+			"groupId":  "AAAA",
+		}, auth.GroupOwnerRights...)
+
+		req.Header.Set("Authorization", token)
+		claims := jwt.MapClaims{
+			"playerId": "1",
+			"groupId":  "AAAA",
+			"rights":   auth.GroupOwnerRights,
+		}
+		req = reqCtx.Init(req, claims, token)
+
+		rec := httptest.NewRecorder()
+
+		r.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusNotFound, rec.Code)
+	})
+
+	t.Run("Should return 401 if user is not group owner", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPatch, "/api/v1/groups/AAAA", test.GetBody(
+			map[string]interface{}{
+				"id":        "AAAA",
+				"open":      true,
+				"voiceChat": true,
+				"mic":       true,
+			},
+		))
+		req = reqCtx.WithAuthInfo(req, &reqCtx.AuthInfo{
+			PlayerID: 1,
+			GroupID:  "AAAA",
+		})
+		rec := httptest.NewRecorder()
+
+		r.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusUnauthorized, rec.Code)
 	})
 }
 

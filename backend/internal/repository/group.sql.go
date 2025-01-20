@@ -213,3 +213,29 @@ func (q *Queries) DeleteGroup(ctx context.Context, id string) error {
 	_, err := q.db.Exec(ctx, deleteGroup, id)
 	return err
 }
+
+const patchGroup = `-- name: PatchGroup :one
+WITH updated AS (
+    UPDATE Groups
+    SET open = $1
+    WHERE id = $2
+    RETURNING id
+)
+SELECT 
+    CASE
+        WHEN EXISTS (SELECT 1 FROM updated) THEN '200'
+        ELSE '404'
+    END as status
+`
+
+type PatchGroupParams struct {
+	Open bool   `json:"open"`
+	ID   string `json:"id"`
+}
+
+func (q *Queries) PatchGroup(ctx context.Context, arg PatchGroupParams) (string, error) {
+	row := q.db.QueryRow(ctx, patchGroup, arg.Open, arg.ID)
+	var status string
+	err := row.Scan(&status)
+	return status, err
+}

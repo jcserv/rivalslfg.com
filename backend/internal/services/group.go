@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/jcserv/rivalslfg/internal/message"
 	"github.com/jcserv/rivalslfg/internal/repository"
@@ -51,6 +52,18 @@ func (s *Group) GetGroupByID(ctx context.Context, id string, isGroupOwner bool) 
 	}
 
 	return group, nil
+}
+
+func (s *Group) PatchGroup(ctx context.Context, arg repository.PatchGroupParams) (string, error) {
+	result, err := s.repo.PatchGroup(ctx, arg)
+	if err != nil {
+		return "", err
+	}
+
+	if result == "404" {
+		return "", NewError(http.StatusNotFound, "Group not found.", nil)
+	}
+	return result, nil
 }
 
 func (s *Group) DeleteGroup(ctx context.Context, id string) error {

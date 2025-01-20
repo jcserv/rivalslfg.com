@@ -60,6 +60,10 @@ export type CreateGroupResponse = {
   playerId: number;
 };
 
+export type PatchGroup = {
+  open: boolean;
+};
+
 export type JoinGroupResponse = {
   status: StatusCode;
   playerId: number;

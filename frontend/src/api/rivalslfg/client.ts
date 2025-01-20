@@ -5,6 +5,7 @@ import {
   Group,
   JoinGroupResponse,
   PaginatedGroupsResponse,
+  PatchGroup,
   Profile,
   QueryParams,
   toURLSearchParams,
@@ -67,6 +68,17 @@ export class RivalsLFGClient extends HTTPClient {
     );
     const data = await response.json();
     return data;
+  }
+
+  async patchGroup(id: string, patch: PatchGroup): Promise<StatusCode> {
+    const response = await this.fetchWithAuth(
+      `${this.baseURL}/api/v1/groups/${id}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(patch),
+      },
+    );
+    return response.status as StatusCode;
   }
 
   async deleteGroup(id: string): Promise<StatusCode> {

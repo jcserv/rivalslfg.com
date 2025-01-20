@@ -101,6 +101,21 @@ func (mr *MockIGroupMockRecorder) GetGroups(ctx, arg any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroups", reflect.TypeOf((*MockIGroup)(nil).GetGroups), ctx, arg)
 }
 
+// PatchGroup mocks base method.
+func (m *MockIGroup) PatchGroup(ctx context.Context, arg repository.PatchGroupParams) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PatchGroup", ctx, arg)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PatchGroup indicates an expected call of PatchGroup.
+func (mr *MockIGroupMockRecorder) PatchGroup(ctx, arg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchGroup", reflect.TypeOf((*MockIGroup)(nil).PatchGroup), ctx, arg)
+}
+
 // MockIPlayer is a mock of IPlayer interface.
 type MockIPlayer struct {
 	ctrl     *gomock.Controller

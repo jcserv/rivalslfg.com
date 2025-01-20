@@ -10,6 +10,7 @@ type IGroup interface {
 	CreateGroup(ctx context.Context, arg repository.CreateGroupParams) (repository.CreateGroupRow, error)
 	GetGroups(ctx context.Context, arg repository.GetGroupsParams) ([]repository.GroupWithPlayers, int32, error)
 	GetGroupByID(ctx context.Context, id string, isGroupOwner bool) (*repository.GroupWithPlayers, error)
+	PatchGroup(ctx context.Context, arg repository.PatchGroupParams) (string, error)
 	DeleteGroup(ctx context.Context, id string) error
 }
 

@@ -75,6 +75,23 @@ export const fetchGroup = async (id: string): Promise<Group | undefined> => {
   }
 };
 
+export const patchGroup = async (
+  id: string,
+  open: boolean,
+): Promise<StatusCode> => {
+  const cached = rivalslfgStore.state.groups.find((group) => group.id === id);
+  if (!cached) return StatusCodes.NotFound;
+
+  const response = await rivalslfgAPIClient.patchGroup(id, { open });
+  if (response === StatusCodes.NoContent) {
+    rivalsStoreActions.upsertGroup({
+      ...cached,
+      open,
+    });
+  }
+  return response;
+};
+
 export const deleteGroup = async (id: string): Promise<StatusCode> => {
   const response = await rivalslfgAPIClient.deleteGroup(id);
   if (response === StatusCodes.NoContent) {

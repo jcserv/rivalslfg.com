@@ -18,22 +18,28 @@ import {
   Skeleton,
   Switch,
 } from "@/components/ui";
+import { usePatchGroup, useToast } from "@/hooks";
 
 const formSchema = z.object({
   open: z.boolean(),
 });
 
 interface GroupControlsProps {
+  groupId: string;
   isGroupOpen: boolean;
   canUserAccessGroup: boolean | null;
   passcode: string;
 }
 
 export function GroupControls({
+  groupId,
   isGroupOpen,
   canUserAccessGroup,
   passcode,
 }: GroupControlsProps) {
+  const { toast } = useToast();
+  const patchGroup = usePatchGroup(groupId);
+
   const defaultValues = {
     open: isGroupOpen,
   };
@@ -44,6 +50,25 @@ export function GroupControls({
   });
 
   const isClosed = form.watch("open") === false;
+
+  const handleOpenToggle = async () => {
+    try {
+      await patchGroup({
+        patch: {
+          open: isClosed,
+        },
+      });
+      toast({
+        title: `Changed group visibility to ${isClosed ? "open" : "closed"}`,
+        variant: "success",
+      });
+    } catch {
+      toast({
+        title: "Unable to modify group",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <Card>
@@ -89,6 +114,7 @@ export function GroupControls({
                             id="open"
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            onClick={handleOpenToggle}
                           />
                         </FormControl>
                         <FormMessage />
