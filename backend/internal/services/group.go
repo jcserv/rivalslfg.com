@@ -3,17 +3,20 @@ package services
 import (
 	"context"
 
+	"github.com/jcserv/rivalslfg/internal/message"
 	"github.com/jcserv/rivalslfg/internal/repository"
-	"github.com/jcserv/rivalslfg/internal/utils/log"
+	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 )
 
 type Group struct {
-	repo *repository.Queries
+	repo      *repository.Queries
+	publisher message.IPublisher
 }
 
-func NewGroup(repo *repository.Queries) *Group {
+func NewGroup(repo *repository.Queries, publisher message.IPublisher) *Group {
 	return &Group{
-		repo: repo,
+		repo:      repo,
+		publisher: publisher,
 	}
 }
 
@@ -44,9 +47,18 @@ func (s *Group) GetGroupByID(ctx context.Context, id string, isGroupOwner bool) 
 	}
 
 	if !isGroupOwner {
-		log.Info(ctx, "Removing passcode from group since user is not the owner")
 		group.Passcode = ""
 	}
 
 	return group, nil
+}
+
+func (s *Group) DeleteGroup(ctx context.Context, id string) error {
+	err := s.repo.DeleteGroup(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	s.publisher.GroupDeleted(ctx, id, reqCtx.GetPlayerID(ctx))
+	return nil
 }

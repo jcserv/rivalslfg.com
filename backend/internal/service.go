@@ -50,12 +50,13 @@ func NewService() (*Service, error) {
 		return nil, err
 	}
 	s.exc = message.NewRedisExchange(redis)
-
 	repo := repository.New(conn)
+
+	publisher := message.NewPublisher(s.exc)
 	s.api = _http.NewAPI(
 		&v1.Dependencies{
-			GroupService:  services.NewGroup(repo),
-			PlayerService: services.NewPlayer(repo, message.NewPublisher(s.exc)),
+			GroupService:  services.NewGroup(repo, publisher),
+			PlayerService: services.NewPlayer(repo, publisher),
 		},
 	)
 	return s, nil

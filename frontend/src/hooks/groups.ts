@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
   createGroup,
+  deleteGroup,
   fetchGroup,
   fetchGroups,
   HTTPError,
@@ -111,6 +112,15 @@ export function useCreateGroup() {
   const { mutateAsync } = useMutation({
     mutationFn: (input: createGroupArgs) => {
       return createGroup(input.profile);
+    },
+  });
+  return mutateAsync;
+}
+
+export function useDeleteGroup() {
+  const { mutateAsync } = useMutation({
+    mutationFn: (id: string) => {
+      return deleteGroup(id);
     },
   });
   return mutateAsync;

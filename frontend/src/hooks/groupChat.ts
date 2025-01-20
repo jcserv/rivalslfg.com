@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { useRouter } from "@tanstack/react-router";
+
 import { WebSocketMessage, WebSocketOp } from "@/api/ws";
-import { addPlayerToGroup, removePlayerFromGroup, useProfile } from "@/hooks";
+import {
+  addPlayerToGroup,
+  removePlayerFromGroup,
+  useProfile,
+  useToast,
+} from "@/hooks";
 import { Player } from "@/types";
 
 import { useWebSocket } from "./ws";
@@ -20,9 +27,13 @@ type PlayerLeftPayload = {
 };
 
 export function useGroupChat(groupId: string) {
+  const router = useRouter();
+  const { toast } = useToast();
+
   const ws = useWebSocket(groupId);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [profile] = useProfile();
+
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   const messageHandler = useCallback((message: WebSocketMessage) => {
     switch (message.op) {
@@ -63,7 +74,12 @@ export function useGroupChat(groupId: string) {
         break;
       }
       case WebSocketOp.GroupDelete:
-        // Handle member promotion
+        toast({
+          title: "Group was deleted",
+          description: "You have been removed from the group.",
+          variant: "destructive",
+        });
+        router.navigate({ to: ".." });
         break;
     }
   }, []);
