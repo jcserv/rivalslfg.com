@@ -5,6 +5,7 @@ export const useProfile = (): readonly [
   profile: Profile,
   setProfile: (p: Profile) => void,
   isProfileConfigured: boolean,
+  setProfileId: (id: number) => void,
 ] => {
   const [profile, setProfile] = useLocalStorage(
     "profile",
@@ -13,5 +14,12 @@ export const useProfile = (): readonly [
   );
   const isProfileConfigured = Object.keys(profile || {}).length > 0;
 
-  return [profile, setProfile, isProfileConfigured];
+  const setProfileId = (id: number) => {
+    setProfile({
+      ...profile,
+      id,
+    });
+  };
+
+  return [profile, setProfile, isProfileConfigured, setProfileId];
 };

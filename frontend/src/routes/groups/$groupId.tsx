@@ -84,7 +84,7 @@ function GroupPage() {
 
   const isAuthed = useIsAuthed(groupId);
   const [g, isLoading, error] = useGroup(groupId);
-  const [profile, setProfile, isProfileConfigured] = useProfile();
+  const [profile, setProfile, isProfileConfigured, setProfileId] = useProfile();
 
   const joinGroup = useJoinGroup();
   const removePlayer = useRemovePlayer();
@@ -176,6 +176,8 @@ function GroupPage() {
         groupId,
         playerId,
       });
+
+      if (isPlayerLeavingGroup) setProfileId(0);
 
       toast({
         title: isPlayerLeavingGroup
