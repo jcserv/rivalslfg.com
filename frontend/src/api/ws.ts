@@ -1,8 +1,9 @@
+/* eslint-disable no-console */
 export const WebSocketOp = {
   GroupChat: 1,
   GroupJoin: 2,
   GroupLeave: 3,
-  GroupPromotion: 4,
+  GroupDelete: 4,
 } as const;
 
 export type WebSocketMessage = {
@@ -57,8 +58,8 @@ export class WebSocketClient {
         try {
           const message = JSON.parse(event.data) as WebSocketMessage;
           this.messageHandlers.forEach((handler) => handler(message));
-        } catch {
-          // console.error("Error parsing WebSocket message:", error);
+        } catch (error) {
+          console.error("Error parsing WebSocket message:", error);
         }
       };
 
@@ -66,11 +67,11 @@ export class WebSocketClient {
         this.attemptReconnect();
       };
 
-      this.ws.onerror = () => {
-        // console.error("WebSocket error:", error);
+      this.ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
       };
-    } catch {
-      // console.error("Error connecting to WebSocket:", error);
+    } catch (error) {
+      console.error("Error connecting to WebSocket:", error);
       this.attemptReconnect();
     }
   }
@@ -112,8 +113,8 @@ export class WebSocketClient {
 
     try {
       this.ws.send(JSON.stringify(message));
-    } catch {
-      //console.error("Error sending WebSocket message:", error);
+    } catch (error) {
+      console.error("Error sending WebSocket message:", error);
     }
   }
 

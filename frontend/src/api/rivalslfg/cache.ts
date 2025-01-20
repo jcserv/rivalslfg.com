@@ -103,8 +103,5 @@ export const removePlayer = async (
     rivalsStoreActions.removeGroup(groupId);
     return result;
   }
-  if (result === StatusCodes.OK) {
-    rivalsStoreActions.removePlayerFromGroup(groupId, playerId);
-  }
   return result;
 };

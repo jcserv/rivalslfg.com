@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { WebSocketMessage, WebSocketOp } from "@/api/ws";
-import { addPlayerToGroup, useProfile } from "@/hooks";
+import { addPlayerToGroup, removePlayerFromGroup, useProfile } from "@/hooks";
 import { Player } from "@/types";
 
 import { useWebSocket } from "./ws";
@@ -12,6 +12,11 @@ export type ChatMessage = {
   sender: string;
   content: string;
   timestamp: string;
+};
+
+type PlayerLeftPayload = {
+  playerId: number;
+  leaderId: number;
 };
 
 export function useGroupChat(groupId: string) {
@@ -42,10 +47,22 @@ export function useGroupChat(groupId: string) {
         ]);
         break;
       }
-      case WebSocketOp.GroupLeave:
-        // Handle member leave
+      case WebSocketOp.GroupLeave: {
+        const payload = message.payload as PlayerLeftPayload;
+        removePlayerFromGroup(groupId, payload.playerId, payload.leaderId);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            system: true,
+            sender: "System",
+            content: `${payload.playerId} has left the group.`, // TODO: add player name
+            timestamp: new Date().toISOString(),
+          },
+        ]);
         break;
-      case WebSocketOp.GroupPromotion:
+      }
+      case WebSocketOp.GroupDelete:
         // Handle member promotion
         break;
     }

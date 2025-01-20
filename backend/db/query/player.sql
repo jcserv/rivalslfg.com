@@ -225,6 +225,6 @@ SELECT
             '200'::TEXT  -- Successfully removed player
     END as status,
     COALESCE(
-        (SELECT player_id FROM next_leader)::INTEGER,
+        (SELECT player_id FROM next_leader),
         0
-    ) as new_leader_id;
+    )::INTEGER as new_leader_id;
