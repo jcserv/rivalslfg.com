@@ -10,9 +10,9 @@ type Server struct {
 	origins []string
 }
 
-func NewServer(allowedOrigins []string) *Server {
+func NewServer(hub *Hub, allowedOrigins []string) *Server {
 	return &Server{
-		hub:     NewHub(),
+		hub:     hub,
 		origins: allowedOrigins,
 	}
 }

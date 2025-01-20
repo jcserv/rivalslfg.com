@@ -56,6 +56,9 @@ CREATE TABLE Community (
     link VARCHAR(255) NOT NULL
 );
 
+INSERT INTO Community (name, description, link) VALUES
+    ('Rivals LFG', 'A site that helps Marvel Rivals players find groups to play with', 'https://rivalslfg.com');
+
 CREATE TABLE Groups (
     id CHAR(4) PRIMARY KEY DEFAULT generate_group_id(),
     community_id INTEGER NOT NULL REFERENCES Community(id) DEFAULT 1,

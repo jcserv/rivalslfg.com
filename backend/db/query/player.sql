@@ -50,18 +50,18 @@ valid_group AS (
         OR
         (
             -- Can fill at least one role
-            (@role = 'vanguard' AND gd.curr_vanguards < g.vanguards)
-            OR (@role = 'duelist' AND gd.curr_duelists < g.duelists)
-            OR (@role = 'strategist' AND gd.curr_strategists < g.strategists)
+            (@role::TEXT = 'vanguard' AND gd.curr_vanguards < g.vanguards)
+            OR (@role::TEXT = 'duelist' AND gd.curr_duelists < g.duelists)
+            OR (@role::TEXT = 'strategist' AND gd.curr_strategists < g.strategists)
         )
     )
     -- Rank check
     AND (
         -- Allow Bronze-Gold players to group with each other
-        @rank_val BETWEEN 0 AND 22 AND gd.min_rank BETWEEN 0 AND 22
+        @rank_val::INTEGER BETWEEN 0 AND 22 AND gd.min_rank BETWEEN 0 AND 22
         OR (
-            ABS(gd.min_rank - @rank_val) <= 10
-            AND ABS(gd.max_rank - @rank_val) <= 10
+            ABS(gd.min_rank - @rank_val::INTEGER) <= 10
+            AND ABS(gd.max_rank - @rank_val::INTEGER) <= 10
         )
     )
     -- If group is not open, check if passcode is correct

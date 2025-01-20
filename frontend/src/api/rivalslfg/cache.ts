@@ -63,7 +63,6 @@ export const fetchGroup = async (id: string): Promise<Group | undefined> => {
     return {
       id,
       open: false,
-      // Add other required fields with placeholder/default values
       name: "Private Group",
       owner: "",
       ownerId: 0,

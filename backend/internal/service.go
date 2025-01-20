@@ -11,6 +11,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/handlers"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jcserv/rivalslfg/internal/message"
 	"github.com/jcserv/rivalslfg/internal/repository"
 	"github.com/jcserv/rivalslfg/internal/services"
 	_http "github.com/jcserv/rivalslfg/internal/transport/http"
@@ -22,6 +23,7 @@ import (
 type Service struct {
 	api *_http.API
 	cfg *Configuration
+	exc message.Exchange
 }
 
 func NewService() (*Service, error) {
@@ -43,18 +45,17 @@ func NewService() (*Service, error) {
 		return nil, err
 	}
 
-	// client, err := s.ConnectCache(context.Background())
-	// if err != nil {
-	// 	return nil, err
-	// }
+	redis, err := s.ConnectRedis(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	s.exc = message.NewRedisExchange(redis)
 
 	repo := repository.New(conn)
-	// store := store.New(client)
-
 	s.api = _http.NewAPI(
 		&v1.Dependencies{
 			GroupService:  services.NewGroup(repo),
-			PlayerService: services.NewPlayer(repo),
+			PlayerService: services.NewPlayer(repo, message.NewPublisher(s.exc)),
 		},
 	)
 	return s, nil
@@ -105,7 +106,7 @@ func (s *Service) ConnectDB(ctx context.Context) (*pgxpool.Pool, error) {
 	return pool, nil
 }
 
-func (s *Service) ConnectCache(ctx context.Context) (*redis.Client, error) {
+func (s *Service) ConnectRedis(ctx context.Context) (*redis.Client, error) {
 	config, err := redis.ParseURL(s.cfg.CacheURL)
 	if err != nil {
 		return nil, err
@@ -122,7 +123,7 @@ func (s *Service) ConnectCache(ctx context.Context) (*redis.Client, error) {
 func (s *Service) StartHTTP(ctx context.Context) error {
 	log.Info(ctx, fmt.Sprintf("Starting HTTP server on port %s", s.cfg.HTTPPort))
 
-	wsServer := ws.NewServer([]string{os.Getenv("ORIGIN_ALLOWED")})
+	wsServer := ws.NewServer(ws.NewHub(s.exc), []string{os.Getenv("ORIGIN_ALLOWED")})
 	wsServer.Start(ctx)
 
 	mainMux := http.NewServeMux()

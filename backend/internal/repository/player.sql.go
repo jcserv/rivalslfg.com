@@ -59,18 +59,18 @@ valid_group AS (
         OR
         (
             -- Can fill at least one role
-            ($7 = 'vanguard' AND gd.curr_vanguards < g.vanguards)
-            OR ($7 = 'duelist' AND gd.curr_duelists < g.duelists)
-            OR ($7 = 'strategist' AND gd.curr_strategists < g.strategists)
+            ($7::TEXT = 'vanguard' AND gd.curr_vanguards < g.vanguards)
+            OR ($7::TEXT = 'duelist' AND gd.curr_duelists < g.duelists)
+            OR ($7::TEXT = 'strategist' AND gd.curr_strategists < g.strategists)
         )
     )
     -- Rank check
     AND (
         -- Allow Bronze-Gold players to group with each other
-        $8 BETWEEN 0 AND 22 AND gd.min_rank BETWEEN 0 AND 22
+        $8::INTEGER BETWEEN 0 AND 22 AND gd.min_rank BETWEEN 0 AND 22
         OR (
-            ABS(gd.min_rank - $8) <= 10
-            AND ABS(gd.max_rank - $8) <= 10
+            ABS(gd.min_rank - $8::INTEGER) <= 10
+            AND ABS(gd.max_rank - $8::INTEGER) <= 10
         )
     )
     -- If group is not open, check if passcode is correct
@@ -151,21 +151,21 @@ SELECT
 `
 
 type JoinGroupParams struct {
-	GroupID     string      `json:"group_id"`
-	Passcode    string      `json:"passcode"`
-	PlayerID    int32       `json:"player_id"`
-	Gamemode    string      `json:"gamemode"`
-	Region      string      `json:"region"`
-	Platform    string      `json:"platform"`
-	Role        interface{} `json:"role"`
-	RankVal     interface{} `json:"rank_val"`
-	Name        string      `json:"name"`
-	Characters  []string    `json:"characters"`
-	VoiceChat   bool        `json:"voice_chat"`
-	Mic         bool        `json:"mic"`
-	Vanguards   int32       `json:"vanguards"`
-	Duelists    int32       `json:"duelists"`
-	Strategists int32       `json:"strategists"`
+	GroupID     string   `json:"group_id"`
+	Passcode    string   `json:"passcode"`
+	PlayerID    int32    `json:"player_id"`
+	Gamemode    string   `json:"gamemode"`
+	Region      string   `json:"region"`
+	Platform    string   `json:"platform"`
+	Role        string   `json:"role"`
+	RankVal     int32    `json:"rank_val"`
+	Name        string   `json:"name"`
+	Characters  []string `json:"characters"`
+	VoiceChat   bool     `json:"voice_chat"`
+	Mic         bool     `json:"mic"`
+	Vanguards   int32    `json:"vanguards"`
+	Duelists    int32    `json:"duelists"`
+	Strategists int32    `json:"strategists"`
 }
 
 type JoinGroupRow struct {

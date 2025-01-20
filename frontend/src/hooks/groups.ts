@@ -8,7 +8,8 @@ import {
   rivalsStoreKeys,
   StatusCodes,
 } from "@/api";
-import { Group, Profile } from "@/types";
+import { queryClient } from "@/routes/__root";
+import { Group, Player, Profile } from "@/types";
 
 import { usePagination } from "./paginate";
 import { useProfile } from "./profile";
@@ -52,6 +53,19 @@ export function useGroup(
   });
 
   return [query.data, query.isLoading, query.error];
+}
+
+export function addPlayerToGroup(groupId: string, player: Player) {
+  queryClient.setQueryData<Group>(
+    rivalsStoreKeys.group(groupId),
+    (oldGroup) => {
+      if (!oldGroup) return;
+      return {
+        ...oldGroup,
+        players: [...oldGroup.players, player],
+      };
+    },
+  );
 }
 
 type createGroupArgs = {
