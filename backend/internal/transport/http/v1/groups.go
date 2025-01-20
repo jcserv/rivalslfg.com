@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jcserv/rivalslfg/internal/auth"
+	"github.com/jcserv/rivalslfg/internal/services"
 	"github.com/jcserv/rivalslfg/internal/transport/http/httputil"
 	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
@@ -141,6 +142,49 @@ func (a *API) GetGroupByID() http.HandlerFunc {
 			}, auth.GroupOwnerRights)
 		}
 		httputil.OK(w, group)
+	}
+}
+
+func (a *API) PatchGroup() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		vars := mux.Vars(r)
+		groupID := vars["id"]
+		if groupID == "" {
+			httputil.BadRequest(w, fmt.Errorf("groupId is required"))
+			return
+		}
+
+		var input PatchGroup
+		err := json.NewDecoder(r.Body).Decode(&input)
+		if err != nil {
+			log.Debug(ctx, err.Error())
+			httputil.BadRequest(w, err)
+			return
+		}
+
+		input.ID = groupID
+		params, err := input.Parse()
+		if err != nil {
+			log.Debug(ctx, err.Error())
+			httputil.BadRequest(w, err)
+			return
+		}
+
+		_, err = a.groupService.PatchGroup(ctx, *params)
+		if err != nil {
+			if serviceErr, ok := err.(services.Error); ok {
+				switch serviceErr.Code() {
+				case http.StatusNotFound:
+					httputil.NotFound(w)
+					return
+				}
+			}
+			httputil.InternalServerError(ctx, w, err)
+			return
+		}
+		httputil.NoContent(w)
 	}
 }
 

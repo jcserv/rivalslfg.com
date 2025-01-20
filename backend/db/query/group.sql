@@ -121,6 +121,19 @@ FROM (
 ) results
 LIMIT 1;
 
+-- name: PatchGroup :one
+WITH updated AS (
+    UPDATE Groups
+    SET open = @open
+    WHERE id = @id
+    RETURNING id
+)
+SELECT 
+    CASE
+        WHEN EXISTS (SELECT 1 FROM updated) THEN '200'
+        ELSE '404'
+    END as status;
+
 -- name: DeleteGroup :exec
 WITH group_to_delete AS (
     SELECT id FROM Groups g WHERE g.id = $1
