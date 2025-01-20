@@ -7,7 +7,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/jcserv/rivalslfg/internal/repository"
 	"github.com/jcserv/rivalslfg/internal/test"
 	"github.com/jcserv/rivalslfg/internal/test/mocks"
@@ -325,5 +327,112 @@ func TestIntegration_GetGroupByID(t *testing.T) {
 
 		r.ServeHTTP(rec, req)
 		assert.Equal(t, http.StatusForbidden, rec.Code)
+	})
+}
+
+func TestIntegration_DeleteGroup(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	r := mux.NewRouter()
+	mockGroupService := mocks.NewMockIGroup(ctrl)
+	mockPlayerService := mocks.NewMockIPlayer(ctrl)
+
+	a := NewAPI(
+		&Dependencies{
+			GroupService:  mockGroupService,
+			PlayerService: mockPlayerService,
+		},
+	)
+	a.RegisterRoutes(r)
+
+	t.Run("Should allow group owner to delete group", func(t *testing.T) {
+		mockGroupService.EXPECT().DeleteGroup(gomock.Any(), "AAAA").Return(nil)
+
+		req := httptest.NewRequest(http.MethodDelete, "/api/v1/groups/AAAA", nil)
+		token, _ := auth.GenerateToken("1", map[string]string{
+			"playerId": "1",
+			"groupId":  "AAAA",
+		}, auth.GroupOwnerRights...)
+
+		req.Header.Set("Authorization", token)
+		claims := jwt.MapClaims{
+			"playerId": "1",
+			"groupId":  "AAAA",
+			"rights":   auth.GroupOwnerRights,
+		}
+		req = reqCtx.Init(req, claims, token)
+		rec := httptest.NewRecorder()
+
+		r.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusNoContent, rec.Code)
+	})
+
+	t.Run("Should return 401 if user is not authenticated", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodDelete, "/api/v1/groups/AAAA", nil)
+		rec := httptest.NewRecorder()
+
+		r.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusUnauthorized, rec.Code)
+	})
+
+	t.Run("Should return 403 if user is not group owner", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodDelete, "/api/v1/groups/AAAA", nil)
+		token, _ := auth.GenerateToken("2", map[string]string{
+			"playerId": "2",
+			"groupId":  "AAAB",
+		}, auth.GroupMemberRights...)
+
+		req.Header.Set("Authorization", token)
+		claims := jwt.MapClaims{
+			"playerId": "2",
+			"groupId":  "AAAB",
+			"rights":   auth.GroupMemberRights,
+		}
+		req = reqCtx.Init(req, claims, token)
+		rec := httptest.NewRecorder()
+
+		r.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusForbidden, rec.Code)
+	})
+
+	t.Run("Should return 500 if unexpected error occurs", func(t *testing.T) {
+		mockGroupService.EXPECT().DeleteGroup(gomock.Any(), "AAAA").Return(fmt.Errorf("unexpected error"))
+
+		req := httptest.NewRequest(http.MethodDelete, "/api/v1/groups/AAAA", nil)
+		token, _ := auth.GenerateToken("1", map[string]string{
+			"playerId": "1",
+			"groupId":  "AAAA",
+		}, auth.GroupOwnerRights...)
+
+		req.Header.Set("Authorization", token)
+		claims := jwt.MapClaims{
+			"playerId": "1",
+			"groupId":  "AAAA",
+			"rights":   auth.GroupOwnerRights,
+		}
+		req = reqCtx.Init(req, claims, token)
+		rec := httptest.NewRecorder()
+
+		r.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusInternalServerError, rec.Code)
+	})
+
+	t.Run("Should handle missing group ID", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodDelete, "/api/v1/groups/", nil)
+		token, _ := auth.GenerateToken("1", map[string]string{
+			"playerId": "1",
+			"groupId":  "AAAA",
+		}, auth.GroupOwnerRights...)
+
+		req.Header.Set("Authorization", token)
+		claims := jwt.MapClaims{
+			"playerId": "1",
+			"groupId":  "AAAA",
+			"rights":   auth.GroupOwnerRights,
+		}
+		req = reqCtx.Init(req, claims, token)
+		rec := httptest.NewRecorder()
+
+		r.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusNotFound, rec.Code)
 	})
 }

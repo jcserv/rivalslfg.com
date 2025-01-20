@@ -10,7 +10,7 @@ dev:
 	go build ./cmd/rivalslfg/main.go && ./main
 
 mocks:
-	mockgen -package=mocks -source=internal/services/interfaces.go -destination=internal/test/mocks/interfaces.go
+	mockgen -package=mocks -source=internal/services/interfaces.go -destination=internal/test/mocks/services.go
 
 test:
 	go test ./... 
