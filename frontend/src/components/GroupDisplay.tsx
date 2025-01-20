@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
-import { Copy, X } from "lucide-react";
+import { useRouter } from "@tanstack/react-router";
+import { Copy, Trash, X } from "lucide-react";
 
 import { TeamUpItem } from "@/components/TeamUp";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useProfile, useToast } from "@/hooks";
+import { useDeleteGroup, useProfile, useToast } from "@/hooks";
 import { toTitleCase } from "@/lib";
 import {
   formatPlatform,
@@ -32,6 +33,8 @@ import {
 } from "@/types";
 
 import teamUps from "@/assets/teamups.json";
+
+import { DeleteGroupDialog } from "./DeleteGroupDialog";
 
 interface GroupDisplayProps {
   group: Group | undefined;
@@ -49,7 +52,12 @@ export function GroupDisplay({
   onRemove,
 }: GroupDisplayProps) {
   const [profile] = useProfile();
+  const router = useRouter();
   const { toast } = useToast();
+
+  const deleteGroup = useDeleteGroup();
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const { currVanguards, currDuelists, currStrategists, currCharacters } =
     useMemo(() => {
@@ -61,7 +69,7 @@ export function GroupDisplay({
       (teamup) =>
         new Set(teamup.requirements.allOf)
           .union(new Set(teamup.requirements.oneOf))
-          .intersection(currCharacters).size > 0,
+          .intersection(currCharacters).size > 0
     );
   }, [teamUps, currCharacters]);
 
@@ -94,12 +102,44 @@ export function GroupDisplay({
     });
   };
 
+  const handleDelete = async () => {
+    try {
+      await deleteGroup(group?.id ?? "");
+      toast({
+        title: "Group deleted",
+        variant: "success",
+      });
+      router.navigate({ to: ".." });
+    } catch {
+      toast({
+        title: "Unable to delete group",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!group) return null;
   return (
     <Card>
       <CardHeader>
         <CardTitle>
           {group?.name}
+          <DeleteGroupDialog
+            open={showDeleteDialog}
+            onClose={() => setShowDeleteDialog(false)}
+            onDelete={handleDelete}
+          />
+          {isOwner && (
+            <Button
+              variant="destructive"
+              size="icon"
+              className="ml-2"
+              onClick={() => setShowDeleteDialog(true)}
+            >
+              <Trash className="w-4 h-4" />
+            </Button>
+          )}
           <Button
             variant="outline"
             size="icon"

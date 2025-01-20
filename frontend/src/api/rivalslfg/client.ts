@@ -69,6 +69,16 @@ export class RivalsLFGClient extends HTTPClient {
     return data;
   }
 
+  async deleteGroup(id: string): Promise<StatusCode> {
+    const response = await this.fetchWithAuth(
+      `${this.baseURL}/api/v1/groups/${id}`,
+      {
+        method: "DELETE",
+      },
+    )
+    return response.status as StatusCode;
+  }
+
   async joinGroup(
     groupId: string,
     player: Profile,

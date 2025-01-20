@@ -75,6 +75,15 @@ export const fetchGroup = async (id: string): Promise<Group | undefined> => {
   }
 };
 
+export const deleteGroup = async (id: string): Promise<StatusCode> => {
+  const response = await rivalslfgAPIClient.deleteGroup(id);
+  if (response === StatusCodes.NoContent) {
+    rivalsStoreActions.removeAuthedGroup(id);
+    rivalsStoreActions.removeGroup(id);
+  }
+  return response;
+};
+
 export const joinGroup = async (
   groupId: string,
   player: Profile,

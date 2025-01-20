@@ -120,3 +120,26 @@ FROM (
     SELECT * FROM new_membership
 ) results
 LIMIT 1;
+
+-- name: DeleteGroup :exec
+WITH group_to_delete AS (
+    SELECT id FROM Groups g WHERE g.id = $1
+),
+deleted_members AS (
+    DELETE FROM GroupMembers gm
+    WHERE gm.group_id IN (SELECT id FROM group_to_delete)
+    RETURNING player_id
+),
+orphaned_players AS (
+    SELECT DISTINCT dm.player_id
+    FROM deleted_members dm
+    LEFT JOIN GroupMembers gm ON dm.player_id = gm.player_id
+    WHERE gm.player_id IS NULL
+),
+deleted_players AS (
+    DELETE FROM Players p
+    WHERE p.id IN (SELECT player_id FROM orphaned_players)
+)
+
+DELETE FROM Groups
+WHERE id IN (SELECT id FROM group_to_delete);

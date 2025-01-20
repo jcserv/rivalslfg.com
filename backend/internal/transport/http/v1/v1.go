@@ -52,6 +52,12 @@ func (a *API) RegisterRoutes(r *mux.Router) {
 	r.HandleFunc(group, a.GetGroupByID()).Methods(http.MethodGet)
 	r.HandleFunc(groupMembers, a.JoinGroup()).Methods(http.MethodPost)
 
+	r.HandleFunc(group,
+		middleware.RequireRight(auth.RightDeleteGroup)(
+			a.DeleteGroup(),
+		),
+	).Methods(http.MethodDelete)
+
 	r.HandleFunc(groupMember,
 		middleware.RequireRight(auth.RightLeaveGroup)(
 			a.RemovePlayer(),

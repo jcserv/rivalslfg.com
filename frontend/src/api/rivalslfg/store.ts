@@ -28,6 +28,12 @@ export const rivalsStoreActions = {
       authedGroups: new Map([...prev.authedGroups, [groupId, true]]),
     }));
   },
+  removeAuthedGroup(groupId: string) {
+    rivalslfgStore.setState((prev) => ({
+      ...prev,
+      authedGroups: new Map([...prev.authedGroups, [groupId, false]]),
+    }));
+  },
   setGroups(groups: Group[]) {
     rivalslfgStore.setState((prev) => ({ ...prev, groups }));
   },

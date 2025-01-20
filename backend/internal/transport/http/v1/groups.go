@@ -2,7 +2,6 @@ package v1
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -145,14 +144,27 @@ func (a *API) GetGroupByID() http.HandlerFunc {
 	}
 }
 
-// DeleteGroup: TODO
 func (a *API) DeleteGroup() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		err := errors.New("test error")
-		httputil.InternalServerError(ctx, w, err)
 
-		// TODO: Generate token with groupId = "", and remove group owner rights
-		return
+		vars := mux.Vars(r)
+		groupID := vars["id"]
+		if groupID == "" {
+			httputil.BadRequest(w, fmt.Errorf("groupId is required"))
+			return
+		}
+
+		err := a.groupService.DeleteGroup(ctx, groupID)
+		if err != nil {
+			httputil.InternalServerError(ctx, w, err)
+			return
+		}
+
+		httputil.EmbedTokenInResponse(ctx, w, &reqCtx.AuthInfo{
+			PlayerID: 0,
+			GroupID:  "",
+		}, auth.NoRights)
+		httputil.NoContent(w)
 	}
 }

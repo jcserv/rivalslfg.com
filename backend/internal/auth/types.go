@@ -20,6 +20,8 @@ const (
 	RightLeaveGroup Right = "group:leave"
 )
 
+var NoRights = []Right{}
+
 // This is granted when a user joins a group, creates a group, or begins queuing up.
 var BaseRights = []Right{
 	RightReadUser,
