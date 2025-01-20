@@ -18,7 +18,7 @@ import {
   ChatInput,
   ChatMessageList,
 } from "@/components/ui/chat";
-import { useGroupChat, useProfile } from "@/hooks";
+import { ChatMessage, useGroupChat, useProfile } from "@/hooks";
 import { formatTimestamp } from "@/lib";
 
 const userColors = [
@@ -99,21 +99,7 @@ export function ChatBox({ canUserAccessGroup, isPlayerInGroup }: ChatBoxProps) {
         {canUserAccessGroup && profile?.name && (
           <ChatMessageList className="flex-1" ref={messagesRef}>
             {messages.map((message) => (
-              <ChatBubble key={message.id} variant="received">
-                <ChatBubbleMessage>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`font-semibold ${getUserColor(message.sender)}`}
-                    >
-                      {message.sender}
-                    </span>
-                    <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                      {formatTimestamp(message.timestamp)}
-                    </span>
-                  </div>
-                  <p className="text-sm break-words">{message.content}</p>
-                </ChatBubbleMessage>
-              </ChatBubble>
+              <ChatItem key={message.id} message={message} />
             ))}
           </ChatMessageList>
         )}
@@ -141,5 +127,37 @@ export function ChatBox({ canUserAccessGroup, isPlayerInGroup }: ChatBoxProps) {
         </form>
       </CardFooter>
     </Card>
+  );
+}
+
+interface ChatMessageProps {
+  message: ChatMessage;
+}
+
+function ChatItem({ message }: ChatMessageProps) {
+  if (message.system) {
+    return (
+      <div>
+        <span className="flex items-center">
+          <p className="text-sm break-words italic mr-2">{message.content}</p>
+          <p className="text-sm">{formatTimestamp(message.timestamp)}</p>
+        </span>
+      </div>
+    );
+  }
+  return (
+    <ChatBubble variant="received">
+      <ChatBubbleMessage>
+        <div className="flex items-center gap-2">
+          <span className={`font-semibold ${getUserColor(message.sender)}`}>
+            {message.sender}
+          </span>
+          <span className="text-xs text-zinc-500 dark:text-zinc-400">
+            {formatTimestamp(message.timestamp)}
+          </span>
+        </div>
+        <p className="text-sm break-words">{message.content}</p>
+      </ChatBubbleMessage>
+    </ChatBubble>
   );
 }

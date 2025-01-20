@@ -67,6 +67,13 @@ func (h *Hub) RegisterClient(authInfo *reqCtx.AuthInfo, client *Client) {
 	h.Lock()
 	defer h.Unlock()
 
+	// Unregister any existing connections for this player
+	for existingClient, info := range h.clientGroups {
+		if info.PlayerID == authInfo.PlayerID && info.GroupID == authInfo.GroupID {
+			h.unregisterClientLocked(existingClient)
+		}
+	}
+
 	if h.groups[authInfo.GroupID] == nil {
 		h.groups[authInfo.GroupID] = make(map[*Client]bool)
 	}
@@ -81,6 +88,10 @@ func (h *Hub) UnregisterClient(client *Client) {
 	h.Lock()
 	defer h.Unlock()
 
+	h.unregisterClientLocked(client)
+}
+
+func (h *Hub) unregisterClientLocked(client *Client) {
 	if clientInfo, ok := h.clientGroups[client]; ok {
 		delete(h.clientGroups, client)
 		if clients, exists := h.groups[clientInfo.GroupID]; exists {
@@ -89,25 +100,30 @@ func (h *Hub) UnregisterClient(client *Client) {
 				delete(h.groups, clientInfo.GroupID)
 			}
 		}
+		client.conn.NetConn().Close()
 	}
 }
 
-func (h *Hub) Broadcast(msg Message) error {
+func (h *Hub) Broadcast(ctx context.Context, msg Message) error {
 	h.RLock()
 	defer h.RUnlock()
 
-	clients, exists := h.groups[msg.GroupID]
-	if !exists {
-		return nil
-	}
+	if clients, exists := h.groups[msg.GroupID]; exists {
+		msgBytes, err := json.Marshal(msg)
+		if err != nil {
+			return err
+		}
 
-	msgBytes, err := json.Marshal(msg)
-	if err != nil {
-		return err
-	}
-
-	for client := range clients {
-		client.conn.WriteMessage(gws.OpcodeText, msgBytes)
+		for client := range clients {
+			info, exists := h.clientGroups[client]
+			if !exists {
+				continue
+			}
+			if err := client.conn.WriteMessage(gws.OpcodeText, msgBytes); err != nil {
+				log.Warn(ctx, fmt.Sprintf("Error writing message to client %d: %v", info.PlayerID, err))
+				h.UnregisterClient(client)
+			}
+		}
 	}
 	return nil
 }
@@ -118,8 +134,6 @@ func (h *Hub) handleRedisMessages(ctx context.Context, ch <-chan *redis.Message)
 		case <-ctx.Done():
 			return
 		case msg := <-ch:
-			log.Info(ctx, fmt.Sprintf("Received message from Redis: %s", msg.Payload))
-
 			event, err := message.UnmarshalJSON([]byte(msg.Payload))
 			if err != nil {
 				continue
@@ -128,7 +142,6 @@ func (h *Hub) handleRedisMessages(ctx context.Context, ch <-chan *redis.Message)
 
 			// Broadcast event to clients in relevant group
 			if clients, exists := h.groups[event.GroupID]; exists {
-				log.Info(ctx, fmt.Sprintf("Broadcasting message to %d clients", len(clients)))
 				wsMsg := Message{
 					GroupID: event.GroupID,
 					Op:      WebSocketEventType(event.Type),
@@ -142,7 +155,6 @@ func (h *Hub) handleRedisMessages(ctx context.Context, ch <-chan *redis.Message)
 					}
 
 					if info.PlayerID != event.PlayerID {
-						log.Info(ctx, fmt.Sprintf("Sending message to client %d", info.PlayerID))
 						data, _ := json.Marshal(wsMsg)
 						client.conn.WriteMessage(gws.OpcodeText, data)
 					}

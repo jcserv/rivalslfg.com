@@ -25,5 +25,5 @@ func (h *ChatHandler) Handle(ctx context.Context, client *Client, payload json.R
 	if err := json.Unmarshal(payload, &msg); err != nil {
 		return err
 	}
-	return h.hub.Broadcast(msg)
+	return h.hub.Broadcast(ctx, msg)
 }

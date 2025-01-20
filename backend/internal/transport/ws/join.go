@@ -3,8 +3,6 @@ package ws
 import (
 	"context"
 	"encoding/json"
-
-	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
 type JoinPayload struct {
@@ -24,6 +22,5 @@ func (h *JoinHandler) Handle(ctx context.Context, client *Client, payload json.R
 	if err := json.Unmarshal(payload, &msg); err != nil {
 		return err
 	}
-	log.Info(ctx, "Broadcasting join message")
-	return h.hub.Broadcast(msg)
+	return h.hub.Broadcast(ctx, msg)
 }

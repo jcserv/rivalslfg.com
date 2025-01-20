@@ -10,6 +10,7 @@ import (
 	"github.com/jcserv/rivalslfg/internal/auth"
 	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 	"github.com/jcserv/rivalslfg/internal/utils"
+	"github.com/jcserv/rivalslfg/internal/utils/log"
 	"github.com/lxzan/gws"
 )
 
@@ -70,6 +71,11 @@ func (h *ClientHandler) OnMessage(socket *gws.Conn, message *gws.Message) {
 
 	var msg Message
 	if err := json.Unmarshal(message.Bytes(), &msg); err != nil {
+		return
+	}
+
+	if _, ok := h.hub.clientGroups[h.client]; !ok {
+		log.Warn(ctx, "Received message from unregistered client")
 		return
 	}
 

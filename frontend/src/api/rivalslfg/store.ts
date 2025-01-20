@@ -1,7 +1,7 @@
 import { Store } from "@tanstack/react-store";
 
 import { queryClient } from "@/routes/__root";
-import { Group, Player } from "@/types";
+import { Group } from "@/types";
 
 interface RivalsLFGStore {
   authedGroups: Map<string, boolean>;
@@ -43,19 +43,6 @@ export const rivalsStoreActions = {
     rivalslfgStore.setState((prev) => ({
       ...prev,
       groups: prev.groups.filter((g) => g.id !== groupId),
-    }));
-  },
-  addPlayerToGroup(groupId: string, player: Player) {
-    rivalslfgStore.setState((prev) => ({
-      ...prev,
-      groups: prev.groups.map((g) =>
-        g.id === groupId
-          ? {
-              ...g,
-              players: [...g.players, player],
-            }
-          : g,
-      ),
     }));
   },
   removePlayerFromGroup(groupId: string, playerId: number) {
