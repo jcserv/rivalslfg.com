@@ -261,6 +261,7 @@ function GroupPage() {
             <div className="col-span-1 md:col-span-4 space-y-4 sm:w-1/2  md:w-full mx-auto">
               {isOwner && (
                 <GroupControls
+                  groupId={group?.id ?? ""}
                   isGroupOpen={group?.open ?? false}
                   canUserAccessGroup={canUserAccessGroup}
                   passcode={group?.passcode ?? ""}

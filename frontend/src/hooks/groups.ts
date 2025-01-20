@@ -6,11 +6,12 @@ import {
   fetchGroup,
   fetchGroups,
   HTTPError,
+  patchGroup,
   rivalsStoreKeys,
   StatusCodes,
 } from "@/api";
 import { queryClient } from "@/routes/__root";
-import { Group, Player, Profile } from "@/types";
+import { Group, PatchGroup, Player, Profile } from "@/types";
 
 import { usePagination } from "./paginate";
 import { useProfile } from "./profile";
@@ -112,6 +113,19 @@ export function useCreateGroup() {
   const { mutateAsync } = useMutation({
     mutationFn: (input: createGroupArgs) => {
       return createGroup(input.profile);
+    },
+  });
+  return mutateAsync;
+}
+
+type patchGroupArgs = {
+  patch: PatchGroup;
+};
+
+export function usePatchGroup(groupId: string) {
+  const { mutateAsync } = useMutation({
+    mutationFn: (input: patchGroupArgs) => {
+      return patchGroup(groupId, input.patch.open);
     },
   });
   return mutateAsync;
