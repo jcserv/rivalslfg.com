@@ -9,7 +9,6 @@ import { rivalslfgAPIClient } from "@/routes/__root";
 import {
   CreateGroupResponse,
   Gamemode,
-  getGroupFromProfile,
   Group,
   JoinGroupResponse,
   PaginatedQueryFnResponse,
@@ -23,10 +22,8 @@ export const createGroup = async (
   profile: Profile,
 ): Promise<CreateGroupResponse> => {
   const { groupId, playerId } = await rivalslfgAPIClient.createGroup(profile);
-  const newGroup = getGroupFromProfile(profile, groupId);
 
   rivalsStoreActions.setAuthedGroup(groupId);
-  rivalsStoreActions.upsertGroup(newGroup);
 
   return { groupId, playerId };
 };

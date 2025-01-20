@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jcserv/rivalslfg/internal/repository"
+	"github.com/jcserv/rivalslfg/internal/utils/log"
 )
 
 type Group struct {
@@ -43,6 +44,7 @@ func (s *Group) GetGroupByID(ctx context.Context, id string, isGroupOwner bool) 
 	}
 
 	if !isGroupOwner {
+		log.Info(ctx, "Removing passcode from group since user is not the owner")
 		group.Passcode = ""
 	}
 

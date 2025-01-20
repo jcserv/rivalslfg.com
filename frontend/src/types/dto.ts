@@ -35,7 +35,7 @@ export function getCreateGroupFromProfile(profile: Profile): CreateGroup {
     owner: profile.name,
     region: profile.region,
     gamemode: profile.gamemode,
-    open: true,
+    open: false,
 
     platform: profile.platform,
     role: profile.role,
