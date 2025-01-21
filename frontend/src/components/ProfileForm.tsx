@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 
 import { z } from "zod";
@@ -50,10 +49,6 @@ export function ProfileForm({
   profile,
   setProfile,
 }: ProfileFormProps) {
-  const [roleQueueEnabled, setRoleQueueEnabled] = useState(
-    profile?.roleQueue ? true : false,
-  );
-
   const { form, onSubmit, onClear, onReset } = useProfileForm({
     profileFormType,
     profile,
@@ -61,6 +56,7 @@ export function ProfileForm({
   });
 
   const isGroup = profileFormType === "create";
+  const roleQueueEnabled = form.watch("roleQueueEnabled");
 
   const personalInfo = (form: UseFormReturn<z.infer<typeof formSchema>>) => (
     <div>
@@ -137,14 +133,10 @@ export function ProfileForm({
                   {isGroup ? "Group" : "Advanced"}
                 </AccordionTrigger>
                 <AccordionContent className="flex flex-col gap-2 m-auto">
-                  <RoleQueueEnabledField
-                    form={form}
-                    roleQueueEnabled={roleQueueEnabled}
-                    setRoleQueueEnabled={setRoleQueueEnabled}
-                  />
+                  <RoleQueueEnabledField form={form} />
                   <div className="grid grid-cols-12 gap-4">
                     <div className="col-span-6">
-                      {roleQueueEnabled && <RoleQueueFields form={form} />}
+                      {roleQueueEnabled && profileFormType === 'create' && <RoleQueueFields form={form} />}
                     </div>
                   </div>
                   {isGroup && (

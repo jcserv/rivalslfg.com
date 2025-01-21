@@ -46,7 +46,7 @@ valid_group AS (
     AND g.platform = @platform
     -- Role queue check (only if enabled)
     AND (
-        (g.vanguards + g.duelists + g.strategists = 0)
+        (@role_queue_enabled::BOOLEAN IS NOT TRUE AND g.vanguards + g.duelists + g.strategists = 0)
         OR
         (
             -- Can fill at least one role
@@ -81,10 +81,7 @@ player_creation AS (
         rank,
         characters,
         voice_chat,
-        mic,
-        vanguards,
-        duelists,
-        strategists
+        mic
     )
     SELECT 
         @name,
@@ -93,10 +90,7 @@ player_creation AS (
         @rank_val,
         @characters,
         @voice_chat,
-        @mic,
-        @vanguards,
-        @duelists,
-        @strategists
+        @mic
     WHERE 
         NOT EXISTS (SELECT 1 FROM player_check)
         AND EXISTS (SELECT 1 FROM valid_group)

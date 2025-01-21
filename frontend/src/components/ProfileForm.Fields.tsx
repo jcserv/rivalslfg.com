@@ -168,7 +168,7 @@ export function RankField({ form }: FormFieldProps) {
                   role="combobox"
                   className={cn(
                     "w-full justify-between",
-                    !field.value && "text-muted-foreground",
+                    !field.value && "text-muted-foreground"
                   )}
                 >
                   {field.value
@@ -197,7 +197,7 @@ export function RankField({ form }: FormFieldProps) {
                             "mr-2 h-4 w-4",
                             rank.value === field.value
                               ? "opacity-100"
-                              : "opacity-0",
+                              : "opacity-0"
                           )}
                         />
                         {rank.label}
@@ -275,29 +275,33 @@ export function CharactersField({ form }: FormFieldProps) {
   );
 }
 
-interface RoleQueueEnabledFieldProps extends FormFieldProps {
-  roleQueueEnabled: boolean;
-  setRoleQueueEnabled: (enabled: boolean) => void;
-}
-
 export function RoleQueueEnabledField({
-  roleQueueEnabled,
-  setRoleQueueEnabled,
-}: RoleQueueEnabledFieldProps) {
+  form,
+}: FormFieldProps) {
   return (
     <>
-      <div className="flex items-center space-x-2 p-2">
-        <Checkbox
-          id="roleQueue"
-          checked={roleQueueEnabled}
-          onClick={() => setRoleQueueEnabled(!roleQueueEnabled)}
+      <div>
+        <FormField
+          control={form.control}
+          name="roleQueueEnabled"
+          render={({ field }) => (
+            <FormItem className="flex items-center space-x-2 p-2">
+              <Checkbox
+                id="roleQueue"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                className="mt-2"
+              />
+              <Label
+                htmlFor="roleQueue"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Enable Role Queue
+              </Label>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        <Label
-          htmlFor="roleQueue"
-          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          Enable Role Queue
-        </Label>
       </div>
       <div>
         <FormDescription>

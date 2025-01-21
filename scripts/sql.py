@@ -49,20 +49,13 @@ def generate_player(name, rank_val=None):
     # If no rank_val provided, generate a random one
     if rank_val is None:
         rank_val = random.choice(list(RANKS.values()))
-    
-    total = 6
-    vanguards = random.randint(0, total)
-    remaining = total - vanguards
-    duelists = random.randint(0, remaining)
-    strategists = remaining - duelists
 
     return (
         f"    ('{name}', '{random.choice(PLATFORMS)}', "
         f"'{role}', {rank_val}, "
         f"ARRAY{characters}, "
         f"{str(random.choice([True, False])).lower()}, "
-        f"{str(random.choice([True, False])).lower()}, "
-        f"{vanguards}, {duelists}, {strategists})"
+        f"{str(random.choice([True, False])).lower()})"
     )
 
 def generate_group(group_id, owner_name):
@@ -140,7 +133,7 @@ def generate_sql(num_groups=20):
 
     final_sql = [
         "-- Players",
-        "INSERT INTO Players (name, platform, role, rank, characters, voice_chat, mic, vanguards, duelists, strategists) VALUES",
+        "INSERT INTO Players (name, platform, role, rank, characters, voice_chat, mic) VALUES",
         ",\n".join(players_sql) + ";",
         "\n-- Groups",
         "INSERT INTO Groups (id, owner, region, gamemode, open, passcode, vanguards, duelists, strategists, platform, voice_chat, mic, created_at, updated_at, last_active_at) VALUES",

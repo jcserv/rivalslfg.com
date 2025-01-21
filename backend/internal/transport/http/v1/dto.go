@@ -313,19 +313,17 @@ type JoinGroup struct {
 	GroupID  string `json:"groupId"`
 	PlayerID int    `json:"playerId"`
 
-	Name        string   `json:"name"`
-	Passcode    string   `json:"passcode"`
-	Platform    string   `json:"platform"`
-	Gamemode    string   `json:"gamemode"`
-	Region      string   `json:"region"`
-	Role        string   `json:"role"`
-	RankID      string   `json:"rankId"`
-	Characters  []string `json:"characters"`
-	VoiceChat   bool     `json:"voiceChat"`
-	Mic         bool     `json:"mic"`
-	Vanguards   int      `json:"vanguards"`
-	Duelists    int      `json:"duelists"`
-	Strategists int      `json:"strategists"`
+	Name             string   `json:"name"`
+	Passcode         string   `json:"passcode"`
+	Platform         string   `json:"platform"`
+	Gamemode         string   `json:"gamemode"`
+	Region           string   `json:"region"`
+	Role             string   `json:"role"`
+	RankID           string   `json:"rankId"`
+	Characters       []string `json:"characters"`
+	VoiceChat        bool     `json:"voiceChat"`
+	Mic              bool     `json:"mic"`
+	RoleQueueEnabled bool     `json:"roleQueueEnabled"`
 }
 
 func (dto *JoinGroup) validate() error {
@@ -356,10 +354,6 @@ func (dto *JoinGroup) validate() error {
 	if valid := types.IsValidRankID(dto.RankID); !valid {
 		return fmt.Errorf("rankId %s is invalid", dto.RankID)
 	}
-
-	if err := types.ValidateRoleQueue(dto.Vanguards, dto.Duelists, dto.Strategists); err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -380,9 +374,7 @@ func (dto *JoinGroup) Parse() (*repository.JoinGroupParams, error) {
 	params.Characters = dto.Characters
 	params.VoiceChat = dto.VoiceChat
 	params.Mic = dto.Mic
-	params.Vanguards = int32(dto.Vanguards)
-	params.Duelists = int32(dto.Duelists)
-	params.Strategists = int32(dto.Strategists)
+	params.RoleQueueEnabled = dto.RoleQueueEnabled
 	return params, nil
 }
 

@@ -199,6 +199,7 @@ export type Profile = {
   characters: string[];
   voiceChat: boolean;
   mic: boolean;
+  roleQueueEnabled: boolean;
   roleQueue?: RoleQueue;
   groupSettings?: GroupSettings;
 };

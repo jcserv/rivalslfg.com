@@ -55,22 +55,22 @@ valid_group AS (
     AND g.platform = $6
     -- Role queue check (only if enabled)
     AND (
-        (g.vanguards + g.duelists + g.strategists = 0)
+        ($7::BOOLEAN IS NOT TRUE AND g.vanguards + g.duelists + g.strategists = 0)
         OR
         (
             -- Can fill at least one role
-            ($7::TEXT = 'vanguard' AND gd.curr_vanguards < g.vanguards)
-            OR ($7::TEXT = 'duelist' AND gd.curr_duelists < g.duelists)
-            OR ($7::TEXT = 'strategist' AND gd.curr_strategists < g.strategists)
+            ($8::TEXT = 'vanguard' AND gd.curr_vanguards < g.vanguards)
+            OR ($8::TEXT = 'duelist' AND gd.curr_duelists < g.duelists)
+            OR ($8::TEXT = 'strategist' AND gd.curr_strategists < g.strategists)
         )
     )
     -- Rank check
     AND (
         -- Allow Bronze-Gold players to group with each other
-        $8::INTEGER BETWEEN 0 AND 22 AND gd.min_rank BETWEEN 0 AND 22
+        $9::INTEGER BETWEEN 0 AND 22 AND gd.min_rank BETWEEN 0 AND 22
         OR (
-            ABS(gd.min_rank - $8::INTEGER) <= 10
-            AND ABS(gd.max_rank - $8::INTEGER) <= 10
+            ABS(gd.min_rank - $9::INTEGER) <= 10
+            AND ABS(gd.max_rank - $9::INTEGER) <= 10
         )
     )
     -- If group is not open, check if passcode is correct
@@ -89,22 +89,16 @@ player_creation AS (
         rank,
         characters,
         voice_chat,
-        mic,
-        vanguards,
-        duelists,
-        strategists
+        mic
     )
     SELECT 
-        $9,
-        $6::TEXT,
-        $7,
-        $8,
         $10,
+        $6::TEXT,
+        $8,
+        $9,
         $11,
         $12,
-        $13,
-        $14,
-        $15
+        $13
     WHERE 
         NOT EXISTS (SELECT 1 FROM player_check)
         AND EXISTS (SELECT 1 FROM valid_group)
@@ -151,21 +145,19 @@ SELECT
 `
 
 type JoinGroupParams struct {
-	GroupID     string   `json:"group_id"`
-	Passcode    string   `json:"passcode"`
-	PlayerID    int32    `json:"player_id"`
-	Gamemode    string   `json:"gamemode"`
-	Region      string   `json:"region"`
-	Platform    string   `json:"platform"`
-	Role        string   `json:"role"`
-	RankVal     int32    `json:"rank_val"`
-	Name        string   `json:"name"`
-	Characters  []string `json:"characters"`
-	VoiceChat   bool     `json:"voice_chat"`
-	Mic         bool     `json:"mic"`
-	Vanguards   int32    `json:"vanguards"`
-	Duelists    int32    `json:"duelists"`
-	Strategists int32    `json:"strategists"`
+	GroupID          string   `json:"group_id"`
+	Passcode         string   `json:"passcode"`
+	PlayerID         int32    `json:"player_id"`
+	Gamemode         string   `json:"gamemode"`
+	Region           string   `json:"region"`
+	Platform         string   `json:"platform"`
+	RoleQueueEnabled bool     `json:"role_queue_enabled"`
+	Role             string   `json:"role"`
+	RankVal          int32    `json:"rank_val"`
+	Name             string   `json:"name"`
+	Characters       []string `json:"characters"`
+	VoiceChat        bool     `json:"voice_chat"`
+	Mic              bool     `json:"mic"`
 }
 
 type JoinGroupRow struct {
@@ -186,15 +178,13 @@ func (q *Queries) JoinGroup(ctx context.Context, arg JoinGroupParams) (JoinGroup
 		arg.Gamemode,
 		arg.Region,
 		arg.Platform,
+		arg.RoleQueueEnabled,
 		arg.Role,
 		arg.RankVal,
 		arg.Name,
 		arg.Characters,
 		arg.VoiceChat,
 		arg.Mic,
-		arg.Vanguards,
-		arg.Duelists,
-		arg.Strategists,
 	)
 	var i JoinGroupRow
 	err := row.Scan(&i.Status, &i.PlayerID)
