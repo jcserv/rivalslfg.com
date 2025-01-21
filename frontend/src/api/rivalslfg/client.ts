@@ -111,9 +111,7 @@ export class RivalsLFGClient extends HTTPClient {
           characters: player.characters,
           voiceChat: player.voiceChat,
           mic: player.mic,
-          vanguards: player.roleQueue?.vanguards ?? 0,
-          duelists: player.roleQueue?.duelists ?? 0,
-          strategists: player.roleQueue?.strategists ?? 0,
+          roleQueueEnabled: player.roleQueueEnabled,
         }),
       },
     );
