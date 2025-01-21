@@ -138,7 +138,7 @@ function ChatItem({ message }: ChatMessageProps) {
   if (message.system) {
     return (
       <div>
-        <span className="flex items-center">
+        <span className="flex items-center justify-between">
           <p className="text-sm break-words italic mr-2">{message.content}</p>
           <p className="text-sm">{formatTimestamp(message.timestamp)}</p>
         </span>

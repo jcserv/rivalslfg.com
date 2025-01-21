@@ -63,10 +63,10 @@ func (s *Player) RemovePlayer(ctx context.Context, arg repository.RemovePlayerPa
 
 	switch result.Status {
 	case "200":
-		s.publisher.PlayerLeft(ctx, arg.GroupID, reqCtx.GetPlayerID(ctx), int(arg.PlayerID), int(result.NewLeaderID))
+		s.publisher.PlayerLeft(ctx, arg.GroupID, reqCtx.GetPlayerID(ctx), int(arg.PlayerID), result.PlayerName, int(result.NewLeaderID))
 		return result.Status, nil
 	case "204":
-		// TODO: Emit event to notify users on group page that group is deleted
+		s.publisher.GroupDeleted(ctx, arg.GroupID, reqCtx.GetPlayerID(ctx))
 		return result.Status, nil
 	case "404":
 		return "", NewError(http.StatusNotFound, "Player not found.", nil)

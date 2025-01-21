@@ -8,7 +8,7 @@ import (
 
 type IPublisher interface {
 	PlayerJoined(ctx context.Context, groupID string, player *repository.PlayerInGroup) error
-	PlayerLeft(ctx context.Context, groupID string, userID int, playerRemoved int, leaderID int) error
+	PlayerLeft(ctx context.Context, groupID string, userID int, playerRemoved int, playerRemovedName string, leaderID int) error
 	GroupDeleted(ctx context.Context, groupID string, userID int) error
 }
 
@@ -28,14 +28,16 @@ func (p *Publisher) PlayerJoined(ctx context.Context, groupID string, player *re
 }
 
 type PlayerLeftPayload struct {
-	PlayerID int `json:"playerId"`
-	LeaderID int `json:"leaderId"`
+	PlayerID   int    `json:"playerId"`
+	PlayerName string `json:"playerName"`
+	LeaderID   int    `json:"leaderId"`
 }
 
-func (p *Publisher) PlayerLeft(ctx context.Context, groupID string, userID int, playerLeft int, leaderID int) error {
+func (p *Publisher) PlayerLeft(ctx context.Context, groupID string, userID int, playerRemoved int, playerRemovedName string, leaderID int) error {
 	msg := NewMessage(groupID, userID, EventTypeGroupLeave, &PlayerLeftPayload{
-		PlayerID: playerLeft,
-		LeaderID: leaderID,
+		PlayerID:   playerRemoved,
+		PlayerName: playerRemovedName,
+		LeaderID:   leaderID,
 	})
 	return p.exchange.Publish(ctx, msg)
 }
