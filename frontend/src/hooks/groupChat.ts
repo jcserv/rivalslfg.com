@@ -23,6 +23,7 @@ export type ChatMessage = {
 
 type PlayerLeftPayload = {
   playerId: number;
+  playerName: string;
   leaderId: number;
 };
 
@@ -35,7 +36,7 @@ export function useGroupChat(groupId: string) {
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  const messageHandler = useCallback((message: WebSocketMessage) => {
+  const messageHandler = useCallback(async (message: WebSocketMessage) => {
     switch (message.op) {
       case WebSocketOp.GroupChat: {
         const chatMessage = message.payload as ChatMessage;
@@ -67,7 +68,7 @@ export function useGroupChat(groupId: string) {
             id: crypto.randomUUID(),
             system: true,
             sender: "System",
-            content: `${payload.playerId} has left the group.`, // TODO: add player name
+            content: `${payload.playerName} has left the group.`,
             timestamp: new Date().toISOString(),
           },
         ]);

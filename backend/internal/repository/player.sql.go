@@ -204,8 +204,9 @@ func (q *Queries) JoinGroup(ctx context.Context, arg JoinGroupParams) (JoinGroup
 const removePlayer = `-- name: RemovePlayer :one
 WITH group_check AS (
     -- Check if group exists and player is in it
-    SELECT group_id, player_id, leader
+    SELECT gm.group_id, gm.player_id, gm.leader, p.name as player_name
     FROM GroupMembers gm
+    JOIN Players p ON p.id = gm.player_id 
     WHERE gm.group_id = $1
     AND gm.player_id = $2
     LIMIT 1
@@ -280,12 +281,16 @@ SELECT
         WHEN EXISTS (SELECT 1 FROM is_last_member WHERE is_last) THEN
             '204'::TEXT  -- Last member left, group will be deleted
         ELSE
-            '200'::TEXT  -- Successfully removed player
+            '200'::TEXT  -- Successfully removed player 
     END as status,
     COALESCE(
         (SELECT player_id FROM next_leader),
         0
-    )::INTEGER as new_leader_id
+    )::INTEGER as new_leader_id,
+    COALESCE(
+        (SELECT player_name FROM group_check),
+        ''
+    )::TEXT as player_name
 `
 
 type RemovePlayerParams struct {
@@ -296,11 +301,12 @@ type RemovePlayerParams struct {
 type RemovePlayerRow struct {
 	Status      string `json:"status"`
 	NewLeaderID int32  `json:"new_leader_id"`
+	PlayerName  string `json:"player_name"`
 }
 
 func (q *Queries) RemovePlayer(ctx context.Context, arg RemovePlayerParams) (RemovePlayerRow, error) {
 	row := q.db.QueryRow(ctx, removePlayer, arg.GroupID, arg.PlayerID)
 	var i RemovePlayerRow
-	err := row.Scan(&i.Status, &i.NewLeaderID)
+	err := row.Scan(&i.Status, &i.NewLeaderID, &i.PlayerName)
 	return i, err
 }

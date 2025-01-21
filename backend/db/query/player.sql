@@ -146,8 +146,9 @@ SELECT
 -- name: RemovePlayer :one
 WITH group_check AS (
     -- Check if group exists and player is in it
-    SELECT *
+    SELECT gm.*, p.name as player_name
     FROM GroupMembers gm
+    JOIN Players p ON p.id = gm.player_id 
     WHERE gm.group_id = @group_id
     AND gm.player_id = @player_id
     LIMIT 1
@@ -222,9 +223,13 @@ SELECT
         WHEN EXISTS (SELECT 1 FROM is_last_member WHERE is_last) THEN
             '204'::TEXT  -- Last member left, group will be deleted
         ELSE
-            '200'::TEXT  -- Successfully removed player
+            '200'::TEXT  -- Successfully removed player 
     END as status,
     COALESCE(
         (SELECT player_id FROM next_leader),
         0
-    )::INTEGER as new_leader_id;
+    )::INTEGER as new_leader_id,
+    COALESCE(
+        (SELECT player_name FROM group_check),
+        ''
+    )::TEXT as player_name;
