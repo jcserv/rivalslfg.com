@@ -5,6 +5,12 @@
 - [X] Add new characters Mr. Fantastic (Duelist) and Invisible Woman (Strategist)
 - [X] Allow ranks bronze-gold to group up with each other
 - [X] Fix bug where, after joining a group, you're asked to re-auth. Can't re-join since you're already in a group
+- [ ] Matchmaking
+- [ ] Set default filters based on user profile (region=, gamemode=, canjoin=) (\*)
+- [ ] Profanity filters
+- [ ] Fix responsiveness of multi-select
+- [ ] Bug where group updates are lost sometimes?
+- [ ] Add indices to tables
 
 ## frontend
 
@@ -20,11 +26,9 @@ FE-Only:
   - Allowed: . - \_ ' < >
 - [x] Group should be private by default
 - [x] Chat
-- [/] Matchmaking
-- [ ] Set default filters based on user profile (region=, gamemode=, canjoin=) (\*)
 - [x] Remove player from group
 - [X] Replace hard-coded player IDs
-- [ ] Fix responsiveness of multi-select & dark mode
+
 
 API Integration:
 
@@ -36,7 +40,7 @@ API Integration:
 - [x] Integrate Group Page
 - [x] Integrate Join Group
 - [x] Integrate remove player from group
-- [ ] Chat
+- [X] Chat
 - [ ] Matchmaking
 - [X] Pagination: Server-side filtering
   - [X] open
@@ -67,18 +71,18 @@ Bugs:
        - Voice Chat
        - Mic
 2. [X] Upsert Group
-3. [ ] Delete Group
+3. [X] Delete Group
 4. [X] Join Group (if private, authenticate provided passcode)
 5. [X] Remove Player from Group
 6. [X] Leave Group
 7. [X] Get Group Passcode
 8. Chat
 - [X] Middleware to log events
-- [ ] Manage state in Redis to make ws server stateless
+- [X] Manage state in Redis to make ws server stateless
 - [X] Refactor code so its similar to http handlers
-- [ ] Group updates
-- [ ] Authentication
-- [ ] Redis messaging between servers
+- [X] Group updates
+- [X] Authentication
+- [X] Redis messaging between servers
 
 1.  Matchmaking
    - Find groups the user can join
@@ -97,7 +101,7 @@ Bugs:
 - [X] Can get into a state where you can't leave a group
 
 Before release:
-- [ ] Squash migrations into one, remove seed data
+- [X] Squash migrations into one, remove seed data
 
 * indicates these are good first issues
 

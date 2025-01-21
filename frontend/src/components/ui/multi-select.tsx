@@ -216,7 +216,7 @@ export const MultiSelect = React.forwardRef<
                         {IconComponent && (
                           <IconComponent className="h-4 w-4 mr-2" />
                         )}
-                        {option?.label}
+                        {option?.label.split("-")[0].trim()}
                         <XCircle
                           className="ml-2 h-4 w-4 cursor-pointer"
                           onClick={(event) => {
