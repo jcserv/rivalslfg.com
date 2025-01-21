@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jcserv/rivalslfg/internal/utils/log"
 	"github.com/lxzan/gws"
 )
 
@@ -38,13 +37,13 @@ func NewClient(hub *Hub, conn *gws.Conn) *Client {
 }
 
 type ClientHandler struct {
-	hub    *Hub
-	client *Client
+	hub     *Hub
+	client  *Client
+	groupID string
 }
 
 func (h *ClientHandler) OnOpen(socket *gws.Conn) {
 	_ = socket.SetDeadline(time.Now().Add(PingInterval + PingWait))
-	h.client = NewClient(h.hub, socket)
 }
 
 func (h *ClientHandler) OnClose(socket *gws.Conn, _ error) {
@@ -73,11 +72,6 @@ func (h *ClientHandler) OnMessage(socket *gws.Conn, message *gws.Message) {
 		return
 	}
 
-	if _, ok := h.hub.clientGroups[h.client]; !ok {
-		log.Warn(ctx, "Received message from unregistered client")
-		return
-	}
-
 	if handler, exists := h.client.eventHandlers[msg.Op]; exists {
 		if err := handler.Handle(ctx, h.client, message.Bytes()); err != nil {
 			return
@@ -86,13 +80,14 @@ func (h *ClientHandler) OnMessage(socket *gws.Conn, message *gws.Message) {
 }
 
 func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
-	client := &Client{
-		hub: hub,
+	groupID := r.URL.Query().Get("groupId")
+	if groupID == "" {
+		return
 	}
 
 	handler := &ClientHandler{
-		hub:    hub,
-		client: client,
+		hub:     hub,
+		groupID: groupID,
 	}
 
 	loggingHandler := NewLoggingMiddleware(handler)
@@ -111,15 +106,11 @@ func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-
+	client := NewClient(hub, conn)
+	handler.client = client
 	client.conn = conn
 
-	groupId := r.URL.Query().Get("groupId")
-	if groupId == "" {
-		return
-	}
-
-	hub.RegisterClient(groupId, client)
+	hub.RegisterClient(groupID, client)
 
 	go func() {
 		conn.ReadLoop() // Blocking prevents the context from being GC
