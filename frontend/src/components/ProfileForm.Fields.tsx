@@ -275,29 +275,31 @@ export function CharactersField({ form }: FormFieldProps) {
   );
 }
 
-interface RoleQueueEnabledFieldProps extends FormFieldProps {
-  roleQueueEnabled: boolean;
-  setRoleQueueEnabled: (enabled: boolean) => void;
-}
-
-export function RoleQueueEnabledField({
-  roleQueueEnabled,
-  setRoleQueueEnabled,
-}: RoleQueueEnabledFieldProps) {
+export function RoleQueueEnabledField({ form }: FormFieldProps) {
   return (
     <>
-      <div className="flex items-center space-x-2 p-2">
-        <Checkbox
-          id="roleQueue"
-          checked={roleQueueEnabled}
-          onClick={() => setRoleQueueEnabled(!roleQueueEnabled)}
+      <div>
+        <FormField
+          control={form.control}
+          name="roleQueueEnabled"
+          render={({ field }) => (
+            <FormItem className="flex items-center space-x-2 p-2">
+              <Checkbox
+                id="roleQueue"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                className="mt-2"
+              />
+              <Label
+                htmlFor="roleQueue"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Enable Role Queue
+              </Label>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        <Label
-          htmlFor="roleQueue"
-          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          Enable Role Queue
-        </Label>
       </div>
       <div>
         <FormDescription>

@@ -134,12 +134,7 @@ CREATE TABLE Players (
     rank INTEGER NOT NULL,
     characters TEXT[] NOT NULL,
     voice_chat BOOLEAN NOT NULL,
-    mic BOOLEAN NOT NULL,
-    
-    -- role_queue
-    vanguards INTEGER NOT NULL DEFAULT 0,
-    duelists INTEGER NOT NULL DEFAULT 0,
-    strategists INTEGER NOT NULL DEFAULT 0
+    mic BOOLEAN NOT NULL
 );
 
 CREATE TABLE GroupMembers (

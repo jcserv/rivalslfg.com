@@ -43,17 +43,14 @@ type Groupmember struct {
 }
 
 type Player struct {
-	ID          int32    `json:"id"`
-	Name        string   `json:"name"`
-	Platform    string   `json:"platform"`
-	Role        string   `json:"role"`
-	Rank        int32    `json:"rank"`
-	Characters  []string `json:"characters"`
-	VoiceChat   bool     `json:"voice_chat"`
-	Mic         bool     `json:"mic"`
-	Vanguards   int32    `json:"vanguards"`
-	Duelists    int32    `json:"duelists"`
-	Strategists int32    `json:"strategists"`
+	ID         int32    `json:"id"`
+	Name       string   `json:"name"`
+	Platform   string   `json:"platform"`
+	Role       string   `json:"role"`
+	Rank       int32    `json:"rank"`
+	Characters []string `json:"characters"`
+	VoiceChat  bool     `json:"voice_chat"`
+	Mic        bool     `json:"mic"`
 }
 
 type Rank struct {

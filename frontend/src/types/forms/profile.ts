@@ -16,6 +16,7 @@ export const formSchema = z.object({
   voiceChat: z.boolean(),
   mic: z.boolean(),
   characters: z.array(z.string()),
+  roleQueueEnabled: z.boolean(),
   roleQueue: z
     .object({
       vanguards: z
@@ -52,6 +53,7 @@ export const emptyState = {
   characters: [] as string[],
   voiceChat: false,
   mic: false,
+  roleQueueEnabled: false,
   roleQueue: {
     vanguards: 0,
     duelists: 0,
