@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/jcserv/rivalslfg/internal/message"
-	"github.com/jcserv/rivalslfg/internal/transport/http/reqCtx"
 	"github.com/jcserv/rivalslfg/internal/utils/log"
 	"github.com/lxzan/gws"
 )
@@ -33,14 +32,14 @@ type Hub struct {
 	// Map of group ID to set of client connections
 	groups map[string]map[*Client]bool
 	// Map of client to its current group ID
-	clientGroups map[*Client]*ClientInfo
+	clientGroups map[*Client]string
 }
 
 func NewHub(exchange message.Exchange) *Hub {
 	return &Hub{
 		exchange:     exchange,
 		groups:       make(map[string]map[*Client]bool),
-		clientGroups: make(map[*Client]*ClientInfo),
+		clientGroups: make(map[*Client]string),
 	}
 }
 
@@ -63,44 +62,29 @@ func (h *Hub) Run(ctx context.Context) {
 	}
 }
 
-func (h *Hub) RegisterClient(authInfo *reqCtx.AuthInfo, client *Client) {
+func (h *Hub) RegisterClient(groupID string, client *Client) {
 	h.Lock()
 	defer h.Unlock()
 
-	// Unregister any existing connections for this player
-	for existingClient, info := range h.clientGroups {
-		if info.PlayerID == authInfo.PlayerID && info.GroupID == authInfo.GroupID {
-			h.unregisterClientLocked(existingClient)
-		}
+	if h.groups[groupID] == nil {
+		h.groups[groupID] = make(map[*Client]bool)
 	}
-
-	if h.groups[authInfo.GroupID] == nil {
-		h.groups[authInfo.GroupID] = make(map[*Client]bool)
-	}
-	h.groups[authInfo.GroupID][client] = true
-	h.clientGroups[client] = &ClientInfo{
-		GroupID:  authInfo.GroupID,
-		PlayerID: authInfo.PlayerID,
-	}
+	h.groups[groupID][client] = true
+	h.clientGroups[client] = groupID
 }
 
 func (h *Hub) UnregisterClient(client *Client) {
 	h.Lock()
 	defer h.Unlock()
 
-	h.unregisterClientLocked(client)
-}
-
-func (h *Hub) unregisterClientLocked(client *Client) {
-	if clientInfo, ok := h.clientGroups[client]; ok {
+	if groupID, ok := h.clientGroups[client]; ok {
 		delete(h.clientGroups, client)
-		if clients, exists := h.groups[clientInfo.GroupID]; exists {
+		if clients, exists := h.groups[groupID]; exists {
 			delete(clients, client)
 			if len(clients) == 0 {
-				delete(h.groups, clientInfo.GroupID)
+				delete(h.groups, groupID)
 			}
 		}
-		client.conn.NetConn().Close()
 	}
 }
 
@@ -115,12 +99,8 @@ func (h *Hub) Broadcast(ctx context.Context, msg Message) error {
 		}
 
 		for client := range clients {
-			info, exists := h.clientGroups[client]
-			if !exists {
-				continue
-			}
 			if err := client.conn.WriteMessage(gws.OpcodeText, msgBytes); err != nil {
-				log.Warn(ctx, fmt.Sprintf("Error writing message to client %d: %v", info.PlayerID, err))
+				log.Warn(ctx, fmt.Sprintf("Error writing message to client: %v", err))
 				h.UnregisterClient(client)
 			}
 		}
@@ -149,15 +129,8 @@ func (h *Hub) handleRedisMessages(ctx context.Context, ch <-chan *redis.Message)
 				}
 
 				for client := range clients {
-					info, exists := h.clientGroups[client]
-					if !exists {
-						continue
-					}
-
-					if info.PlayerID != event.PlayerID {
-						data, _ := json.Marshal(wsMsg)
-						client.conn.WriteMessage(gws.OpcodeText, data)
-					}
+					data, _ := json.Marshal(wsMsg)
+					client.conn.WriteMessage(gws.OpcodeText, data)
 				}
 			}
 			h.RUnlock()
