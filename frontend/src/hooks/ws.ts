@@ -12,8 +12,6 @@ export function useWebSocket(groupId: string) {
   >("disconnected");
   const [profile] = useProfile();
 
-  const token = localStorage.getItem("token");
-
   const clientRef = useRef<WebSocketClient | null>(null);
 
   useEffect(() => {
@@ -31,7 +29,7 @@ export function useWebSocket(groupId: string) {
       setClient(null);
       setConnectionStatus("disconnected");
     };
-  }, [groupId, profile.id, token]);
+  }, [groupId, profile.id]);
 
   const subscribe = useCallback((handler: WebSocketHandler) => {
     if (!clientRef.current) return () => {};
