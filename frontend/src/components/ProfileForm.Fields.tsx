@@ -168,7 +168,7 @@ export function RankField({ form }: FormFieldProps) {
                   role="combobox"
                   className={cn(
                     "w-full justify-between",
-                    !field.value && "text-muted-foreground"
+                    !field.value && "text-muted-foreground",
                   )}
                 >
                   {field.value
@@ -197,7 +197,7 @@ export function RankField({ form }: FormFieldProps) {
                             "mr-2 h-4 w-4",
                             rank.value === field.value
                               ? "opacity-100"
-                              : "opacity-0"
+                              : "opacity-0",
                           )}
                         />
                         {rank.label}
@@ -275,9 +275,7 @@ export function CharactersField({ form }: FormFieldProps) {
   );
 }
 
-export function RoleQueueEnabledField({
-  form,
-}: FormFieldProps) {
+export function RoleQueueEnabledField({ form }: FormFieldProps) {
   return (
     <>
       <div>

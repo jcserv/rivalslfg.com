@@ -136,7 +136,9 @@ export function ProfileForm({
                   <RoleQueueEnabledField form={form} />
                   <div className="grid grid-cols-12 gap-4">
                     <div className="col-span-6">
-                      {roleQueueEnabled && profileFormType === 'create' && <RoleQueueFields form={form} />}
+                      {roleQueueEnabled && profileFormType === "create" && (
+                        <RoleQueueFields form={form} />
+                      )}
                     </div>
                   </div>
                   {isGroup && (

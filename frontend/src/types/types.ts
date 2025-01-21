@@ -281,6 +281,7 @@ export type Group = {
 type GroupInfo = {
   minRank: number;
   maxRank: number;
+  arePlayersBetweenBronzeAndGold: boolean;
   currVanguards: number;
   currDuelists: number;
   currStrategists: number;
@@ -292,6 +293,7 @@ export function getGroupInfo(group: Group | undefined): GroupInfo {
     return {
       minRank: 0,
       maxRank: 0,
+      arePlayersBetweenBronzeAndGold: false,
       currVanguards: 0,
       currDuelists: 0,
       currStrategists: 0,
@@ -301,16 +303,21 @@ export function getGroupInfo(group: Group | undefined): GroupInfo {
     return {
       minRank: 0,
       maxRank: 0,
+      arePlayersBetweenBronzeAndGold: false,
       currVanguards: 0,
       currDuelists: 0,
       currStrategists: 0,
       currCharacters: new Set<string>(),
     };
-  return group.players.reduce(
+
+  const groupInfo = group.players.reduce(
     (acc, player) => {
       const rankKey = player.rank as RankKey;
       acc.minRank = Math.min(acc.minRank, RankVals[rankKey]);
       acc.maxRank = Math.max(acc.maxRank, RankVals[rankKey]);
+
+      if (RankVals[rankKey] > RankVals["g1"])
+        acc.arePlayersBetweenBronzeAndGold = false;
       acc.currVanguards += player.role === "vanguard" ? 1 : 0;
       acc.currDuelists += player.role === "duelist" ? 1 : 0;
       acc.currStrategists += player.role === "strategist" ? 1 : 0;
@@ -320,12 +327,20 @@ export function getGroupInfo(group: Group | undefined): GroupInfo {
     {
       minRank: RankVals["oa"],
       maxRank: RankVals["b1"],
+      arePlayersBetweenBronzeAndGold: true,
       currVanguards: 0,
       currDuelists: 0,
       currStrategists: 0,
       currCharacters: new Set<string>(),
     },
   );
+
+  if (groupInfo.arePlayersBetweenBronzeAndGold) {
+    groupInfo.minRank = RankVals["b3"];
+    groupInfo.maxRank = RankVals["g1"];
+  }
+
+  return groupInfo;
 }
 
 export type GroupRequirements = {
