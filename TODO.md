@@ -6,9 +6,9 @@
 - [X] Allow ranks bronze-gold to group up with each other
 - [X] Fix bug where, after joining a group, you're asked to re-auth. Can't re-join since you're already in a group
 - [ ] Matchmaking
-- [ ] Set default filters based on user profile (region=, gamemode=, canjoin=) (\*)
+- [X] Set default filters based on user profile (region=, gamemode=, canjoin=) (\*)
 - [ ] Profanity filters
-- [ ] Fix responsiveness of multi-select
+- [X] Fix responsiveness of multi-select
 - [ ] Bug where group updates are lost sometimes?
 - [ ] Add indices to tables
 

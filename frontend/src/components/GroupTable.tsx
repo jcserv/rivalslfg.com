@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 
+import { ColumnFiltersState, OnChangeFn } from "@tanstack/react-table";
+
 import { columns } from "@/components/GroupTable.Columns";
 import { DataTable } from "@/components/ui";
 import { useGroups } from "@/hooks";
@@ -8,9 +10,18 @@ import { areRequirementsMet, getRequirements, Group, Profile } from "@/types";
 interface GroupTableProps {
   profile: Profile | undefined;
   isProfileEmpty: boolean;
+  filters: ColumnFiltersState;
+  handleColumnFiltersChange: OnChangeFn<ColumnFiltersState>;
+  handleClearFilters: () => void;
 }
 
-export function GroupTable({ profile, isProfileEmpty }: GroupTableProps) {
+export function GroupTable({
+  profile,
+  isProfileEmpty,
+  filters,
+  handleColumnFiltersChange,
+  handleClearFilters,
+}: GroupTableProps) {
   const { data, pagination, isLoading } = useGroups();
   const groups: Group[] = !isLoading ? data : [];
 
@@ -33,6 +44,9 @@ export function GroupTable({ profile, isProfileEmpty }: GroupTableProps) {
       columns={columns(isProfileEmpty)}
       pagination={pagination}
       isLoading={isLoading}
+      filters={filters}
+      handleColumnFiltersChange={handleColumnFiltersChange}
+      handleClearFilters={handleClearFilters}
     />
   );
 }

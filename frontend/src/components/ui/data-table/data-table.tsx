@@ -2,6 +2,7 @@ import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
+  OnChangeFn,
   SortingState,
   VisibilityState,
   flexRender,
@@ -32,6 +33,9 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   pagination?: PaginationState;
   isLoading?: boolean;
+  filters?: ColumnFiltersState;
+  handleColumnFiltersChange?: OnChangeFn<ColumnFiltersState>;
+  handleClearFilters?: () => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -39,19 +43,19 @@ export function DataTable<TData, TValue>({
   data,
   pagination,
   isLoading,
+  filters,
+  handleColumnFiltersChange,
+  handleClearFilters,
 }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
 
   React.useEffect(() => {
     if (pagination?.setFilters) {
-      pagination.setFilters(columnFilters);
+      pagination.setFilters(filters ?? []);
     }
-  }, [columnFilters]);
+  }, [filters]);
 
-  const [sorting, setSorting] = React.useState<SortingState>([]);
   const table = useReactTable({
     data,
     columns,
@@ -61,7 +65,7 @@ export function DataTable<TData, TValue>({
         open: false,
       },
       rowSelection,
-      columnFilters,
+      columnFilters: filters,
       ...(pagination
         ? {
             pageSize: pagination.pageSize,
@@ -72,7 +76,7 @@ export function DataTable<TData, TValue>({
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    onColumnFiltersChange: handleColumnFiltersChange,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -97,12 +101,13 @@ export function DataTable<TData, TValue>({
     if (pagination?.refetch) {
       pagination.refetch();
     }
-  }, [columnFilters]);
+  }, [filters]);
 
   return (
     <div className="space-y-4">
       <DataTableToolbar
         table={table}
+        handleClearFilters={handleClearFilters}
         rightAdornment={
           <DataTablePagination
             table={table}

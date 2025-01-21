@@ -15,11 +15,13 @@ import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
+  handleClearFilters?: () => void;
   rightAdornment?: React.ReactNode;
 }
 
 export function DataTableToolbar<TData>({
   table,
+  handleClearFilters,
   rightAdornment,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
@@ -72,7 +74,10 @@ export function DataTableToolbar<TData>({
         {isFiltered && (
           <Button
             variant="ghost"
-            onClick={() => table.resetColumnFilters()}
+            onClick={() => {
+              table.resetColumnFilters();
+              if (handleClearFilters) handleClearFilters();
+            }}
             className="h-8 px-2 lg:px-3"
           >
             Clear
