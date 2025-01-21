@@ -143,3 +143,10 @@ CREATE TABLE GroupMembers (
     leader BOOLEAN NOT NULL,
     PRIMARY KEY (group_id, player_id)
 );
+
+CREATE INDEX idx_groups_region ON Groups (region) WHERE region IS NOT NULL;
+CREATE INDEX idx_groups_gamemode ON Groups (gamemode) WHERE gamemode IS NOT NULL;
+CREATE INDEX idx_groups_platform ON Groups (platform) WHERE platform IS NOT NULL;
+
+CREATE INDEX idx_group_members_group ON GroupMembers (group_id);
+CREATE INDEX idx_group_members_player ON GroupMembers (player_id);
