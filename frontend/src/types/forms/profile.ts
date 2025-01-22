@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { containsProfanity } from "@/lib";
 import { Gamemode, Platform, Rank, Region, Roles } from "@/types/types";
 
 export const formSchema = z.object({
@@ -7,7 +8,11 @@ export const formSchema = z.object({
     .string()
     .min(3, "Username must be at least 3 characters")
     .max(14, "Username cannot exceed 14 characters")
-    .regex(/^[a-zA-Z0-9.\-_'<>]+$/, "Username contains invalid characters."),
+    .regex(/^[a-zA-Z0-9.\-_'<>]+$/, "Username contains invalid characters.")
+    .refine((val) => !containsProfanity(val), {
+      message:
+        "Username contains restricted words. If you believe this is an error, please open an issue on GitHub.",
+    }),
   region: z.nativeEnum(Region).or(z.string()),
   platform: z.nativeEnum(Platform).or(z.string()),
   gamemode: z.nativeEnum(Gamemode).or(z.string()),

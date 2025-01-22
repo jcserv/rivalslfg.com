@@ -10,7 +10,7 @@
 - [ ] Profanity filters
 - [X] Fix responsiveness of multi-select
 - [ ] Bug where group updates are lost sometimes?
-- [ ] Add indices to tables
+- [X] Add indices to tables
 
 ## frontend
 

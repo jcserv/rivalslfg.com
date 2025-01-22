@@ -1,3 +1,4 @@
+export * from "./chatForm";
 export * from "./groupChat";
 export * from "./groups";
 export * from "./localStorage";

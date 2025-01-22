@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { useParams } from "@tanstack/react-router";
 import { Send } from "lucide-react";
@@ -9,6 +9,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  Form,
+  FormField,
+  FormItem,
+  FormMessage,
   Skeleton,
 } from "@/components/ui";
 import { Button } from "@/components/ui/button";
@@ -18,7 +22,7 @@ import {
   ChatInput,
   ChatMessageList,
 } from "@/components/ui/chat";
-import { ChatMessage, useGroupChat, useProfile } from "@/hooks";
+import { ChatMessage, useChatForm, useGroupChat, useProfile } from "@/hooks";
 import { formatTimestamp } from "@/lib";
 
 const userColors = [
@@ -51,7 +55,6 @@ export function ChatBox({ canUserAccessGroup, isPlayerInGroup }: ChatBoxProps) {
   const [profile] = useProfile();
   const { messages, sendMessage, connectionStatus } = useGroupChat(groupId);
 
-  const [newMessage, setNewMessage] = useState("");
   const messagesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -60,24 +63,13 @@ export function ChatBox({ canUserAccessGroup, isPlayerInGroup }: ChatBoxProps) {
     }
   }, [messages]);
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newMessage.trim()) {
-      sendMessage(newMessage.trim());
-      setNewMessage("");
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // Prevents adding a new line in the input
-      if (newMessage.trim()) {
-        handleSendMessage(e as unknown as React.FormEvent);
-      }
-    }
-  };
+  const { form, handleSubmit, handleKeyDown } = useChatForm({
+    onSubmit: (message) => sendMessage(message),
+  });
 
   const isConnected = connectionStatus === "connected";
+  const isDisabled = !isPlayerInGroup || !isConnected;
+  const isSendDisabled = isDisabled || form.watch("message").length === 0;
 
   return (
     <Card>
@@ -105,26 +97,32 @@ export function ChatBox({ canUserAccessGroup, isPlayerInGroup }: ChatBoxProps) {
         )}
       </CardContent>
       <CardFooter className="p-2 w-full">
-        <form
-          onSubmit={handleSendMessage}
-          className="flex align-center gap-2 w-full m-2"
-        >
-          <ChatInput
-            value={newMessage}
-            onKeyDown={handleKeyDown}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Send message"
-            className="flex-1 w-full"
-            disabled={!isPlayerInGroup || !isConnected}
-          />
-          <Button
-            type="submit"
-            size="icon"
-            disabled={!isPlayerInGroup || !isConnected}
+        <Form {...form}>
+          <form
+            onSubmit={handleSubmit}
+            className="flex align-center gap-2 w-full m-2"
           >
-            <Send className="h-4 w-4" />
-          </Button>
-        </form>
+            <FormField
+              control={form.control}
+              name="message"
+              render={({ field }) => (
+                <FormItem className="flex-1 w-full">
+                  <ChatInput
+                    id="message"
+                    {...field}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Send message"
+                    disabled={isDisabled}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" size="icon" disabled={isSendDisabled}>
+              <Send className="h-4 w-4" />
+            </Button>
+          </form>
+        </Form>
       </CardFooter>
     </Card>
   );
