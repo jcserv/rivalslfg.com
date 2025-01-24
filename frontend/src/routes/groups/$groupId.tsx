@@ -12,6 +12,7 @@ import { HTTPError, StatusCodes } from "@/api/types";
 import {
   AccessGroupDialog,
   ChatBox,
+  ErrorBanner,
   GroupControls,
   GroupDisplay,
   TooltipItem,
@@ -27,7 +28,7 @@ import {
   useRemovePlayer,
   useToast,
 } from "@/hooks";
-import { getPlayerFromProfile, Group, Profile } from "@/types";
+import { Gamemode, getPlayerFromProfile, Group, Profile } from "@/types";
 
 type GroupPageSearchParams = {
   join?: boolean;
@@ -212,6 +213,15 @@ function GroupPage() {
 
   return (
     <section className="p-2 md:p-4">
+      {group?.gamemode === Gamemode.Competitive &&
+        group?.players.length === 5 && (
+          <ErrorBanner message="Group is full">
+            <p>
+              Restriction met: unable to play competitive mode with five group
+              members.
+            </p>
+          </ErrorBanner>
+        )}
       <div className="h-full w-full flex flex-col items-center">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 w-full max-w-[1200px]">
           <div className="col-span-1 md:col-span-8">
