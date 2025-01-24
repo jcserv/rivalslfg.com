@@ -112,8 +112,8 @@ export function DataTablePagination<TData>({
         )}
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
           {!showCompactMode
-            ? `Page ${pageIndex + 1} of ${totalPages}`
-            : `Page ${pageIndex + 1}/${totalPages}`}
+            ? `Page ${pageIndex + 1} of ${Math.max(1, totalPages)}`
+            : `Page ${pageIndex + 1}/${Math.max(1, totalPages)}`}
         </div>
         <div className="flex items-center space-x-2">
           <Button
