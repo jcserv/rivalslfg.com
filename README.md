@@ -4,9 +4,12 @@
 
 rivalslfg.com is a matchmaking platform for Marvel Rivals players, enabling group formation based on rank, region, platform, and other preferences (notably providing role queue as an option).
 
-<img src="ui.png" alt="screenshot of the rivalslfg.com frontend" width="750">
+<img src="docs/ui.png" alt="screenshot of the rivalslfg.com frontend" width="750">
+
+<img src="docs/ui2.png" alt="screenshot of the rivalslfg.com frontend" width="750">
 
 ## features ✨
+
 - find groups matching your preferences (rank, region, gamemode)
 - create/join groups with role-based matchmaking
 - real-time group chat & group updates
